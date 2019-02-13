@@ -1,0 +1,17 @@
+dist
+build
+lib/**/dll
+coverage
+node_modules
+docs/public
+*.bundle.js
+*.main.js
+*.js.map
+*.ts
+*.jsx
+*.tsx
+tsconfig.json
+!.remarkrc.js
+!.babelrc.js
+!.eslintrc.js
+!.eslintrc-markdown.js
