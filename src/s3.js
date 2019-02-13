@@ -1,4 +1,4 @@
-import { intersection } from 'lodash-es'
+import { isEmpty, intersection } from 'lodash-es'
 import { validations, properties } from './validations/s3-validations.js'
 
 export class S3BucketPolicy {
@@ -21,6 +21,14 @@ export class S3Bucket {
     }
   }
 
+  toString (replacer = null, spaces = 2) {
+    const printable = Object.entries(this).reduce((a, [k, v]) => {
+      if (v && !isEmpty(v)) a[k] = v
+      return a
+    }, {})
+    return JSON.stringify(printable, replacer, spaces)
+  }
+
   validate () {
     const testStatusBuilder = (passing = true, msgAccum = {}) => {
       return (pass, addMsg) => {
@@ -40,18 +48,4 @@ export class S3Bucket {
     })
     return { passes: allTestsPass, failMsgs }
   }
-}
-
-export const cfnS3 = env => {
-  const path = require('path')
-  const cfg = require('dotenv').config({
-    path: path.resolve(__dirname, '../vars/test.env')
-  })
-  console.log({ cfg })
-
-  const bucket = {
-    Type: 'AWS::S3::Bucket',
-    Properties: { ...env }
-  }
-  return bucket
 }
