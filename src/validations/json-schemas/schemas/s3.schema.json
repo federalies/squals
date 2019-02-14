@@ -1,0 +1,170 @@
+{
+  "$id": "http://github.com/federalies/squals/tree/master/src/validations/json-schemas/schemas/S3::Bucket.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Person",
+  "type": "object",
+  "properties": {
+    "BucketName": {
+      "type": "string",
+      "description": "The name for the AWS::S3::Bucket."
+    },
+    "AccessControl": {
+      "type": "string",
+      "description": "The person's last name.",
+      "enum": [
+        "AuthenticatedRead",
+        "AwsExecRead",
+        "BucketOwnerRead",
+        "BucketOwnerFullControl",
+        "LogDeliveryWrite",
+        "Private",
+        "PublicRead",
+        "PublicReadWrite"
+      ]
+    },
+    "AnalyticsConfigurations": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/AnalyticsConfiguration" }
+    },
+    "BucketEncryption": {
+      "type": "object",
+      "required": ["ServerSideEncryptionConfiguration"],
+      "properties": {
+        "ServerSideEncryptionConfiguration": {
+          "type": "array",
+          "items": { "$ref": "#definitions/ServerSideEncryptionRule" }
+        }
+      }
+    },
+    "CorsConfiguration": {
+      "type": "object",
+      "required": ["CorsRules"],
+      "properties": {
+        "CorsRules": {
+          "type": "array",
+          "items": { "$ref": "#defenitions/CorsRules" }
+        }
+      }
+    },
+    "InventoryConfigurations": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/InventoryConfiguration" }
+    },
+    "MetricsConfigurations": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/MetricsConfiguration" }
+    },
+    "Tags": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/Tag" }
+    }
+  },
+  "definitions": {
+    "AccelerateConfiguration": {
+      "type": "object",
+      "required": ["AccelerationStatus"],
+      "properties": {
+        "AccelerationStatus": {
+          "type": "string",
+          "enum": ["Enabled", "Suspended"]
+        }
+      }
+    },
+    "AnalyticsConfiguration": {
+      "type": "object",
+      "properties": {
+        "Id": {
+          "type": "string"
+        },
+        "Prefix": {
+          "type": "string"
+        },
+        "StorageClassAnalysis": {
+          "type": "object",
+          "properties": {
+            "DataExport": {
+              "type": "object",
+              "required": ["OutputSchemaVersion", "Destination"],
+              "properties": {
+                "OutputSchemaVersion": {
+                  "type": "string",
+                  "enum": ["V_1"]
+                },
+                "Destination": {
+                  "$id": "#Destination",
+                  "type": "object",
+                  "required": ["BucketArn", "Format"],
+                  "properties": {
+                    "BucketArn": { "type": "string" },
+                    "Format": { "type": "string" },
+                    "BucketAccountId": { "type": "string" },
+                    "Prefix": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "TagFilters": {
+          "type": "array",
+          "items": { "$ref": "#/defintions/TagFilter" }
+        }
+      }
+    },
+    "CorsRules": {
+      "type": "object",
+      "required": ["AllowedMethods", "AllowedOrigins"],
+      "properties": {
+        "AllowedMethods": { "type": "array", "items": { "type": "string" } },
+        "AllowedOrigins": { "type": "array", "items": { "type": "string" } },
+        "AllowedHeaders": { "type": "array", "items": { "type": "string" } },
+        "ExposedHeaders": { "type": "array", "items": { "type": "string" } },
+        "Id": { "type": "string", "minimum": 0 },
+        "MaxAge": { "type": "number" }
+      }
+    },
+    "InventoryConfiguration": {
+      "type": "object",
+      "required": [
+        "Enabled",
+        "Destination",
+        "IncludedObjectVersions",
+        "ScheduleFrequency"
+      ],
+      "properties": {
+        "Enabled": { "type": "boolean" },
+        "Id": { "type": "string" },
+        "IncludedObjectVersions": {
+          "type": "string",
+          "enum": ["All", "Current"]
+        },
+        "OptionalFields": { "type": "array", "items": { "type": "string" } },
+        "Prefix": { "type": "string" },
+        "ScheduleFrequency": { "type": "string" },
+        "Destination": { "$ref": "#Destination" }
+      }
+    },
+    "LifecycleConfiguration": {},
+    "LoggingConfiguration": {},
+    "MetricsConfiguration": {},
+    "NotificationConfiguration": {},
+    "PublicAccessBlockConfiguration": {},
+    "ReplicationConfiguration": {},
+    "ServerSideEncryptionRule": {
+      "type": "object",
+      "properties": {
+        "ServerSideEncryptionByDefault": {
+          "type": "object",
+          "required": ["SSEAlgorithm"],
+          "properties": {
+            "KMSMasterKeyID": { "type": "string" },
+            "SSEAlgorithm": { "type": "string", "enum": ["AES256", "aws:kms"] }
+          }
+        }
+      }
+    },
+    "Tag": {},
+    "VersioningConfiguration": {},
+    "WebsiteConfiguration": {}
+  }
+}
