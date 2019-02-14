@@ -5,22 +5,15 @@
  * - or `node -r esm validtor.js examples/simple-static-website.js`
  */
 
-/*
-import route53 from '../src/s3.js'
-import cloudfront from '../src/s3.js'
-import certificateManager from '../src/s3.js'
-*/
-
 import { Template, S3Bucket, CloudFrontCDN, Route53RecordSet } from '../src'
-// import { S3Bucket } from '../src/s3.js'
-// import { CloudFrontCDN } from '../src/s3.js'
-// import { Route53RecordSet } from '../src/route53.js'
 
 const t = new Template({ Description: `A simple website template` })
-t.Resources['MyName'] = new S3Bucket()
+t.Resources['MyName'] = new S3Bucket({
+  BucketName: 'MyAwesomeBucketThatIHopeHasTheNameAvailable'
+})
 t.Resources['MyCDN'] = new CloudFrontCDN()
 t.Resources['Domain+CDN'] = new Route53RecordSet()
 
-console.log(t.toString())
+// console.log(t.toString())
 
 export default t

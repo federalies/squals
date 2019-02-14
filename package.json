@@ -16,6 +16,7 @@
   "license": "MIT",
   "dependencies": {
     "aws-cdk": "^0.24.1",
+    "djv": "^2.1.1",
     "dotenv": "^6.2.0",
     "getopts": "^2.2.3",
     "lodash-es": "^4.17.11",
