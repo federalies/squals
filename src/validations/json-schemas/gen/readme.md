@@ -46,22 +46,20 @@ Schema^ := is the output JSON-Schema OBJ - can be read as Schema-Next or SchemaP
 -> denoted the change of types
 ```
 
-- `inline = ƒ( [{objSelector}] , 'defName', Schema ) -> { [{objSelector}], 'defName', Schema^ }`
+- `inline = ƒ( [{objSelector}] , [{definitionSelector}], Schema ) -> { [{objSelector}], [{definitionSelector}], Schema^ }`
 - or could a curreied ƒ to make `definitionInline` a version of a schemaChanger? maybe like this?
 
-  - `inline = ƒ( [{objSelector}] , 'defName') -> changer`
+  - `inline = ƒ( [{objSelector}] , [{definitionSelector}] ) -> changer`
 
 - or in reverse `makeDef`
 
-  - `makeDef = ƒ( [{objSelector}], {defName}, Schema ) -> { def, Schema^ }`
+  - `makeDef = ƒ( [{objSelector}], [{ObjectPattern}], {defName}, Schema ) -> changer`
+  - `extract = makeDef`
 
 - or optimize schema
 
-  - `optimize = ƒ( [changers] , {schema} ) -> { [nullable changers], Schema^ }`
-  - `changer = ƒ('goalName', schemaTransformer ) -> {t: incremented | complete, Schema^ }`
-  - `schemaTransformer = ƒ( Schema, ?Stats ) -> {t: incremented | complete, Schema^ }`
-
-    - thus a `changer` is merely a named `schemaTransformer` - operating to increase it goal
+  - `optimize = ƒ( [[changers] , {schema}] ) -> [ [nullable changers], Schema^ ]`
+  - `changer = ƒ(?Stats, ?name, Schema ) -> {t: incremented | complete, Schema^ }`
 
 - or analyze schema
 

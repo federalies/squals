@@ -27,6 +27,10 @@ export class Template {
   validate () {
     return { pass: true, msg: null }
   }
+  addResources (_inputs) {
+    this.Resources = { ...this.Resources, ..._inputs }
+    return this
+  }
   toString (replacer = null, spaces = 2) {
     const printable = Object.entries(this).reduce((a, [k, v]) => {
       if (v && !isEmpty(v)) a[k] = v
