@@ -1,5 +1,5 @@
 {
-  "$id": "https://raw.githack.com/federalies/squals/master/src/validations/json-schemas/schemas/s3.schema.json",
+  "$id": "https://raw.githack.com/federalies/squals/master/src/validations/json-schemas/schemas/AWS::S3::Bucket.schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "Person",
   "type": "object",

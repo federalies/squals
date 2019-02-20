@@ -1,5 +1,8 @@
 import { isEmpty, intersection } from 'lodash-es'
-import { validations, properties } from './validations/s3-validations.js'
+import {
+  validations,
+  properties as importedValidProperties
+} from '../validations/s3-validations.js'
 
 export class S3BucketPolicy {
   constructor (props = {}) {
@@ -41,7 +44,9 @@ export class S3Bucket {
     this.Type = 'AWS::S3::Bucket'
     if (Object.keys(props).length > 0) {
       const validProps = Object.entries(props).reduce((a, [k, v]) => {
-        if (intersection(Object.keys(props), properties).includes(k)) a[k] = v
+        if (
+          intersection(Object.keys(props), importedValidProperties).includes(k)
+        ) { a[k] = v }
         return a
       }, {})
       console.log({ validProps })
