@@ -46,7 +46,9 @@ export class S3Bucket {
       const validProps = Object.entries(props).reduce((a, [k, v]) => {
         if (
           intersection(Object.keys(props), importedValidProperties).includes(k)
-        ) { a[k] = v }
+        ) {
+          a[k] = v
+        }
         return a
       }, {})
       console.log({ validProps })

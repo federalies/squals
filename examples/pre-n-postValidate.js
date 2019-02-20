@@ -2,7 +2,7 @@
 
 // import an example or just as easily iport your own
 //
-import TemplateBody from './squals-comps/recipies/simple-static-website'
+import TemplateBody from './myComponents/recipies/simple-static-website'
 const AWS = require('aws-sdk')
 AWS.config.apiVersions = {
   cloudformation: '2010-05-15'
