@@ -1,0 +1,36 @@
+# List of Sharable Components
+
+- [x] Template.js
+- [] apiGateway.js
+- [] appSync.js
+- [] awsBatch.js
+- [] awsCloud9.js
+- [] certificateManager.js
+- [x] cloudFront.js
+- [] cloudwatch.js
+- [] codeBuild.js
+- [] codeCommit.js
+- [] codeDeploy.js
+- [] codePipeline.js
+- [] cognito.js
+- [] comprehend.js
+- [] dynamoDB.js
+- [] ec2.js
+- [] ecs.js
+- [] eks.js
+- [] elastiCache.js
+- [] kinesis.js
+- [] lambda.js
+- [] lex.js
+- [] macie.js
+- [] polly.js
+- [] readme.md
+- [] rekognition.js
+- [] route53.js
+- [x] s3.js
+- [] secretsManager.js
+- [] ses.js
+- [] sns.js
+- [] sqs.js
+- [] transcribe.js
+- [] translate.js
