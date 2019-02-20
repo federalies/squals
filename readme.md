@@ -5,3 +5,17 @@
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
 
 **Squals** is a an attempt to round off the edges of `AWS::cloudformation` making it a bit more composable in the process. And all done in modern js.
+
+## Installation
+
+`git clone https://github.com/federalies/squals.git squals && cd $_ && npm i`
+
+## Usage
+
+> See Examples folder
+
+`node -r esm examples/DIY-validator-cli.js`
+
+or
+
+`node -r esm examples/pre-n-postValidate.js`
