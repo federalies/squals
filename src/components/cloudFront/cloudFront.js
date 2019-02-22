@@ -1,27 +1,22 @@
+/* eslint no-unused-vars: ["error", { "args": "none" }] */
+
 export class CloudFrontCDN {
   constructor (props = {}) {
+    this.Type = 'AWS::CloudFront::Distribution'
     props = {
-      Aliases: [],
       Enabled: true,
       IPV6Enabled: true,
       DefaultRootObject: 'index.html',
-      WebACLId: '',
-      Comment: '',
       PriceClass: 'PriceClass_All', // enum
       HttpVersion: 'http2', // enum
+      WebACLId: null, // '',
+      Comment: null, // '',
+      Aliases: null, // [],
       ...props
     }
-    this.Type = 'AWS::CloudFront::Distribution'
     this.Properties = {
       DistributionConfig: {
-        Aliases: props.Aliases,
-        Enabled: props.Enabled,
-        IPV6Enabled: props.IPV6Enabled,
-        DefaultRootObject: props.DefaultRootObject,
-        HttpVersion: props.HttpVersion,
-        Comment: props.Comment,
-        PriceClass: props.PriceClass,
-        WebACLId: props.WebACLId
+        ...props
         // CacheBehaviors: [],
         // CustomErrorResponses: [],
         // Origins: [],
@@ -37,12 +32,23 @@ export class CloudFrontCDN {
 
 export class CloudFrontID {
   constructor (props = {}) {
-    this.Type = 'a'
+    this.Type = 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
+    this.Properties = {
+      CloudFrontOriginAccessIdentityConfig:
+        'CloudFrontOriginAccessIdentityConfig'
+    }
+  }
+
+  Ref () {
+    return {}
+  }
+  DomainName () {
+    return {}
   }
 }
 
 export class CloudFrontStreaming {
   constructor (props = {}) {
-    this.Type = 'a'
+    this.Type = 'AWS::CloudFront::StreamingDistribution'
   }
 }
