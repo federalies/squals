@@ -3,8 +3,8 @@
 // $1$2,
 
 export { Template } from './Template'
-export { S3Bucket, S3BucketPolicy } from './s3.js'
-export { SqsQueue, SqsQueuePolicy } from './sqs.js'
+export { S3Bucket, S3BucketPolicy } from './s3'
+export { SqsQueue, SqsQueuePolicy } from './sqs'
 export { SnsSubscription, SnsTopic, SnsTopicPolicy } from './sns.js'
 export { CodeCommitRepo } from './codeCommit.js'
 export { Table } from './dynamoDB.js'

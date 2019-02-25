@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "types": ["node", "lodash-es"],
+    "module": "commonjs",
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "removeComments": false,
+    "preserveConstEnums": true,
+    "sourceMap": false,
+    "allowJs": false
+  },
+  "compileOnSave": true,
+  // "files": ["src/components/*"]
+  "baseUrl": "types",
+  "typeRoots": ["types"],
+  "include": ["src/components/s3/bucket.*"]
+}

@@ -4,7 +4,14 @@
 
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
 
-**Squals** is a an attempt to round off the edges of `AWS::cloudformation` making it a bit more composable in the process. And all done in modern js.
+**Squals** is a an attempt to round off/smooth the sharp edges of dealing with `AWS::cloudformation` templates.
+
+The project goals are to make the system more composeable, shareable, and done in modern js patterns.
+
+## Goals:
+
+- Sharable Components & HOCs
+- Decompose Recompose Princples
 
 ## Installation
 
