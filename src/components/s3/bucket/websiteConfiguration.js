@@ -6,7 +6,7 @@ import { redirRule } from './redirectRule'
  * AWS:S3:: Website Configuration.
  *
  * @description Make a Website Cofig
- * @param {Array.<Object>|string} redir - String: redirects all traffic to the `protocol://host` provided in the string - Array: goes in as redir rules.
+ * @param {Array<Object>|string} redir - String: redirects all traffic to the `protocol://host` provided in the string - Array: goes in as redir rules.
  * @param {string} [indexpage='index.html'] - Asd.
  * @param {string} [errorpage='search.html'] - Asd.
  * @returns {Object} Cloudformation obj.

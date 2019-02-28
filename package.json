@@ -15,6 +15,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@sandfox/arn": "^2.1.0",
     "ajv": "^6.9.1",
     "aws-cdk": "^0.24.1",
     "djv": "^2.1.1",

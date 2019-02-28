@@ -12,13 +12,22 @@ import {
   Route53RecordSet
 } from '../../../src/components'
 
+import simpleWebsite from '../../../src/higher-order-comps/staticWebsite'
+
 const webContent = new S3Bucket()
 const MyCDN = new CloudFrontCDN()
 const DomainRecordsForCDN = new Route53RecordSet()
 
 const t = new Template({
-  Description: `A simple website template`,
-  Resources: { webContent, MyCDN, DomainRecordsForCDN }
+  Description: `A simple website template`
 })
 
-export default t
+const t2 = simpleWebsite(t, 'www.mywebsite.com', {
+  bucket: webContent,
+  distribution: MyCDN,
+  recordSet: DomainRecordsForCDN
+})
+
+console.log({ t2 })
+
+export default t2

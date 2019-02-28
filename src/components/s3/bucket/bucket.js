@@ -40,11 +40,11 @@ export class S3Bucket {
    *  console.log({myBucket})
    */
 
-  constructor (name = null, props = {}) {
+  constructor (props = {}, name = null) {
     this.Type = 'AWS::S3::Bucket'
     this.name =
       name ||
-      `${randomWord()}-${randomWord()}-${new Randoma({
+      `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
         seed: new Date().getTime()
       }).integer()}`
 
@@ -64,10 +64,15 @@ export class S3Bucket {
 
   website (config) {
     if (config) {
-      this.Properties.AccessControl = 'PublicRead'
-      this.Properties.WebsiteConfiguration = {
+      const AccessControl = 'PublicRead'
+      const WebsiteConfiguration = {
         IndexDocument: 'index.html',
         ErrorDocument: '404.html'
+      }
+      this.Properties = {
+        ...this.Properties,
+        AccessControl,
+        WebsiteConfiguration
       }
       // use RedirectAllRequestsTo XOR RoutingRules
       const { RedirectAllRequestsTo, RoutingRules } = config

@@ -3,31 +3,27 @@
 // $1$2,
 
 export { Template } from './Template'
-export { S3Bucket, S3BucketPolicy } from './s3'
+export { S3Bucket } from './s3' // removed S3BucketPolicy @todo add back
 export { SqsQueue, SqsQueuePolicy } from './sqs'
-export { SnsSubscription, SnsTopic, SnsTopicPolicy } from './sns.js'
-export { CodeCommitRepo } from './codeCommit.js'
-export { Table } from './dynamoDB.js'
-export { EcsCluster, EcsService, EcsTaskDefinition } from './ecs'
-export { EksCluster } from './eks'
+// export { SnsSubscription, SnsTopic, SnsTopicPolicy } from './sns.js'
+// export { CodeCommitRepo } from './codeCommit.js'
+// export { Table } from './dynamoDB.js'
+// export { EcsCluster, EcsService, EcsTaskDefinition } from './ecs'
+// export { EksCluster } from './eks'
 
-export {
-  CloudFrontCDN,
-  CloudFrontID,
-  CloudFrontStreaming
-} from './cloudFront.js'
+export { CloudFrontCDN, CloudFrontID, CloudFrontStreaming } from './cloudFront'
 
 export {
   // https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html#welcome-pricing
   CodeBuildProject
-} from './codeBuild.js'
+} from './codeBuild'
 
 export {
   // https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html
   CodeDeployApp,
   CodeDeployConfig,
   CodeDeployGroup
-} from './codeDeploy.js'
+} from './codeDeploy'
 
 export {
   CodePipelineCustomActionType,
@@ -42,7 +38,7 @@ export {
   AppSyncGraphQLApi,
   AppSyncGraphQLSchema,
   AppSyncResolver
-} from './appSync.js'
+} from './appSync'
 
 export {
   CognitoIDPool,
@@ -51,13 +47,13 @@ export {
   CognitoUserPoolGroup,
   CognitoIDPoolRoleAttachment,
   CognitoUserPoolUserToGroupAttachment
-} from './cognito.js'
+} from './cognito'
 
 export {
   BatchComputeEnvironment,
   BatchJobDefinition,
   BatchJobQueue
-} from './awsBatch.js'
+} from './awsBatch'
 
 // export { Cloud9EnvironmentEC2 } from './awsCloud9.js'
 
@@ -68,7 +64,7 @@ export {
   ElastiCacheSecurityGroup,
   ElastiCacheSecurityGroupIngress,
   ElastiCacheSubnetGroup
-} from './elastiCache.js'
+} from './elastiCache'
 
 export {
   KinesisStream,
@@ -77,7 +73,7 @@ export {
   KinesisAnalyticsApplication,
   KinesisAnalyticsApplicationOutput,
   KinesisAnalyticsApplicationReferenceDataSource
-} from './kinesis.js'
+} from './kinesis'
 
 export {
   LambdaEventSourceMapping,
@@ -87,7 +83,7 @@ export {
   LambdaLayerVersionPermission,
   LambdaPermission,
   LambdaVersion
-} from './lambda.js'
+} from './lambda'
 
 export {
   Route53HealthCheck,
@@ -97,14 +93,14 @@ export {
   Route53ResolverResolverEndpoint,
   Route53ResolverResolverRule,
   Route53ResolverResolverRuleAssociation
-} from './route53.js'
+} from './route53'
 
 export {
   SecretsManagerResourcePolicy,
   SecretsManagerRotationSchedule,
   SecretsManagerSecret,
   SecretsManagerSecretTargetAttachment
-} from './secretsManager.js'
+} from './secretsManager'
 
 export {
   SesConfigurationSet,
@@ -113,7 +109,7 @@ export {
   SesReceiptRule,
   SesReceiptRuleSet,
   SesTemplate
-} from './ses.js'
+} from './ses'
 
 export {
   ApiGatewayAccount,
@@ -133,7 +129,7 @@ export {
   ApiGatewayStage,
   ApiGatewayUsagePlan,
   ApiGatewayUsagePlanKey
-} from './apiGateway.js'
+} from './apiGateway'
 
 export {
   Ec2CustomerGateway,

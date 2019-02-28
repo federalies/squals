@@ -1,6 +1,15 @@
+/* eslint no-unused-vars: ["error", { "args": "none" }] */
+import randomWord from 'random-word'
+import Randoma from 'randoma'
+
 export class Route53RecordSet {
-  constructor (props = {}) {
+  constructor (props = {}, name = null) {
     this.Type = 'AWS::Route53::RecordSet'
+    this.name =
+      name ||
+      `${randomWord()}-${randomWord()}-${new Randoma({
+        seed: new Date().getTime()
+      }).integer()}`
     this.Properties = {
       Name: null, // String
       AliasTarget: {
@@ -26,5 +35,8 @@ export class Route53RecordSet {
       Type: null, // String,
       Weight: null // 'Integer'
     }
+  }
+  addCNAMEs (subdomain, FQDN) {
+    return this
   }
 }

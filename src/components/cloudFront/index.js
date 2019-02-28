@@ -1,7 +1,15 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
+import randomWord from 'random-word'
+import Randoma from 'randoma'
 
 export class CloudFrontCDN {
-  constructor (props = {}) {
+  constructor (props = {}, name = null) {
+    this.name =
+      name ||
+      `${randomWord()}-${randomWord()}-${new Randoma({
+        seed: new Date().getTime()
+      }).integer()}`
+
     this.Type = 'AWS::CloudFront::Distribution'
     props = {
       Enabled: true,
@@ -27,6 +35,21 @@ export class CloudFrontCDN {
       },
       Tags: []
     }
+  }
+  addOrigins (origins) {
+    this.Properties.DistributionConfig = {
+      ...this.Properties.DistributionConfig,
+      Origins: origins
+    }
+    return this
+  }
+
+  DomainName () {
+    /**
+     * Returns the Amazon Resource Name (ARN) of the specified bucket.
+     * Example: arn:aws:s3:::mybucket
+     * */
+    return { 'Fn::GetAtt': [this.name, 'DomainName'] }
   }
 }
 
