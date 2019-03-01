@@ -2,38 +2,69 @@
  * AWS::S3 Cors Rule Config Method title.
  *
  * @description descrip.
- * @param {Array<string>} methods - Asdf.
- * @param {Array<string>} origins - Asdf.
- * @param {Object} defaults - Asdf.
- * @param {Array<string>} defaults.headersExposed - Asdf.
- * @param {Array<string>} defaults.headersAllowed - Asdf.
- * @param {string} defaults.id - Asdf.
- * @param {number} defaults.maxAge - Asdf.
- * @returns {Object} - Asdf.
+ * @param {!inCorsRule|!Object<string, string|Array<string>>} params - Is a structured set of properties unless using the dynamic key options with methods separeted by a | and the domains are listed as a string or array.
+ * @returns {outCorsRule} - Valid Cloudformation keys.
+ * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-cors-corsrule.html>
+ * @todo >>> New Feature - {"GET|POST":"localhost"}
  * @example
- *  var cors = corsRule(['GET', 'POST'],['localhost'],{id:"Local Development Rule", maxAge:3600*6})
+ *  var cors1 = corsRule({id:"Local Development Rule1", methods:'GET', origins:'localhost', maxAge:3600*6})
+ *  var cors2 = corsRule({id:"Local Development Rule2", methods:['GET', 'POST'], origins:['localhost'], maxAge:3600*6})
+ *  var cors3 = corsRule({id:"Local Development Rule3", maxAge:3600*6,  GET:'localhost'})
+ *  var cors4 = corsRule({id:"Local Development Rule4", maxAge:3600*6, 'GET|POST':['mydomain.com','localhost']})
  */
-const corsRule = (
-  methods,
-  origins,
-  { headersExposed, headersAllowed, id, maxAge } = {
-    headersExposed: null,
-    headersAllowed: null,
+const corsRule = params => {
+  const { methods, origins, headersExposed, headersAllowed, id, maxAge } = {
+    methods: [],
+    origins: [],
+    headersExposed: [],
+    headersAllowed: [],
     id: null,
-    maxAge: null
+    maxAge: null,
+    ...params
   }
-) => {
-  const [...AllowedMethods] = methods // GET | PUT | HEAD | POST | DELETE.
-  const [...AllowedOrigins] = origins // reqd
+
+  const validMethods = ['GET', 'PUT', 'HEAD', 'POST', 'DELETE']
+  let AllowedMethods
+
+  if (
+    methods &&
+    Array.isArray(methods) &&
+    methods.length > 0 &&
+    methods.every(elem => {
+      return validMethods.includes(elem.toString().toUpperCase())
+    })
+  ) {
+    AllowedMethods = methods
+  } else if (
+    methods &&
+    validMethods.includes(methods.toString().toUpperCase())
+  ) {
+    AllowedMethods = [methods]
+  } else {
+    throw new Error(
+      'in the corsConfig the methods param must be an array with 1+ valid HTTP verb'
+    )
+  }
+
+  let AllowedOrigins
+  if (origins && Array.isArray(origins) && origins.length > 0) {
+    AllowedOrigins = origins
+  } else if (origins) {
+    AllowedOrigins = [origins]
+  } else {
+    throw new Error(
+      'in the corsConfig the origins param must be an array with 1+ domain listed'
+    )
+  }
 
   let rule = { AllowedMethods, AllowedOrigins }
   if (id && id.length < 255) rule['Id'] = id.toString()
   if (Number.isSafeInteger(maxAge)) rule['MaxAge'] = maxAge
 
-  if (headersAllowed) {
+  if (headersAllowed && headersAllowed.length > 0) {
     rule['AllowedHeaders'] = headersAllowed.map(v => v.toString())
   }
-  if (headersExposed) {
+  if (headersExposed && headersExposed.length > 0) {
     rule['ExposedHeaders'] = headersExposed.map(v => v.toString())
   }
 
@@ -45,17 +76,62 @@ const corsRule = (
  * Cors Config.
  *
  * @description asdf.
- * @param {Array<{methods: Array<string>, origins: Array<string>, opts: Object}>} rules - * Array of Objects with methods, origins, & opts.
+ * @param {inCorsConfig} rules - * Array of Objects with methods, origins, & opts.
  * @returns {Object} - Asd.
  * @example
- *   var a =corsConfig([{methods:[],origins:[],opts:{}}])
+ *   var cfmCorsConfig = corsConfig([{methods:[],origins:[]}])
  */
 const corsConfig = rules => {
-  return {
-    CorsConfiguration: {
-      CorsRules: rules.map(v => corsRule(v.methods, v.origins, v.opts))
+  return Array.isArray(rules)
+    ? {
+      CorsConfiguration: {
+        CorsRules: rules.map(item => corsRule(item))
+      }
     }
-  }
+    : {
+      CorsConfiguration: {
+        CorsRules: [corsRule(rules)]
+      }
+    }
 }
+console.log(
+  JSON.stringify(
+    corsConfig([{ methods: 'GET', origins: 'localhost' }], null, 2)
+  )
+)
+
+/**
+ * @typedef inCorsRule
+ * @type {Object}
+ * @property {!string|!Array<string>} methods - asd
+ * @property {!string|!Array<string>} origins - asd
+ * @property {?Array<string>} headersExposed - asd
+ * @property {?Array<string>} headersAllowed - asd
+ * @property {?string} id - asd
+ * @property {?number} maxAge - asd
+ */
+
+/**
+ * @typedef inCorsConfig
+ * @type {inCorsRule | Array<inCorsRule>}
+ */
+
+/**
+ * @typedef outCorsRule
+ * @type {Object}
+ * @property {!Array<string>} AllowedMethods - An HTTP method that you allow the origin to execute.
+ * @property {!Array<string>} AllowedOrigins - An origin that you allow to send cross-domain requests.
+ * @property {?Array<string>} AllowedHeaders - Headers that are specified in the Access-Control-Request-Headers header. These headers are allowed in a preflight OPTIONS request. In response to any preflight OPTIONS request, Amazon S3 returns any requested headers that are allowed.
+ * @property {?Array<string>} ExposedHeaders - One or more headers in the response that are accessible to client applications (for example, from a JavaScript XMLHttpRequest object).
+ * @property {?string} Id - A unique identifier for this rule. The value cannot be more than 255 characters.
+ * @property {?number} MaxAge - The time in seconds that your browser is to cache the preflight response for the specified resource.
+ */
+
+/**
+ * @typedef outputCorsConfig
+ * @type {Object}
+ * @property {!Object} CorsConfiguration
+ * @property {!Array<outCorsRule>} CorsConfiguration.CorsRules
+ */
 
 export { corsConfig, corsRule }

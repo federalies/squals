@@ -22,11 +22,16 @@ const a = new S3Bucket()
 
 ### Storied
 
+- corresponding AWS documentaiton
+
 - [x] Analytics
 
 ### Shaped Types
 
-- [x] Analytics
+- [x] analyticsConfiguration
+- [x] bucketEncryption
+- [x] corsConfiguration
+- [x] destination
 
 ### Symetric
 
