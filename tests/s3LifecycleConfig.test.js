@@ -1,8 +1,15 @@
-import { lifecycleConfig } from '../src/components/s3/lifecycleConfiguration'
+const Import = require('esm')(module)
+const { lifecycleConfig } = Import(
+  '../src/components/s3/bucket/lifecycleConfiguration'
+)
 
 const log = data => {
   console.log(JSON.stringify(data, null, 2))
 }
+
+test('sinple 2+2=4', () => {
+  expect(2 + 2).toBe(4)
+})
 
 log({ 1: lifecycleConfig({ c: [{ expiryDate: '2020-01-01' }] }) })
 

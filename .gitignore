@@ -164,6 +164,8 @@ typings/
 # DynamoDB Local files
 .dynamodb/
 
+docs/
+
 #sketchSourcefiles
 *.sketch
 #_scratch folders

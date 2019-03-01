@@ -5,7 +5,7 @@ const path = require('path')
 
 AWS.config.update({ region: 'us-west-2' })
 AWS.config.apiVersions = { cloudformation: '2010-05-15' }
-var cloudformation = new AWS.CloudFormation()
+// const cloudformation = new AWS.CloudFormation()
 
 /**
  * intended use: `node makeChangeSet.js -l -u -m -p --mode1Flag --modeAFlag -- string1 string2 string3`

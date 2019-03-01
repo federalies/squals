@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "jest",
-    "test:watch": "npm run test -- --watchAll"
+    "test:watch": "npm run test -- --watchAll",
+    "docs": "jsdoc -r -R readme.md -d ./docs/ src/* && open docs/index.html"
   },
   "keywords": [],
   "author": "",
@@ -43,6 +44,7 @@
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-standard": "^4.0.0",
     "esm": "^3.2.4",
-    "jest": "^24.1.0"
+    "jest": "^24.1.0",
+    "jsdoc": "^3.5.5"
   }
 }

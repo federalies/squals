@@ -1,3 +1,5 @@
+/* optional webpack entrypoint for tests */
+//
 // import apiGatewayTests from './apiGateway.test'
 // import appSyncTests from './apiGateway.test'
 // import awsBatchTests from './apiGateway.test'
@@ -13,7 +15,7 @@
 // import secretsManagerTests from './apiGateway.test'
 // import snsTests from './apiGateway.test'
 // import sqsTests from './apiGateway.test'
-
+//
 import './apiGateway.test'
 import './appSync.test'
 import './awsBatch.test'

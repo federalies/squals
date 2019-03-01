@@ -1,9 +1,10 @@
 /**
- * Title.
+ * AWS:S3:: Acceleration Configuration.
  *
- * @description descrip.
- * @param {boolean} shouldAccelate - Asd.
- * @returns {Object} - Asd.
+ * @description `AccelerateConfiguration` configures the transfer acceleration state for an S3 bucket.
+ * @param {boolean} shouldAccelate - A bool that is transformed to the two valid states [  Enabled | Suspended ].
+ * @returns {Object} An AccelerateConfiguration property.
+ * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-accelerateconfiguration.html>
  * @example
  *  var acc = accelerate(true)
  */

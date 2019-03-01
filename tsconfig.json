@@ -10,8 +10,8 @@
     "allowJs": false
   },
   "compileOnSave": true,
-  // "files": ["src/components/*"]
+  // "files": ["src/components/*"],
   "baseUrl": "types",
   "typeRoots": ["types"],
-  "include": ["src/components/s3/bucket/.*"]
+  "include": ["src/components/s3/bucket/*"]
 }

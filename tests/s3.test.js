@@ -3,7 +3,7 @@
 // const ow = require('ow')
 // const esmImporter = require('esm')(module)
 // import const { cfnS3, S3Bucket, S3BucketPolicy } = esmImporter('../src/s3.js')
-import { S3Bucket, S3BucketPolicy } from '../src/s3.js'
+// import { S3Bucket, S3BucketPolicy } from '../src/s3.js'
 
 /**
  * is test priority a good thing?
@@ -11,26 +11,26 @@ import { S3Bucket, S3BucketPolicy } from '../src/s3.js'
 
 const sum = (a, b) => a + b
 
-describe('defaults', () => {
+describe.skip('defaults', () => {
   test('s3 all defaults', () => {
     console.log(S3BucketPolicy)
     expect(new S3Bucket()).toEqual({ Type: 'AWS::S3::Bucket' })
   })
 })
 
-describe('excercise validations', () => {
+describe.skip('excercise validations', () => {
   test('adds 1 + 2 to equal 3', () => {
     expect(sum(1, 2)).toBe(3)
   })
 })
 
-describe('sanitations', () => {
+describe.skip('sanitations', () => {
   test.skip('add 1 + 2 = 3', () => {
     expect(sum(1, 2)).toBe(3)
   })
 })
 
-describe('functionality', () => {
+describe.skip('functionality', () => {
   test('unit/self validate defaults', () => {
     expect(new S3Bucket().validate().passes).toBe(true)
   })

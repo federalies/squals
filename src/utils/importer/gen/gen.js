@@ -1,7 +1,3 @@
-/**
- * Overview
- */
-
 const convert2JsSchemaType = {
   String: 'string',
   List: 'array',
