@@ -1,3 +1,4 @@
+// @ts-nocheck
 const Import = require('esm')(module)
 const { analyticsConfig } = Import('./analyticsConfiguration')
 
@@ -5,7 +6,7 @@ test('Analyics Single Object Input', () => {
   const actual = analyticsConfig({
     id: 'asdf',
     prefix: 'docs/',
-    taglist: [{ k: 'val' }]
+    tagList: [{ k: 'val' }]
   })
 
   const expected = {

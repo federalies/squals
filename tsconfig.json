@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "types": ["node", "lodash-es"],
+    "types": ["node", "lodash-es", "jest"],
     "module": "commonjs",
     "strictNullChecks": true,
     "noImplicitAny": true,

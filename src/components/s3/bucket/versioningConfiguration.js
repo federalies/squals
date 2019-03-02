@@ -1,3 +1,5 @@
+/** @module S3Bucket */
+
 /**
  * AWS:S3:: Setup Versioning Config.
  *

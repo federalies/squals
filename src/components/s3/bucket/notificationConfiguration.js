@@ -1,5 +1,7 @@
 import { parse } from '@sandfox/arn'
 
+/** @module S3Bucket */
+
 const parseFilter = filter => {
   let Name = null
   let Value = null

@@ -1,3 +1,5 @@
+/** @module S3Bucket */
+
 /**
  * AWS::S3:Bucket Tags.
  *.
@@ -11,6 +13,7 @@ const tags = (tagList = []) => {
   return tagList.reduce((p, c) => {
     p.push({
       Key: Object.keys(c)[0].toString(),
+      // @ts-ignore
       Value: Object.values(c)[0].toString()
     })
     return p
@@ -22,7 +25,7 @@ const tags = (tagList = []) => {
  *
  * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
  * @param {Array<Object>} tagList - * asdasd.
- * @returns {Array} - Asd.
+ * @returns {{Tags:Array<string>}} - Asd.
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
@@ -32,6 +35,15 @@ const Tags = tagList => {
   }
 }
 
+/**
+ * AWS::S3:Bucket Tags.
+ *
+ * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
+ * @param {Array<Object>} tagList - * asdasd.
+ * @returns {{TagFilters:Array<string>}} - Asd.
+ * @example
+ *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
+ */
 const TagFilters = tagList => {
   return {
     TagFilters: tags(tagList)

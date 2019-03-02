@@ -1,3 +1,5 @@
+/** @module S3Bucket */
+
 /**
  * Title.
  *

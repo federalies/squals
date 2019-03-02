@@ -1,16 +1,24 @@
 import { destination } from './destination'
 
+/** @module S3Bucket */
+
+// * @param {string} configs.id -
+//  * @param {inDestination} configs.dest -
+//  * @param {!string} configs.dest.arn -
+
 /**
- *  Title.
+ *  Amazon S3 bucket inventory configuration.
  *
- * @description Descr.
- * @param {!inInventoryConfig } configs -
- * @returns {!outInventoryConfig} -
+ * @description The inventory configuration for an Amazon S3 bucket. Duplicate rules not allowed.
+ * @param {inInventoryConfig } configs -
+ * @returns {outInventoryConfig} -
+ * @todo Validate no duplicates.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html>
  * @example
- *   var invCfg =   inventoryConfig([
- *         { id: 'myID1', dest: { arn: 'arn:aws:s3:bucket1' } },
- *         { id: 'myID2', dest: { arn: 'arn:aws:s3:bucket2' } }
+ *   var invCfg1 = inventoryConfig({ id: 'myID1', dest: { arn: 'arn:aws:s3:bucket1' }})
+ *   var invCfg2 = inventoryConfig([
+ *        { id: 'myID1', dest: { arn: 'arn:aws:s3:bucket1' } },
+ *        { id: 'myID2', dest: { arn: 'arn:aws:s3:bucket2' } }
  *   ])
  */
 const inventoryConfig = configs => {
@@ -19,28 +27,30 @@ const inventoryConfig = configs => {
     : { InventoryConfigurations: [inventoryRule(configs)] }
 }
 
+// * @param { !string } params.id -
+// * @param { ?string } [params.versions='All'] - 'All' or 'Current'.
+// * @param { ?string } [params.frequency='Weekly'] - 'Daily' or 'Weekly'.
+// * @param { ?Array<string> } params.optional - Valid values include: `Size` ,`LastModifiedDate` ,`StorageClass` ,`ETag` ,`IsMultipartUploaded` ,`ReplicationStatus` ,`EncryptionStatus` ,`ObjectLockRetainUntilDate` ,`ObjectLockMode` ,`ObjectLockLegalHoldStatus `.
+// * @param { !module:S3Bucket.inDestination } params.dest -
+// * @param { !string } params.dest.arn -
+// * @param { ?string } params.dest.acctId -
+// * @param { ?string } params.dest.format - Default = 'CSV'.
+// * @param { ?string } params.dest.prefix -
+
 /**
- * Title.
+ * Make an invetory analysis rule.
  *
- * @description asdf.
- * @param { !paramInventoryRule } params - Input variables to make an inventoryConfig.
- * @param { !string } params.id -
- * @param { ?string } [params.versions='All'] - 'All' or 'Current'.
- * @param { ?string } [params.frequency='Weekly'] - 'Daily' or 'Weekly'.
- * @see <https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putBucketInventoryConfiguration-property>
- * @param { ?Array<string> } params.optional - Valid values include: `Size` ,`LastModifiedDate` ,`StorageClass` ,`ETag` ,`IsMultipartUploaded` ,`ReplicationStatus` ,`EncryptionStatus` ,`ObjectLockRetainUntilDate` ,`ObjectLockMode` ,`ObjectLockLegalHoldStatus `.
- * @param { !inDestination } params.dest -
- * @param { !string } params.dest.arn -
- * @param { ?string } params.dest.acctId -
- * @param { ?string } params.dest.format - Default = 'CSV'.
- * @param { ?string } params.dest.prefix -
+ * @description make on inventory configuration rule for the inventory config.
+ * @param { !inInventoryRule } params - Input variables to make an inventoryConfig.
  * @returns { !outInventoryRule } - Asd.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html>
+ * @see <https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putBucketInventoryConfiguration-property>
  * @example
  *  var a = inventoryRule({ id: 'myID', dest: { arn: 'arn:aws:s3:bucket0' } })
  *  var b = inventoryRule([{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket1' }},{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket2' }} ] )
  */
 const inventoryRule = params => {
+  // @ts-ignore
   const { id, versions, frequency, dest, enabled, optionals, prefix } = {
     id: null,
     versions: 'All', // other value "Current"
@@ -119,7 +129,7 @@ const inventoryRule = params => {
 // log()
 
 /**
- * @typedef paramInventoryRule
+ * @typedef inInventoryRule
  * @type {!Object}
  * @property {!string} id - The ID that identifies the inventory configuration.
  * @property {!Object} dest - Information about where to publish the inventory results.
@@ -144,12 +154,13 @@ const inventoryRule = params => {
 
 /**
  * @typedef inInventoryConfig
- * @type {!paramInventoryRule|!Array<paramInventoryRule>}
+ * @type {!inInventoryRule|!Array<inInventoryRule>}
  */
 
 /**
  * @typedef outInventoryConfig
- * @type {!Array<outInventoryRule>}
+ * @type {Object}
+ * @property {Array<outInventoryRule>} InventoryConfigurations - asd.
  */
 
 export { inventoryConfig, inventoryRule }

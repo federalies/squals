@@ -1,3 +1,5 @@
+/** @module S3Bucket */
+
 const loggingConfg = (saveLogsToBucket = null, logPrefix = 'logs/') => {
   const LoggingConfiguration = {}
   LoggingConfiguration['LogFilePrefix'] = logPrefix

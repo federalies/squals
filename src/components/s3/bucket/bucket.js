@@ -7,6 +7,8 @@ import {
   properties as importedValidProperties
 } from './s3-validations.js'
 
+/** @module S3Bucket */
+
 export class S3Bucket {
   /**
    * S3Bucket Class that models info needed for Cloudformation.

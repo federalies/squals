@@ -1,62 +1,64 @@
 import { tags } from './tags'
 
-/**
- * Title.
- *
- * @description description.
- * @param {Object} firstRule - Asd.
- * @param {Array} firstRule.c - Asd.
- * @param {Object} firstRule.o - Asd.
- * @param {Object} firstRule.c - Asd.
- * @param {number} firstRule.c.quiteMultipartsAfterDays - Asd.
- * @param {string} firstRule.c.expiryDate - Asd.
- * @param {number} firstRule.c.expiryDays - Asd.
- * @param {number} firstRule.c.keepOldVersionForDays - Asd.
- * @param {Array<Object>} firstRule.c.moveOldVersion - Asd.
- * @param {Array<Object>} firstRule.c.transitions - Asd.
- * @param {Array} moreRules - Asd.
- * @returns {Object} - Asd.
- * @example
- *  var lifeCycle1 = lifecycleConfig([[{someCondition:1}]])
- *  var lifeCycle2 = lifecycleConfig([[{someCondition:1}, {prefix:'pre'}]])
- */
-const lifecycleConfig = (firstRule, moreRules = []) => {
-  if (Array.isArray(moreRules)) {
-    const inputRuleTuples = [firstRule, ...moreRules]
+/** @module S3Bucket */
 
-    return {
+/**
+ * @typeDef outLifecycleConfig
+ * @type {Object}
+ * @property {Object} LifecycleConfiguration - asd
+ * @property {Array<outRule>} LifecycleConfiguration.Rules - asd
+ */
+
+/**
+ * Config the Lifecycle Rules.
+ *
+ * @description  Collection of S3 Bucket Rules that govern the process of fading to longterm/cold storage
+ * @param {inRule | Array<inRule>} rules -
+ * @returns {Object} -
+ * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig.html>
+ * @example
+ *  var lifeCycle1 = lifecycleConfig({})
+ *  var lifeCycle2 = lifecycleConfig([{},{}])
+ */
+const lifecycleConfig = rules => {
+  return Array.isArray(rules)
+    ? {
       LifecycleConfiguration: {
-        Rules: lifecyleRule(inputRuleTuples)
+        Rules: rules.map(item => lifecyleRule(item))
       }
     }
-  } else {
-    console.error(
-      `lifecycleConfig function was expecting otherRules to be an array`
-    )
-  }
+    : {
+      LifecycleConfiguration: {
+        Rules: [lifecyleRule(rules)]
+      }
+    }
 }
 
 /**
- *
- * @param {Array<Object>} conditions - Asdf.
- * @param {Object} opts - Asdf.
- * @param {boolean} [opts.status=true] - Asdf.
- * @param {string} opts.id - Asdf.
- * @param {string} opts.prefix - Asdf.
- * @param {Array<Object>} opts.tagList - Asdf.} param0
- */
-
-/**
  * Title.
  *
  * @description description.
- * @param {Array<{c:Array,o:Object}>} rules - Where C = conditions and O = options.
- * @returns {Array} - Asd.
+ * @param {Object<string, boolean|string|Array<string>>} rule -
+ * @param {?boolean} [rule.status=true] -
+ * @param {?string} [rule.id=null] -
+ * @param {?string} [rule.prefix=null] -
+ * @param {?Array<string>} [rule.tagList=[]] -
+ * @returns {Object} -
+ * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule.html>
+ * @todo Add more validations to cover the covariance requirements on input variable
  * @example
- *  var rulesA = lifecyleRule([{opt:1}])
- *  var rulesB = lifecyleRule([{opt:1}], {status:true})
+ *  var rulesA = lifecyleRule({opt:1})
+ *  var rulesB = lifecyleRule([{opt:1},{opt:1}])
  */
-const lifecyleRule = rules => {
+const lifecyleRule = rule => {
+  const { status, id, prefix, tagList, ...inRuleConfig } = {
+    status: true,
+    id: null,
+    prefix: null,
+    tagList: [],
+    ...rule
+  }
+
   /**
    * At least ONE of is required
    * 1. AbortIncompleteMultipartUpload
@@ -85,33 +87,26 @@ const lifecyleRule = rules => {
    * o = options
    */
 
-  //   log({ rules })
-
-  return rules.map(({ c, o }) => {
-    const { status, id, prefix, tagList } = {
-      status: true,
-      id: null,
-      prefix: null,
-      tagList: [],
-      ...o
-    }
-
-    // log({ c, o, status, id, prefix, tagList })
-
-    const r = c.reduce((p, v) => {
-      return { ...p, ...transformtoAWSfmt(v) }
-    }, {})
-    const ret = {
-      ...r,
-      Status: status ? 'Enabled' : 'Disabled'
-    }
-    if (id) ret['Id'] = id
-    if (prefix) ret['Prefix'] = prefix
-    if (tagList.length > 0) ret['TagFilters'] = tags(tagList)
-    return ret
-  })
+  const ret = {
+    Status: status ? 'Enabled' : 'Disabled',
+    ...transformtoAWSfmt(inRuleConfig)
+  }
+  if (id) ret['Id'] = id
+  if (prefix) ret['Prefix'] = prefix
+  if (tagList.length > 0) ret['TagFilters'] = tags(tagList)
+  return ret
 }
 
+/**
+ * Title.
+ *
+ * @description descrip.
+ * @param {Object} input -
+ * @param {!number} input.quiteMultipartsAfterDays -
+ * @returns {Object} Cloudformation S3::AbortIncompleteMultipartUpload property.
+ * @example
+ * var v = conditionAbortIncompleteMultipartUpload()
+ */
 const conditionAbortIncompleteMultipartUpload = ({
   quiteMultipartsAfterDays
 }) => {
@@ -122,34 +117,83 @@ const conditionAbortIncompleteMultipartUpload = ({
   }
 }
 
+/**
+ * Title.
+ *
+ * @description descrip.
+ * @param {Object} input -
+ * @param {!string} input.expiryDate -
+ * @returns {Object} Cloudformation S3:: property.
+ * @example
+ * var v = conditionExpirationDate()
+ */
 const conditionExpirationDate = ({ expiryDate }) => {
   return { ExpirationDate: expiryDate }
 }
 
+/**
+ * Title.
+ *
+ * @description descrip.
+ * @param {Object} input -
+ * @param {!number} input.expiryDays -
+ * @returns {Object} Cloudformation S3:: property.
+ * @example
+ * var v = conditionExpirationInDays()
+ */
 const conditionExpirationInDays = ({ expiryDays }) => {
   return { ExpirationInDays: expiryDays }
 }
 
+/**
+ * Title.
+ *
+ * @description descrip.
+ * @param {Object} input -
+ * @param {!number} input.keepOldVersionForDays -
+ * @returns {Object} Cloudformation S3:: property.
+ * @example
+ * var v = conditionNoncurrentVersionExpirationInDays()
+ */
 const conditionNoncurrentVersionExpirationInDays = ({
   keepOldVersionForDays
 }) => {
   return { NoncurrentVersionExpirationInDays: keepOldVersionForDays }
 }
 
+/**
+ * Title.
+ *
+ * @description descrip.
+ * @param {Array<{storage:?string, daysTillSlowDown:!number}>} trans -
+ * @returns {Object} Cloudformation S3:: property.
+ * @example
+ * var v = conditionNoncurrentVersionTransitions()
+ */
 const conditionNoncurrentVersionTransitions = trans => {
   return {
     NoncurrentVersionTransitions: trans.map(v => ({
       StorageClass: v.storage,
-      TransitionInDays: v.daysTillslowdown
+      TransitionInDays: v.daysTillSlowDown
     }))
   }
 }
+
+/**
+ * Title.
+ *
+ * @description descrip.
+ * @param {Array<inTransitionItem>} trans -
+ * @returns {Object} Cloudformation S3::AbortIncompleteMultipartUpload property.
+ * @example
+ * var v = conditionTransitions()
+ */
 const conditionTransitions = trans => {
   return {
     Transitions: trans.map(v => {
       const ret = { StorageClass: v.storage }
       if (v.atDate) ret['TransitionDate'] = v.atDate
-      if (v.daysTillslowdown) ret['TransitionInDays'] = v.daysTillslowdown
+      if (v.daysTillSlowDown) ret['TransitionInDays'] = v.daysTillSlowDown
       return ret
     })
   }
@@ -182,5 +226,75 @@ const transformtoAWSfmt = input => {
     return new Error('poorly formed inputs in the lifecycleConfig function')
   }
 }
+
+/**
+ * @typedef inMoveOldVersionsItem
+ * @type {Object}
+ * @property {!string} storage - The storage class to which you want the object to transition, such as GLACIER. For valid values, see the StorageClass request element of the PUT Bucket lifecycle action in the Amazon Simple Storage Service API Reference.
+ * @property {!number} daysTillSlowDown - The number of days between the time that a new version of the object is uploaded to the bucket and when old versions of the object are transitioned to the specified storage class.
+ */
+
+/**
+ * @typedef inRuleMoveOldVersions
+ * @type {Object}
+ * @property {*} moveOldVersion - For buckets with versioning enabled (or suspended), one or more transition rules that specify when non-current objects transition to a specified storage class. If you specify a transition and expiration time, the expiration time must be later than the transition time. If you specify this property, don't specify the NoncurrentVersionTransition property
+ */
+
+/**
+ * @typedef outMoveOldVersionsItem
+ * @type {Object}
+ * @property {!string} StorageClass - The storage class to which you want the object to transition, such as GLACIER. For valid values, see the StorageClass request element of the PUT Bucket lifecycle action in the Amazon Simple Storage Service API Reference.
+ * @property {!number} TransitionInDays - The number of days between the time that a new version of the object is uploaded to the bucket and when old versions of the object are transitioned to the specified storage class.
+ */
+
+/**
+ * @typedef inTransitionItem
+ * @type {Object}
+ * @property {!string} storage - The storage class to which you want the object to transition, such as GLACIER.
+ * @property {?string} atDate - Indicates when objects are transitioned to the specified storage class. The date value must be in ISO 8601 format. The time is always midnight UTC.
+ * @property {?number} daysTillSlowDown - Indicates the number of days after creation when objects are transitioned to the specified storage class.
+ */
+
+/**
+ * @typedef outTransitionItem
+ * @type {Object}
+ * @property {!string} StorageClass - The storage class to which you want the object to transition, such as GLACIER.
+ * @property {?string} TransitionDate - Indicates when objects are transitioned to the specified storage class. The date value must be in ISO 8601 format. The time is always midnight UTC.
+ * @property {?number} TransitionInDays - Indicates the number of days after creation when objects are transitioned to the specified storage class.
+ */
+
+/**
+ * @typedef inRule
+ * @type {Object}
+ * @property {?string} id - A unique identifier for this rule. The value cannot be more than 255 characters.
+ * @property {?string} prefix - Object key prefix that identifies one or more objects to which this rule applies.
+ * @property {?boolean} [status=true] - [Enabled | Disabled] Specify either Enabled or Disabled. If you specify Enabled, Amazon S3 executes this rule as scheduled. If you specify Disabled, Amazon S3 ignores this rule.
+ * @property {?Array} tagList - Tags to use to identify a subset of objects to which the lifecycle rule applies.
+ * @property {?number} expiryDays - Indicates the number of days after creation when objects are deleted from Amazon S3 and Glacier. If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time.
+ * @property {?string} expiryDate - Indicates when objects are deleted from Amazon S3 and Glacier. The date value must be in ISO 8601 format. The time is always midnight UTC. If you specify an expiration and transition time, you must use the same time unit for both properties (either in days or by date). The expiration time must also be later than the transition time.
+ * @property {?number} keepOldVersionForDays - For buckets with versioning enabled (or suspended), specifies the time, in days, between when a new version of the object is uploaded to the bucket and when old versions of the object expire. When object versions expire, Amazon S3 permanently deletes them. If you specify a transition and expiration time, the expiration time must be later than the transition time.
+ * @property {?number} quiteMultipartsAfterDays - Specifies a lifecycle rule that aborts incomplete multipart uploads to an Amazon S3 bucket.
+ * @property {?inRuleMoveOldVersions|?Array<inRuleMoveOldVersions>} moveOldVersion -
+ * @property {?inTransitionItem | ?Array<inTransitionItem>} transitions -
+ */
+
+/**
+ * @typedef outRule
+ * @type {Object}
+ * @property {?string} Id - A unique identifier for this rule. The value cannot be more than 255 characters.
+ * @property {?string} Prefix - Object key prefix that identifies one or more objects to which this rule applies.
+ * @property {?string} Status - [Enabled | Disabled] Specify either Enabled or Disabled. If you specify Enabled, Amazon S3 executes this rule as scheduled. If you specify Disabled, Amazon S3 ignores this rule.
+ * @property {?Array} TagFilters - Tags to use to identify a subset of objects to which the lifecycle rule applies.
+ * @property {?number} ExpirationInDays
+ * @property {?string} ExpirationDate -
+ * @property {?number} NoncurrentVersionExpirationInDays -
+ * @property {?Object} AbortIncompleteMultipartUpload -
+ * @property {?Array<outMoveOldVersionsItem>} NoncurrentVersionTransitions -
+ * @property {?Array<outTransitionItem>} Transitions -
+ */
+
+const log = data => console.log(JSON.stringify(data, null, 2))
+
+log(lifecyleRule({}))
 
 export { lifecycleConfig, lifecyleRule }

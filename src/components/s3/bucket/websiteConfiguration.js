@@ -1,8 +1,9 @@
-import url from 'url'
+import { Url } from 'url' // eslint-disable-line
 import { redirRule } from './redirectRule'
 
+/** @module S3Bucket */
+
 /**
- *
  * AWS:S3:: Website Configuration.
  *
  * @description Make a Website Cofig
@@ -10,6 +11,7 @@ import { redirRule } from './redirectRule'
  * @param {string} [indexpage='index.html'] - Asd.
  * @param {string} [errorpage='search.html'] - Asd.
  * @returns {Object} Cloudformation obj.
+ * @todo BUILD Out better output type/interfaces showing Object shape/properties
  * @example
  *  var webcfgPlain = websiteConfig()
  *  var webcfgWRedir = websiteConfig([{when:'docs/', to:'squals.readthedocs.io/', replacer:'', doFullReplace:true}])
@@ -22,14 +24,14 @@ const websiteConfig = (
   if (!Array.isArray(redir)) {
     // redirect is a URL
     try {
-      const uri = url.URL(redir)
+      const uri = new URL(redir)
       return {
         WebsiteConfiguration: {
           IndexDocument: indexpage,
           ErrorDocument: errorpage,
           RedirectAllRequestsTo: {
-            Protocol: uri.Protocol,
-            HostName: uri.HostName
+            Protocol: uri.protocol,
+            HostName: uri.hostname
           }
         }
       }
@@ -57,8 +59,9 @@ const websiteConfig = (
         RoutingRules: redir.map(arg => {
           // add your defaults here in the { ...args }
           // add any other defaults for the `reachin` param
+          // @ts-ignore
           const { to, when, replacer, doFullReplace } = { ...arg }
-          return redirRule({ to, when }, { replacer, doFullReplace })
+          return redirRule({ to, when, replacer, doFullReplace })
         })
       }
     }
