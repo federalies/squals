@@ -7,10 +7,10 @@ import { redirRule } from './redirectRule'
  * AWS:S3:: Website Configuration.
  *
  * @description Make a Website Cofig
- * @param {Array<Object>|string} redir - String: redirects all traffic to the `protocol://host` provided in the string - Array: goes in as redir rules.
+ * @param {string|Array<Object>} redir - String: redirects all traffic to the `protocol://host` provided in the string - Array: goes in as redir rules.
  * @param {string} [indexpage='index.html'] - Asd.
  * @param {string} [errorpage='search.html'] - Asd.
- * @returns {Object} Cloudformation obj.
+ * @returns {outWebsiteConfig} Cloudformation obj.
  * @todo BUILD Out better output type/interfaces showing Object shape/properties
  * @example
  *  var webcfgPlain = websiteConfig()
@@ -67,5 +67,61 @@ const websiteConfig = (
     }
   }
 }
+
+/**
+ * @typedef outWebsiteConfig
+ * @type {Object}
+ * @property {outWebsiteConfigElem} WebsiteConfiguration  -  sd..
+ */
+
+/**
+ * @typedef outWebsiteConfigElem
+ * @type {outWebsiteConfigNoRedirRules | outWebsiteConfigRedirAllElem | outWebsiteConfigRedirRules}
+ */
+
+/**
+ * @typedef outWebsiteConfigRedirAllElem
+ * @type {Object}
+ * @property {string} ErrorDocument - asd.
+ * @property {string} IndexDocument - asd.
+ * @property {Object} RedirectAllRequestsTo - asd.
+ * @property {Object} RedirectAllRequestsTo.HostName - asd.
+ * @property {Object} RedirectAllRequestsTo.Protocol - asd.
+ */
+
+/**
+ * @typedef outWebsiteConfigRedirRules
+ * @type {Object}
+ * @property {string} ErrorDocument -  sd - asd.
+ * @property {string} IndexDocument - asd.
+ * @property {Array<outRoutingRule>} RoutingRules - asd.
+ */
+
+/**
+ * @typedef outWebsiteConfigNoRedirRules
+ * @type {Object}
+ * @property {string} ErrorDocument -  sd - asd.
+ * @property {string} IndexDocument - asd.
+ */
+
+/**
+ * @typedef outRoutingRule
+ * @type {outRuleElem}
+ */
+
+/**
+ * @typedef outRuleElem
+ * @type {Object}
+ * @property {Object} RedirectRule - asd
+ * @property {string} RedirectRule.HostName - asd
+ * @property {string} RedirectRule.HostName - asd
+ * @property {string} RedirectRule.HttpRedirectCode - asd
+ * @property {string} RedirectRule.Protocol - asd
+ * @property {string} RedirectRule.ReplaceKeyPrefixWith - asd
+ * @property {string} RedirectRule.ReplaceKeyWith - as
+ * @property {Object} RoutingRuleCondition
+ * @property {string} RoutingRuleCondition.HttpErrorCodeReturnedEquals
+ * @property {string} RoutingRuleCondition.KeyPrefixEquals
+ */
 
 export { websiteConfig }

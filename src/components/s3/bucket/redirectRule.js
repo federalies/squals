@@ -16,7 +16,7 @@ const url = require('url')
  *  var output1 = redirRule({ to:'https://otherdomain.com', when: '/docs' , replacer:'/documents', doFullReplace:true})
  *  var output2 = redirRule({ to:'https://otherdomain.com', when: 404 })
  *  var output3 = redirRule({ to:'https://otherdomain.com/', when: '/doc', replacer: '/docs', doFullReplace: true })
- * @returns {Object} Cloudoformation object.
+ * @returns {outRuleElem} Cloudoformation object.
  */
 const redirRule = param => {
   // @ts-ignore
@@ -40,7 +40,13 @@ const redirRule = param => {
   const cond = when
 
   const uri = new url.URL(desturl)
-  let condition = {}
+  let condition = {
+    RoutingRuleCondition: Number.isSafeInteger(
+      Number.parseInt(cond.toString(), 10)
+    )
+      ? { HttpErrorCodeReturnedEquals: cond.toString() }
+      : { KeyPrefixEquals: cond.toString() }
+  }
   let destination = {
     RedirectRule: {
       HttpRedirectCode: opts.HttpRedirectCode || '302',
@@ -55,14 +61,29 @@ const redirRule = param => {
       : (destination.RedirectRule['ReplaceKeyPrefixWith'] = replacer)
   }
   // @ts-ignore
-  if (Number.isSafeInteger(cond)) {
-    condition = {
-      RoutingRuleCondition: { HttpErrorCodeReturnedEquals: `${cond}` }
-    }
-  } else {
-    condition = { RoutingRuleCondition: { KeyPrefixEquals: `${cond}` } }
-  }
+
   return { ...condition, ...destination }
 }
 
 export { redirRule }
+
+/**
+ * @typedef outRuleElem
+ * @type {Object}
+ * @property {Object} RedirectRule - asd
+ * @property {string} RedirectRule.HostName - asd
+ * @property {string} RedirectRule.HostName - asd
+ * @property {string} RedirectRule.HttpRedirectCode - asd
+ * @property {string} RedirectRule.Protocol - asd
+ * @property {string} RedirectRule.ReplaceKeyPrefixWith - asd
+ * @property {string} RedirectRule.ReplaceKeyWith - as
+ * @property {Object} RoutingRuleCondition
+ * @property {string} RoutingRuleCondition.HttpErrorCodeReturnedEquals
+ * @property {string} RoutingRuleCondition.KeyPrefixEquals
+ */
+
+/**
+ * Property 'RoutingRuleCondition' is missing in type
+ * '{ RedirectRule: { HttpRedirectCode: string; Protocol: string; HostName: string; }; }'
+ * but required in type 'outRuleElem'.
+ */

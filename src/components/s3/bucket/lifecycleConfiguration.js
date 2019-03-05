@@ -39,10 +39,10 @@ const lifecycleConfig = rules => {
  *
  * @description description.
  * @param {Object<string, boolean|string|Array<string>>} rule -
- * @param {?boolean} [rule.status=true] -
- * @param {?string} [rule.id=null] -
- * @param {?string} [rule.prefix=null] -
- * @param {?Array<string>} [rule.tagList=[]] -
+ * @param {?boolean} [rule.status] -
+ * @param {?string} [rule.id] -
+ * @param {?string} [rule.prefix] -
+ * @param {?Array<{string:string}>} [rule.tagList]-.
  * @returns {Object} -
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule.html>
  * @todo Add more validations to cover the covariance requirements on input variable
@@ -293,8 +293,7 @@ const transformtoAWSfmt = input => {
  * @property {?Array<outTransitionItem>} Transitions -
  */
 
-const log = data => console.log(JSON.stringify(data, null, 2))
-
-log(lifecyleRule({}))
+// const log = data => console.log(JSON.stringify(data, null, 2))
+// log(lifecyleRule({}))
 
 export { lifecycleConfig, lifecyleRule }

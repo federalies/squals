@@ -9,6 +9,7 @@ import { TagFilters } from './tags'
  * @description specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
  * @param {inAnalyticsConfigItem|Array<inAnalyticsConfigItem>} config - Object or array of objects.
  * @returns {outAnalyticsConfig} Cloudformation Object.
+ * @todo work on a way to imply the ID from the prefix, bucketname, date created, etc
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html>
  * @example
  *  var analyticsItem = analyticsConfig([
@@ -37,6 +38,7 @@ const analyticsConfig = config => {
  * @description Packages the item level config for bucket analysis
  * @param {inAnalyticsConfigItem} config - The required config baed on required field desinations in AWS docs.
  * @returns {outAnalyticsItem} - The AWS model of what is passed into the AWS Template.Resources.
+ * @todo work on a way to imply the ID from the prefix, bucketname, date created, etc - do it here first - and see if we can just make it not required first
  * @example
  *   var v = makeItem({ id:'heyThere', prefix:'myPrefix', tagList:[{key1:'val1'},{key1:'val2'}] })
  */
