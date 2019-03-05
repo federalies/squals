@@ -35,8 +35,8 @@ const destination = ({ arn, acctId, format, prefix }) => {
  * @type {Object}
  * @property {!string} arn  - The Amazon Resource Name (ARN) of the bucket where analytics results are published. This destination bucket must be in the same region as the bucket used for the analytics or inventory configuration
  * @property {?string} [format='CSV'] - Valid values include ['CSV', 'ORC', 'Parquet']
- * @property {?string} [acctId=null]  - The ID of the account that owns the destination bucket where the analytics is published. Although optional, we recommend that the value be set to prevent problems if the destination bucket ownership changes.
- * @property {?string} [prefix=null] - The prefix that is prepended to all analytics results.
+ * @property {?string} [acctId]  - The ID of the account that owns the destination bucket where the analytics is published. Although optional, we recommend that the value be set to prevent problems if the destination bucket ownership changes.
+ * @property {?string} [prefix] - The prefix that is prepended to all analytics results.
  */
 
 /**
@@ -44,8 +44,8 @@ const destination = ({ arn, acctId, format, prefix }) => {
  * @type {Object}
  * @property {!string} BucketArn - The Amazon Resource Name (ARN) of the bucket where analytics results are published. This destination bucket must be in the same region as the bucket used for the analytics or inventory configuration.
  * @property {!string} Format - Specifies the output format of the analytics or inventory results. Currently, Amazon S3 supports the comma-separated value (CSV) format.
- * @property {?string} [BucketAccountId=null] - The ID of the account that owns the destination bucket where the analytics is published.
- * @property {?string} [Prefix=null] - The prefix that is prepended to all analytics results.
+ * @property {?string} [Prefix] - The prefix that is prepended to all analytics results.
+ * @property {?string} [BucketAccountId] - The ID of the account that owns the destination bucket where the analytics is published.
  */
 
 export { destination }

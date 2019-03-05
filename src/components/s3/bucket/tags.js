@@ -2,10 +2,10 @@
 
 /**
  * AWS::S3:Bucket Tags.
- *.
+ *
  * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
- * @param {Array<Object>} tagList - * asdasd.
- * @returns {Array} - Asd.
+ * @param {Array<{string: string}>} tagList - TagList  * asdasd.
+ * @returns {Array<{Key:string,Value:string}>} - Asd.
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
@@ -24,8 +24,8 @@ const tags = (tagList = []) => {
  * AWS::S3:Bucket Tags.
  *
  * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
- * @param {Array<Object>} tagList - * asdasd.
- * @returns {{Tags:Array<string>}} - Asd.
+ * @param {Array<{string:string}>} tagList - * asdasd.
+ * @returns {{Tags:Array<{Key:string,Value:string}>}} - Asd.
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
@@ -39,8 +39,8 @@ const Tags = tagList => {
  * AWS::S3:Bucket Tags.
  *
  * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
- * @param {Array<Object>} tagList - * asdasd.
- * @returns {{TagFilters:Array<string>}} - Asd.
+ * @param {Array<{string: string}>} tagList - Incoming tagList.
+ * @returns {{TagFilters:Array<{Key: string, Value:string}>}} - Asd.
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */

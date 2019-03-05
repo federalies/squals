@@ -7,11 +7,11 @@ import { TagFilters } from './tags'
  * AWS:S3:: Analytics Configuration.
  *
  * @description specifies the configuration and any analyses for the analytics filter of an Amazon S3 bucket.
- * @param {Array<inAnalyticsConfigItem>|inAnalyticsConfigItem} config - Object or array of objects.
+ * @param {inAnalyticsConfigItem|Array<inAnalyticsConfigItem>} config - Object or array of objects.
  * @returns {outAnalyticsConfig} Cloudformation Object.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html>
  * @example
- *  var analyticsItem1 = analyticsConfig([
+ *  var analyticsItem = analyticsConfig([
  *    { id: 'testA', prefix: 'doc/', tagList: [{ keyy: 'value' }] },
  *    {
  *      id: 'testB',
@@ -48,20 +48,20 @@ const makeItem = config => {
     tagList: null,
     ...config
   }
+  // Can I imply the ID from the prefix + dateCreated + bucketName
 
-  const item = tagList
+  let item = tagList
     ? {
       Id: id,
+      Prefix: '',
       StorageClassAnalysis: {
-        DataExport: {
-          OutputSchemaVersion: 'V_1',
-          ...destination(dest)
-        }
-      },
-      ...TagFilters(tagList)
+        DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
+      }
     }
     : {
       Id: id,
+      Prefix: '',
+      ...TagFilters(tagList),
       StorageClassAnalysis: {
         DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
       }
@@ -72,45 +72,36 @@ const makeItem = config => {
 }
 
 /**
- * {
-{
-
-"Type '{ TagFilters: any[]; Id: string; StorageClassAnalysis: { DataExport: { OutputSchemaVersion: string; Destination: outDestination; }; }; }
-| { Id: string; StorageClassAnalysis: { DataExport: { BucketArn: string; ... 4 more ...; Destination?: undefined; }; }; }'
-
-is not assignable to type 'outAnalyticsItem'.
-
-Type '{ Id: string; StorageClassAnalysis: { DataExport: { BucketArn: string; Format: string; BucketAccountId: string; Prefix: string; OutputSchemaVersion: string; Destination?: undefined; }; }; }' is not assignable to type 'outAnalyticsItem'.\n    Types of property 'StorageClassAnalysis' are incompatible.\n      Type '{ DataExport: { BucketArn: string; Format: string; BucketAccountId: string; Prefix: string; OutputSchemaVersion: string; Destination?: undefined; }; }' is not assignable to type '{ DataExport: { OutputSchemaVersion?: string; Destination: Destination; }; }'.\n        Types of property 'DataExport' are incompatible.\n          Type '{ BucketArn: string; Format: string; BucketAccountId: string; Prefix: string; OutputSchemaVersion: string; Destination?: undefined; }' is not assignable to type '{ OutputSchemaVersion?: string; Destination: Destination; }'.\n            Property 'Destination' is optional in type '{ BucketArn: string; Format: string; BucketAccountId: string; Prefix: string; OutputSchemaVersion: string; Destination?: undefined; }' but required in type '{ OutputSchemaVersion?: string; Destination: Destination; }'.",
-
-}
- */
-
-/**
  *
- * @typedef DestInputParam
+ * @typedef inDestination
  * @type {Object}
  * @property {!string} arn - asdf.
- * @property {?string} savePrefix - asdf.
- * @property {?string} format - asdf.
- * @property {?string} acctId - asdf.
+ * @property {?string} [savePrefix] - asdf.
+ * @property {?string} [format] - asdf.
+ * @property {?string} [acctId] - asdf.
  *
  */
 
 /**
- * @typedef Destination
+ * @typedef outDestination
  * @type {Object}
- * @property {!string} BucketArn - asdf.
- * @property {?string} Prefix - asdf.
- * @property {?string} Format - asdf.
- * @property {?string} BucketAccountId - asdf.
+ * @property {string} BucketArn - asdf.
+ * @property {string} Format - asdf.
+ * @property {string} [Prefix] - asdf.
+ * @property {string} [BucketAccountId] - asdf.
  *
  */
 
 /**
- * @typedef Tags
+ * @typedef inTags
+ * @type {Object<string, string>} - asd
+ */
+
+/**
+ * @typedef outTags
  * @type {Object}
- * @property {!string} Name - Asd.
- * @property {!string} Value - Asd.
+ * @property {string} Key - Asd.
+ * @property {string} Value - Asd.
  *
  */
 
@@ -119,9 +110,9 @@ Type '{ Id: string; StorageClassAnalysis: { DataExport: { BucketArn: string; For
  * @typedef inAnalyticsConfigItem
  * @type {Object}
  * @property {!string} id - asd
- * @property {?string} prefix - asd
- * @property {?Array<Object>} tagList - asd
- * @property {?DestInputParam} dest - asd
+ * @property {?inDestination} dest - asd
+ * @property {?string} [prefix] - asd
+ * @property {?Array<{string: string}>} [tagList] - asd
  *
  */
 
@@ -129,13 +120,19 @@ Type '{ Id: string; StorageClassAnalysis: { DataExport: { BucketArn: string; For
  *
  * @typedef outAnalyticsItem
  * @type {Object}
- * @property {!string} Id - identifies the analytics configuration.
- * @property {?string} [Prefix=null] - a require prefix for objects to be analyzed - (none implies ALL objects)
- * @property {?Array<Tags>} [TagFilter=[]] - The tags to use when evaluating an analytics filter.
- * @property {Object} StorageClassAnalysis - An analysis of tradeoffs between different storage classes will have results to be store somewhere.
- * @property {Object} StorageClassAnalysis.DataExport - How should analysis should be exported.
- * @property {!string} [StorageClassAnalysis.DataExport.OutputSchemaVersion='V_1'] - Version num of the output schema when exporting data. (only valid value='V_1'.)
- * @property {Destination} StorageClassAnalysis.DataExport.Destination - Where to publish analysis or configuration results for an Amazon S3 bucket.
+ * @property {string} Id - identifies the analytics configuration.
+ * @property {string} [Prefix] - a require prefix for objects to be analyzed - (none implies ALL objects)
+ * @property {Array<{Key:string, Value:string}>} [TagFilter] - The tags to use when evaluating an analytics filter.
+ * @property {DataExport} StorageClassAnalysis - An analysis of tradeoffs between different storage classes will have results to be store somewhere.
+ *
+ */
+
+/**
+ * @typedef DataExport
+ * @type {Object}
+ * @property {Object} DataExport - How should analysis should be exported.
+ * @property {string} DataExport.OutputSchemaVersion - Version num of the output schema when exporting data. (only valid value='V_1'.)
+ * @property {outDestination} DataExport.Destination - Where to publish analysis or configuration results for an Amazon S3 bucket.
  *
  */
 
@@ -148,14 +145,3 @@ Type '{ Id: string; StorageClassAnalysis: { DataExport: { BucketArn: string; For
  */
 
 export { analyticsConfig }
-
-// {
-// "message": "Type '{ TagFilters: any[]; Id: string; } | { Id: string; }' is not assignable
-// to type 'AnalyticsItemOutput'.\n  Type '{ TagFilters: any[]; Id: string; }'
-// is missing the following properties from type 'AnalyticsItemOutput':
-// Prefix, TagFilter, StorageClassAnalysis, DataExport, Destination",
-// "startLineNumber": 77,
-// "startColumn": 3,
-// "endLineNumber": 77,
-// "endColumn": 14
-// }
