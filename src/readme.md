@@ -30,8 +30,8 @@ I may need a different phrase other than "Shareable Infracture" because it is al
 
 Don't share lovers ; share love.
 
-Sharable server recipies = yes;
-
-Shared servers = no
+Dont share servers; share services
 
 Federalies Are Free
+
+Digital Freedom For Mankind - Join The Federalies

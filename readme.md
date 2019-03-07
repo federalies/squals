@@ -4,12 +4,14 @@
 
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
 
-**Squals** is a an attempt to round off/smooth the sharp edges of dealing with `AWS::cloudformation` templates.
+**Squals** is an idiomatic cloudformation generator that makes it incredibly easy to share your setup via `npm` or similair.
 
-The project goals are to make the system more composeable, shareable, and done in modern js patterns.
+The project goals are to make the system more composeable, contextual, shareable, and done in modern js (actually built in typescript) patterns.
 
 ## Goals:
 
+- Layer Up a Declarative Interface via resuable composable functions rather than inert markup.
+- Round off the sharp edges of dealing with `AWS::cloudformation` templates
 - Sharable Components & HOCs
 - Decompose Recompose Princples
 

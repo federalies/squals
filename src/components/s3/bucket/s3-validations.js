@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 // const esImport = require('esm')(module)
 // const ow = esImport('ow')
 import ow from 'ow'

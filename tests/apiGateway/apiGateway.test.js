@@ -1,3 +1,4 @@
+// @ts-nocheck
 // import require source files
 
 describe.skip('defaults', () => {

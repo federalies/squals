@@ -6,6 +6,7 @@ module.exports = {
     semi: ['error', 'never', { beforeStatementContinuationChars: 'always' }],
     'no-unused-vars': [2, { varsIgnorePattern: 'h' }],
     'linebreak-style': 'off',
+    'max-len': [2, 100, 4, { ignoreComments: true }],
     'react/jsx-uses-vars': 2,
     'jsdoc/check-examples': 1,
     'jsdoc/check-param-names': 1,
@@ -20,10 +21,10 @@ module.exports = {
     'jsdoc/require-param': 1,
     'jsdoc/require-param-description': 1,
     'jsdoc/require-param-name': 1,
-    'jsdoc/require-param-type': 1,
-    'jsdoc/require-returns': 1,
-    'jsdoc/require-returns-description': 1,
-    'jsdoc/require-returns-type': 1,
+    // 'jsdoc/require-param-type': 1,
+    // 'jsdoc/require-returns': 1,
+    // 'jsdoc/require-returns-description': 1,
+    // 'jsdoc/require-returns-type': 1,
     'jsdoc/valid-types': 1
   },
   settings: {
