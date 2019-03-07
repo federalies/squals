@@ -25,23 +25,22 @@ Object.defineProperty(exports, "__esModule", { value: true });
  *  var rcfg = replicationConfig({ iamARN:getActingIAMWhileReplcating(),
  *                                 rules: getTheRuleListWeNeedToConfigureTheTempalte() })
  */
-var replicationConfig = function (params) {
+exports.replicationConfig = function (params) {
     var iamARN = params.iamARN, rules = params.rules;
     return Array.isArray(rules)
         ? {
             ReplicationConfiguration: {
                 Role: iamARN,
-                Rules: rules.map(function (r) { return replicationRule(r); })
+                Rules: rules.map(function (r) { return exports.replicationRule(r); })
             }
         }
         : {
             ReplicationConfiguration: {
                 Role: iamARN,
-                Rules: [replicationRule(rules)]
+                Rules: [exports.replicationRule(rules)]
             }
         };
 };
-exports.replicationConfig = replicationConfig;
 /**
  * Title.
  *
@@ -55,7 +54,7 @@ exports.replicationConfig = replicationConfig;
  * @example
  *  var r = replicationRule()
  */
-var replicationRule = function (params) {
+exports.replicationRule = function (params) {
     if (params === void 0) { params = {
         dest: { bucket: '' },
         prefix: '',
@@ -67,7 +66,7 @@ var replicationRule = function (params) {
         // dest*
         prefix: '', status: true, replicateEncData: false, id: null }, params), id = _a.id, prefix = _a.prefix, replicateEncData = _a.replicateEncData, status = _a.status;
     var ret = {
-        Destination: replicationDest(params.dest),
+        Destination: exports.replicationDest(params.dest),
         Prefix: prefix,
         Status: status ? 'Enabled' : 'Disabled'
     };
@@ -82,7 +81,6 @@ var replicationRule = function (params) {
         ret['Id'] = id;
     return ret;
 };
-exports.replicationRule = replicationRule;
 /**
  * TItle.
  *
@@ -97,7 +95,7 @@ exports.replicationRule = replicationRule;
  * @example
  *  var d = replicationDest({bucket: 'myBucket'})
  */
-var replicationDest = function (params) {
+exports.replicationDest = function (params) {
     var _a = __assign({ account: null, kmsId: null, storageClass: 'STANDARD' }, params), bucket = _a.bucket, account = _a.account, kmsId = _a.kmsId, storageClass = _a.storageClass;
     var validStorageClass = ['STANDARD', 'STANDARD_IA', 'ONEZONE_IA', 'REDUCED_REDUNDANCY'];
     if (storageClass && !validStorageClass.includes(storageClass)) {
@@ -118,4 +116,3 @@ var replicationDest = function (params) {
         ret['EncryptionConfiguration'] = { ReplicaKmsKeyID: kmsId };
     return ret;
 };
-exports.replicationDest = replicationDest;

@@ -12,7 +12,7 @@
  *  var rcfg = replicationConfig({ iamARN:getActingIAMWhileReplcating(),
  *                                 rules: getTheRuleListWeNeedToConfigureTheTempalte() })
  */
-declare const replicationConfig: (params: InReplicaConfig) => OutReplicaConfig;
+export declare const replicationConfig: (params: InReplicaConfig) => OutReplicaConfig;
 /**
  * Title.
  *
@@ -26,25 +26,7 @@ declare const replicationConfig: (params: InReplicaConfig) => OutReplicaConfig;
  * @example
  *  var r = replicationRule()
  */
-declare const replicationRule: (params?: InReplicaRule) => OutReplicationRule;
-export interface InReplicaRule {
-    dest: InReplicaDest;
-    prefix: string;
-    status?: boolean;
-    replicateEncData?: boolean;
-    id?: string;
-}
-interface OutReplicationRule {
-    Destination: OutReplicaDestination;
-    Prefix: string;
-    Id?: string;
-    Status: 'Enabled' | 'Disabled';
-    SourceSelectionCriteria?: {
-        SseKmsEncryptedObjects: {
-            Status: 'Enabled' | 'Disabled';
-        };
-    };
-}
+export declare const replicationRule: (params?: InReplicaRule) => OutReplicationRule;
 /**
  * TItle.
  *
@@ -59,7 +41,7 @@ interface OutReplicationRule {
  * @example
  *  var d = replicationDest({bucket: 'myBucket'})
  */
-declare const replicationDest: (params: InReplicaDest) => OutReplicaDestination;
+export declare const replicationDest: (params: InReplicaDest) => OutReplicaDestination;
 export interface InReplicaDest {
     bucket: string;
     account?: string;
@@ -67,7 +49,18 @@ export interface InReplicaDest {
     owner?: string;
     kmsId?: string;
 }
-interface OutReplicaDestination {
+export interface InReplicaConfig {
+    iamARN: string;
+    rules: InReplicaRule | Array<InReplicaRule>;
+}
+export interface InReplicaRule {
+    dest: InReplicaDest;
+    prefix: string;
+    status?: boolean;
+    replicateEncData?: boolean;
+    id?: string;
+}
+export interface OutReplicaDestination {
     Bucket: string;
     StorageClass?: string;
     Account?: string;
@@ -78,15 +71,21 @@ interface OutReplicaDestination {
         ReplicaKmsKeyID: string;
     };
 }
-export interface InReplicaConfig {
-    iamARN: string;
-    rules: InReplicaRule | Array<InReplicaRule>;
-}
-interface OutReplicaConfig {
-    ReplicationConfiguration: {
-        Role: string;
-        Rules: Array<OutReplicationRule>;
+export interface OutReplicationRule {
+    Destination: OutReplicaDestination;
+    Prefix: string;
+    Id?: string;
+    Status: 'Enabled' | 'Disabled';
+    SourceSelectionCriteria?: {
+        SseKmsEncryptedObjects: {
+            Status: 'Enabled' | 'Disabled';
+        };
     };
 }
-export { replicationConfig, replicationRule, replicationDest };
+export interface OutReplicaConfig {
+    ReplicationConfiguration: {
+        Role: string;
+        Rules: OutReplicationRule[];
+    };
+}
 //# sourceMappingURL=replicationConfiguration.d.ts.map

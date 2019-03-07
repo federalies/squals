@@ -10,7 +10,7 @@
  * @example
  *  var lc = loggingConfg({saveLogsToBucket:'otherbucket', logPrefix:'logs/'})
  */
-const loggingConfg = (params: InLoggingConfig) => {
+export const loggingConfg = (params: InLoggingConfig) => {
   const { saveLogsToBucket, logPrefix } = params
   const data: OutLogging = {}
   if (logPrefix) data['LogFilePrefix'] = logPrefix
@@ -20,16 +20,15 @@ const loggingConfg = (params: InLoggingConfig) => {
   }
 }
 
-interface InLoggingConfig {
+export interface InLoggingConfig {
   saveLogsToBucket?: string
   logPrefix?: string
 }
-interface OutLogging {
+export interface OutLogging {
   DestinationBucketName?: string // defaults to same bucket
   LogFilePrefix?: string // default to empty string
 }
 
-interface OutLoggingConfig {
+export interface OutLoggingConfig {
   LoggingConfiguration: OutLogging
 }
-export { loggingConfg }

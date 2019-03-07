@@ -12,6 +12,7 @@ var __assign = (this && this.__assign) || function () {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var destination_1 = require("./destination");
+var lodash_es_1 = require("lodash-es");
 /** @module S3Bucket */
 // * @param {string} configs.id -
 //  * @param {inDestination} configs.dest -
@@ -31,21 +32,11 @@ var destination_1 = require("./destination");
  *        { id: 'myID2', dest: { arn: 'arn:aws:s3:bucket2' } }
  *   ])
  */
-var inventoryConfig = function (configs) {
+exports.inventoryConfig = function (configs) {
     return Array.isArray(configs)
-        ? { InventoryConfigurations: configs.map(function (item) { return inventoryRule(item); }) }
-        : { InventoryConfigurations: [inventoryRule(configs)] };
+        ? { InventoryConfigurations: configs.map(function (item) { return exports.inventoryRule(item); }) }
+        : { InventoryConfigurations: [exports.inventoryRule(configs)] };
 };
-exports.inventoryConfig = inventoryConfig;
-// * @param { !string } params.id -
-// * @param { ?string } [params.versions='All'] - 'All' or 'Current'.
-// * @param { ?string } [params.frequency='Weekly'] - 'Daily' or 'Weekly'.
-// * @param { ?Array<string> } params.optional - Valid values include: `Size` ,`LastModifiedDate` ,`StorageClass` ,`ETag` ,`IsMultipartUploaded` ,`ReplicationStatus` ,`EncryptionStatus` ,`ObjectLockRetainUntilDate` ,`ObjectLockMode` ,`ObjectLockLegalHoldStatus `.
-// * @param { !module:S3Bucket.inDestination } params.dest -
-// * @param { !string } params.dest.arn -
-// * @param { ?string } params.dest.acctId -
-// * @param { ?string } params.dest.format - Default = 'CSV'.
-// * @param { ?string } params.dest.prefix -
 /**
  * Make an invetory analysis rule.
  *
@@ -58,7 +49,7 @@ exports.inventoryConfig = inventoryConfig;
  *  var a = inventoryRule({ id: 'myID', dest: { arn: 'arn:aws:s3:bucket0' } })
  *  var b = inventoryRule([{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket1' }},{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket2' }} ] )
  */
-var inventoryRule = function (params) {
+exports.inventoryRule = function (params) {
     // @ts-ignore
     var _a = __assign({ id: null, versions: 'All', frequency: 'Weekly', dest: null, enabled: true, optionals: [], prefix: null }, params), id = _a.id, versions = _a.versions, frequency = _a.frequency, dest = _a.dest, enabled = _a.enabled, optionals = _a.optionals, prefix = _a.prefix;
     // assert data presence
@@ -94,9 +85,7 @@ var inventoryRule = function (params) {
     if (!['Daily', 'Weekly'].includes(frequency)) {
         throw new Error("\u0192.inventoryRule frequency only has two valid values: 'Daily' + 'Weekly' - found the value: " + frequency);
     }
-    if (!optionals.every(function (elem) {
-        validOptionals.includes(elem);
-    })) {
+    if (lodash_es_1.difference(optionals, validOptionals).length > 1) {
         throw new Error("\u0192.inventoryRule param: optionals have a defined of properties that can be requested as included in invetory analysis - found: " + optionals);
     }
     // construct return obj
@@ -107,4 +96,3 @@ var inventoryRule = function (params) {
         ret['Prefix'] = prefix;
     return ret;
 };
-exports.inventoryRule = inventoryRule;

@@ -116,7 +116,7 @@ interface InCorsRule {
   maxAge?: number
 }
 
-interface OutCorsRule {
+export interface OutCorsRule {
   AllowedMethods: Array<string>
   AllowedOrigins: Array<string>
   AllowedHeaders?: Array<string>

@@ -32,25 +32,19 @@ var tags_1 = require("./tags");
  * Config the Lifecycle Rules.
  *
  * @description  Collection of S3 Bucket Rules that govern the process of fading to longterm/cold storage
- * @param {inRule | Array<inRule>} rules -
- * @returns {Object} -
+ * @param rules -
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig.html>
  * @example
  *  var lifeCycle1 = lifecycleConfig({})
  *  var lifeCycle2 = lifecycleConfig([{},{}])
  */
 var lifecycleConfig = function (rules) {
-    return Array.isArray(rules)
-        ? {
-            LifecycleConfiguration: {
-                Rules: rules.map(function (item) { return lifecyleRule(item); })
-            }
+    rules = Array.isArray(rules) ? rules : new Array(rules);
+    return {
+        LifecycleConfiguration: {
+            Rules: rules.map(function (item) { return lifecyleRule(item); })
         }
-        : {
-            LifecycleConfiguration: {
-                Rules: [lifecyleRule(rules)]
-            }
-        };
+    };
 };
 exports.lifecycleConfig = lifecycleConfig;
 /**
@@ -64,7 +58,7 @@ exports.lifecycleConfig = lifecycleConfig;
  * @param {?Array<{string:string}>} [rule.tagList]-.
  * @returns {Object} -
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule.html>
- * @todo Add more validations to cover the covariance requirements on input variable
+ * @todo Add more validations to cover the covariance requirements on input variable -namely choose a unit and stick with it
  * @example
  *  var rulesA = lifecyleRule({opt:1})
  *  var rulesB = lifecyleRule([{opt:1},{opt:1}])
@@ -81,7 +75,7 @@ var lifecyleRule = function (rule) {
      * 6. Transitions.
      *
      * Condtion Options:
-     * 1. { quiteMultipartsAfterDays: Number }
+     * 1. { quitMultipartsAfterDays: Number }
      * 2. { expiryDate: "YYYY-MM-DD" } // isoDate
      * 3. { expiryDays: Number }
      * 4. { keepOldVersionForDays: Number }
@@ -92,22 +86,44 @@ var lifecyleRule = function (rule) {
      * 1. use relative dates "daysFromCreated" or absoluteDates and stick to it
      * 2. lifecycle options can only reduce availability of objects
      * 3. Don't use 'transition' if you are using - 'expiryDays'|'keepOldVersionForDays'
-     *
-     *
-     * Do NOTE:
-     * c = conditions
-     * o = options
      */
-    var ret = __assign({ Status: status ? 'Enabled' : 'Disabled' }, transformtoAWSfmt(inRuleConfig));
+    var ruleConfig = inRuleConfig;
+    var ret = __assign({ Status: status ? 'Enabled' : 'Disabled' }, transformtoAWSfmt(ruleConfig), tags_1.TagFilters(tagList));
     if (id)
         ret['Id'] = id;
     if (prefix)
         ret['Prefix'] = prefix;
-    if (tagList.length > 0)
-        ret['TagFilters'] = tags_1.tags(tagList);
     return ret;
 };
 exports.lifecyleRule = lifecyleRule;
+/*
+ * "Type '{
+      Status: \"Enabled\" | \"Disabled\";
+      TagFilters: OutTags[];
+      AbortIncompleteMultipartUpload: { DaysAfterInitiation: number; };
+    }
+   | {
+     TagFilters: OutTags[];
+     ExpirationDate: string | undefined;
+     Status: \"Enabled\" | \"Disabled\";
+    }
+    | ... 4 more ... | { ...; }'
+
+    is not assignable to type 'OutValidLifeCycleRule'.
+
+    Type '{ TagFilters: OutTags[];
+      AbortIncompleteMultipartUpload: { DaysAfterInitiation: number; };
+      Status: \"Enabled\" | \"Disabled\"; }' is not assignable to type 'OutValidLifeCycleRule'.
+
+    Type '{ TagFilters: OutTags[];
+      AbortIncompleteMultipartUpload: { DaysAfterInitiation: number; };
+      Status: \"Enabled\" | \"Disabled\"; }' is not assignable to type 'OutMultiPartCancel'
+
+      Types of property 'TagFilters' are incompatible.\n
+
+      Type 'OutTags[]' is missing the following properties from type 'OutTags': Key, Value",
+ *
+ */
 /**
  * Title.
  *
@@ -118,11 +134,11 @@ exports.lifecyleRule = lifecyleRule;
  * @example
  * var v = conditionAbortIncompleteMultipartUpload()
  */
-var conditionAbortIncompleteMultipartUpload = function (_a) {
-    var quiteMultipartsAfterDays = _a.quiteMultipartsAfterDays;
+var conditionAbortIncompleteMultipartUpload = function (params) {
+    var quitMultipartsAfterDays = params.quitMultipartsAfterDays;
     return {
         AbortIncompleteMultipartUpload: {
-            DaysAfterInitiation: quiteMultipartsAfterDays
+            DaysAfterInitiation: quitMultipartsAfterDays
         }
     };
 };
@@ -130,56 +146,56 @@ var conditionAbortIncompleteMultipartUpload = function (_a) {
  * Title.
  *
  * @description descrip.
- * @param {Object} input -
- * @param {!string} input.expiryDate -
- * @returns {Object} Cloudformation S3:: property.
+ * @param input -
+ * @param input.expiryDate -
  * @example
  * var v = conditionExpirationDate()
  */
-var conditionExpirationDate = function (_a) {
-    var expiryDate = _a.expiryDate;
+var conditionExpirationDate = function (params) {
+    var expiryDate = params.expiryDate;
     return { ExpirationDate: expiryDate };
 };
 /**
  * Title.
  *
  * @description descrip.
- * @param {Object} input -
- * @param {!number} input.expiryDays -
- * @returns {Object} Cloudformation S3:: property.
+ * @param input -
+ * @param input.expiryDays -
  * @example
  * var v = conditionExpirationInDays()
  */
-var conditionExpirationInDays = function (_a) {
-    var expiryDays = _a.expiryDays;
+var conditionExpirationInDays = function (params) {
+    var expiryDays = params.expiryDays;
     return { ExpirationInDays: expiryDays };
 };
 /**
  * Title.
  *
  * @description descrip.
- * @param {Object} input -
- * @param {!number} input.keepOldVersionForDays -
- * @returns {Object} Cloudformation S3:: property.
+ * @param input -
+ * @param input.keepOldVersionForDays -
+ * @returns Cloudformation S3:: property.
  * @example
  * var v = conditionNoncurrentVersionExpirationInDays()
  */
-var conditionNoncurrentVersionExpirationInDays = function (_a) {
-    var keepOldVersionForDays = _a.keepOldVersionForDays;
+var conditionNoncurrentVersionExpirationInDays = function (params) {
+    var keepOldVersionForDays = params.keepOldVersionForDays;
     return { NoncurrentVersionExpirationInDays: keepOldVersionForDays };
 };
 /**
  * Title.
  *
  * @description descrip.
- * @param {Array<{storage:?string, daysTillSlowDown:!number}>} trans -
- * @returns {Object} Cloudformation S3:: property.
+ * @param  trans -
  * @example
  * var v = conditionNoncurrentVersionTransitions()
  */
 var conditionNoncurrentVersionTransitions = function (trans) {
+    var transitionList = Array.isArray(trans.moveOldVersionRules)
+        ? trans.moveOldVersionRules
+        : new Array(trans.moveOldVersionRules);
     return {
-        NoncurrentVersionTransitions: trans.map(function (v) { return ({
+        NoncurrentVersionTransitions: transitionList.map(function (v) { return ({
             StorageClass: v.storage,
             TransitionInDays: v.daysTillSlowDown
         }); })
@@ -189,19 +205,31 @@ var conditionNoncurrentVersionTransitions = function (trans) {
  * Title.
  *
  * @description descrip.
- * @param {Array<inTransitionItem>} trans -
- * @returns {Object} Cloudformation S3::AbortIncompleteMultipartUpload property.
+ * @param trans - Param.
  * @example
  * var v = conditionTransitions()
  */
-var conditionTransitions = function (trans) {
+var conditionTransitions = function (input) {
+    var transitionList = Array.isArray(input.transitions)
+        ? input.transitions
+        : new Array(input.transitions);
+    var ret;
     return {
-        Transitions: trans.map(function (v) {
-            var ret = { StorageClass: v.storage };
-            if (v.atDate)
-                ret['TransitionDate'] = v.atDate;
-            if (v.daysTillSlowDown)
-                ret['TransitionInDays'] = v.daysTillSlowDown;
+        Transitions: transitionList.map(function (v) {
+            if (v.atDate) {
+                var complierHelp = v;
+                ret = {
+                    StorageClass: complierHelp.storage,
+                    TransitionDate: complierHelp.atDate
+                };
+            }
+            else {
+                var complierHelp = v;
+                ret = {
+                    StorageClass: complierHelp.storage,
+                    TransitionInDays: complierHelp.daysTillSlowDown
+                };
+            }
             return ret;
         })
     };
@@ -209,33 +237,28 @@ var conditionTransitions = function (trans) {
 var transformtoAWSfmt = function (input) {
     /**
      * Condtion Options:
-     * 1. { quiteMultipartsAfterDays: Number }
+     * 1. { quitMultipartsAfterDays: Number }
      * 2. { expiryDate: "YYYY-MM-DD" } // isoDate
      * 3. { expiryDays: Number }
      * 4. { keepOldVersionForDays: Number }
      * 5. { moveOldVersion: [{ storage:"type1", daysTillslowdown:Number },{ storage:"type1", daysTillslowdown:Number }] } // options({storage:['STANDARD_IA', 'GLACIER', 'INTELLIGENT_TIERING','ONEZONE_IA']}
      * 6. { transitions: [{storage: "class1", atDate:"YYYY-MM-DD", daysTillslowdown:Number}] }
      */
-    if (input.quiteMultipartsAfterDays) {
-        return conditionAbortIncompleteMultipartUpload(input);
-    }
-    else if (input.expiryDate) {
-        return conditionExpirationDate(input);
-    }
-    else if (input.expiryDays) {
-        return conditionExpirationInDays(input);
-    }
-    else if (input.keepOldVersionForDays) {
-        return conditionNoncurrentVersionExpirationInDays(input);
-    }
-    else if (input.moveOldVersion) {
-        // the next two (with transition conditions) expect arrays
-        return conditionNoncurrentVersionTransitions(input.moveOldVersion);
-    }
-    else if (input.transitions) {
-        return conditionTransitions(input.transitions);
-    }
-    else {
-        return new Error('poorly formed inputs in the lifecycleConfig function');
+    switch (input.ruleName) {
+        case 'AbortIncompleteMultipartUpload':
+            return conditionAbortIncompleteMultipartUpload(input);
+        case 'ExpirationDate':
+            return conditionExpirationDate(input);
+        case 'ExpirationInDays':
+            return conditionExpirationInDays(input);
+        case 'NoncurrentVersionExpirationInDays':
+            return conditionNoncurrentVersionExpirationInDays(input);
+        case 'NoncurrentVersionTransitions':
+            return conditionNoncurrentVersionTransitions(input);
+        case 'Transitions':
+            return conditionTransitions(input);
+        default:
+            var shouldNeverGetHere = void 0;
+            return new Error('poorly formed inputs in the lifecycleConfig function');
     }
 };

@@ -373,14 +373,14 @@ interface OutNonCurrentTrans extends OutLifecycleRule {
 interface OutTransitions extends OutLifecycleRule {
   Transitions: OutTransitionItem[]
 }
-interface OutLifecycleRule {
+export interface OutLifecycleRule {
   Status: 'Enabled' | 'Disabled'
   Id?: string
   Prefix?: string
   TagFilters?: OutTags
 }
 
-interface OutLifecycleConfig {
+export interface OutLifecycleConfig {
   LifecycleConfiguration: { Rules: OutLifecycleRule[] }
 }
 export { lifecycleConfig, lifecyleRule }

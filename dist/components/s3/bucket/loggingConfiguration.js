@@ -1,14 +1,24 @@
 "use strict";
 /** @module S3Bucket */
 Object.defineProperty(exports, "__esModule", { value: true });
-var loggingConfg = function (saveLogsToBucket, logPrefix) {
-    if (saveLogsToBucket === void 0) { saveLogsToBucket = null; }
-    if (logPrefix === void 0) { logPrefix = 'logs/'; }
-    var LoggingConfiguration = {};
-    LoggingConfiguration['LogFilePrefix'] = logPrefix;
-    LoggingConfiguration['DestinationBucketName'] = saveLogsToBucket;
+/**
+ * This is a Title.
+ *
+ * @description creates a valid CFM key
+ * @param params - Asd.
+ * @param params.saveLogsToBucket -Asd.
+ * @param paramslogPrefix - Asd.
+ * @example
+ *  var lc = loggingConfg({saveLogsToBucket:'otherbucket', logPrefix:'logs/'})
+ */
+exports.loggingConfg = function (params) {
+    var saveLogsToBucket = params.saveLogsToBucket, logPrefix = params.logPrefix;
+    var data = {};
+    if (logPrefix)
+        data['LogFilePrefix'] = logPrefix;
+    if (saveLogsToBucket)
+        data['DestinationBucketName'] = saveLogsToBucket;
     return {
-        LoggingConfiguration: LoggingConfiguration
+        LoggingConfiguration: data
     };
 };
-exports.loggingConfg = loggingConfg;

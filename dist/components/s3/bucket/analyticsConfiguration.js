@@ -36,12 +36,11 @@ var tags_1 = require("./tags");
  *    }
  *  ])
  */
-var analyticsConfig = function (config) {
+exports.analyticsConfig = function (config) {
     return Array.isArray(config)
         ? { AnalyticsConfigurations: config.map(function (item) { return makeItem(item); }) }
         : { AnalyticsConfigurations: [makeItem(config)] };
 };
-exports.analyticsConfig = analyticsConfig;
 /**
  * Support the Item Declarations for the top-level array.
  *
@@ -58,15 +57,15 @@ var makeItem = function (config) {
     var item = tagList
         ? {
             Id: id,
-            Prefix: "",
+            Prefix: '',
             StorageClassAnalysis: {
-                DataExport: __assign({ OutputSchemaVersion: "V_1" }, destination_1.destination(dest))
+                DataExport: __assign({ OutputSchemaVersion: 'V_1' }, destination_1.destination(dest))
             }
         }
-        : __assign({ Id: id, Prefix: "" }, tags_1.TagFilters(tagList), { StorageClassAnalysis: {
-                DataExport: __assign({ OutputSchemaVersion: "V_1" }, destination_1.destination(dest))
+        : __assign({ Id: id, Prefix: '' }, tags_1.TagFilters(tagList), { StorageClassAnalysis: {
+                DataExport: __assign({ OutputSchemaVersion: 'V_1' }, destination_1.destination(dest))
             } });
     if (prefix)
-        item["Prefix"] = prefix;
+        item['Prefix'] = prefix;
     return item;
 };

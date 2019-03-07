@@ -38,7 +38,7 @@ const parseFilter = (filter: string): OutNotifFilterRule => {
  *                             filters:['YellowSto*', '*.jpg', '*.png']}
  *                          ])
  */
-const notifConfig = (notifList: InNotifs | InNotifs[]) => {
+export const notifConfig = (notifList: InNotifs | InNotifs[]) => {
   notifList = Array.isArray(notifList) ? notifList : new Array(notifList)
 
   const data: SeparatedReducer = notifList.reduce(
@@ -88,7 +88,10 @@ const notifConfig = (notifList: InNotifs | InNotifs[]) => {
  * @example
  * var a = toAWSfmt({event:'', arn:'', filters:['*.jpg']}, 'lambda')
  */
-const toAWSfmt = (item: InNotifs, svc: string): OutAllNotificationConfigs => {
+export const toAWSfmt = (
+  item: InNotifs,
+  svc: string
+): OutLambdaConfig | OutQueueConfig | OutTopicConfig => {
   // where items = {event: String, arn: String, filters=['*.jpg', 'Mrs.*']}
   // where items.filters MUST have a `*` denoting the filter is a `prefix` or `suffix`
   // where lambdaList(items).event = enum
@@ -155,11 +158,7 @@ const toAWSfmt = (item: InNotifs, svc: string): OutAllNotificationConfigs => {
   }
 }
 
-interface OutNotificationConfiguration {
-  NotificationConfiguration: SeparatedNotificationSets
-}
-
-interface InNotifs {
+export interface InNotifs {
   arn: string
   event: string
   filters: string[]
@@ -171,41 +170,41 @@ interface SeparatedReducer {
   t: OutTopicConfig[]
 }
 
-interface SeparatedNotificationSets {
+export interface OutSeparatedNotificationSets {
   LambdaConfigurations?: OutLambdaConfig[]
   QueueConfigurations?: OutQueueConfig[]
   TopicConfigurations?: OutTopicConfig[]
 }
 
-type OutAllNotificationConfigs = OutLambdaConfig | OutQueueConfig | OutTopicConfig
-
-interface OutLambdaConfig {
+export interface OutLambdaConfig {
   Event: string
   Function: string
   Filter?: OutNotificationFilters
 }
 
-interface OutQueueConfig {
+export interface OutQueueConfig {
   Event: string
   Queue: string
   Filter?: OutNotificationFilters
 }
 
-interface OutTopicConfig {
+export interface OutTopicConfig {
   Event: string
   Topic: string
   Filter?: OutNotificationFilters
 }
 
-interface OutNotificationFilters {
+export interface OutNotificationFilters {
   S3Key: {
     Rules: OutNotifFilterRule[]
   }
 }
 
-interface OutNotifFilterRule {
+export interface OutNotifFilterRule {
   Name: string
   Value: string
 }
 
-export { notifConfig }
+export interface OutNotificationConfiguration {
+  NotificationConfiguration: OutSeparatedNotificationSets
+}

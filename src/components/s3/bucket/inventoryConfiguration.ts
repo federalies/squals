@@ -21,7 +21,9 @@ import { difference } from 'lodash-es'
  *        { id: 'myID2', dest: { arn: 'arn:aws:s3:bucket2' } }
  *   ])
  */
-const inventoryConfig = (configs: InInventoryRule | Array<InInventoryRule>): OutInventoryConfig => {
+export const inventoryConfig = (
+  configs: InInventoryRule | Array<InInventoryRule>
+): OutInventoryConfig => {
   return Array.isArray(configs)
     ? { InventoryConfigurations: configs.map(item => inventoryRule(item)) }
     : { InventoryConfigurations: [inventoryRule(configs)] }
@@ -39,7 +41,7 @@ const inventoryConfig = (configs: InInventoryRule | Array<InInventoryRule>): Out
  *  var a = inventoryRule({ id: 'myID', dest: { arn: 'arn:aws:s3:bucket0' } })
  *  var b = inventoryRule([{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket1' }},{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket2' }} ] )
  */
-const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
+export const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
   // @ts-ignore
   const { id, versions, frequency, dest, enabled, optionals, prefix } = {
     id: null,
@@ -108,7 +110,7 @@ const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
   return ret
 }
 
-interface InInventoryRule {
+export interface InInventoryRule {
   id: string
   dest: InDestination
   enabled?: boolean
@@ -118,7 +120,7 @@ interface InInventoryRule {
   prefix?: string
 }
 
-interface OutInventoryRule {
+export interface OutInventoryRule {
   Id: string
   Enabled: boolean
   Destination: Object
@@ -128,8 +130,6 @@ interface OutInventoryRule {
   OptionalFields?: string[]
 }
 
-interface OutInventoryConfig {
+export interface OutInventoryConfig {
   InventoryConfigurations: OutInventoryRule[]
 }
-
-export { inventoryConfig, inventoryRule }

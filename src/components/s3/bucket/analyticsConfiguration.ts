@@ -1,5 +1,5 @@
-import { destination, InDestination, OutDestinationItem } from "./destination";
-import { OutTags, InTags, TagFilters } from "./tags";
+import { destination, InDestination, OutDestinationItem } from './destination'
+import { OutTags, InTags, TagFilters } from './tags'
 
 /** @module S3Bucket */
 
@@ -25,13 +25,13 @@ import { OutTags, InTags, TagFilters } from "./tags";
  *    }
  *  ])
  */
-const analyticsConfig: (
+export const analyticsConfig: (
   config: InAnalyticsConfigItem | Array<InAnalyticsConfigItem>
-) => OutAnalyticsConfig = function(config) {
+) => OutAnalyticsConfig = function (config) {
   return Array.isArray(config)
     ? { AnalyticsConfigurations: config.map(item => makeItem(item)) }
-    : { AnalyticsConfigurations: [makeItem(config)] };
-};
+    : { AnalyticsConfigurations: [makeItem(config)] }
+}
 
 /**
  * Support the Item Declarations for the top-level array.
@@ -42,58 +42,54 @@ const analyticsConfig: (
  * @example
  *   var v = makeItem({ id:'heyThere', prefix:'myPrefix', tagList:[{key1:'val1'},{key1:'val2'}] })
  */
-const makeItem: (config: InAnalyticsConfigItem) => OutAnalyticsItem = function(
-  config
-) {
+const makeItem: (config: InAnalyticsConfigItem) => OutAnalyticsItem = function (config) {
   const { id, prefix, dest, tagList } = {
     // id*
     dest: null,
     prefix: null,
     tagList: null,
     ...config
-  };
+  }
   let item = tagList
     ? {
-        Id: id,
-        Prefix: "",
-        StorageClassAnalysis: {
-          DataExport: { OutputSchemaVersion: "V_1", ...destination(dest) }
-        }
+      Id: id,
+      Prefix: '',
+      StorageClassAnalysis: {
+        DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
       }
+    }
     : {
-        Id: id,
-        Prefix: "",
-        ...TagFilters(tagList),
-        StorageClassAnalysis: {
-          DataExport: { OutputSchemaVersion: "V_1", ...destination(dest) }
-        }
-      };
+      Id: id,
+      Prefix: '',
+      ...TagFilters(tagList),
+      StorageClassAnalysis: {
+        DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
+      }
+    }
 
-  if (prefix) item["Prefix"] = prefix;
-  return item;
-};
+  if (prefix) item['Prefix'] = prefix
+  return item
+}
 
 interface InAnalyticsConfigItem {
-  id: string;
-  dest: InDestination;
-  prefix?: string;
-  tagList: Array<InTags>;
+  id: string
+  dest: InDestination
+  prefix?: string
+  tagList: Array<InTags>
 }
 
-interface OutAnalyticsItem {
-  Id: string;
-  Prefix?: string;
-  TagFilter?: Array<OutTags>;
+export interface OutAnalyticsItem {
+  Id: string
+  Prefix?: string
+  TagFilter?: Array<OutTags>
   StorageClassAnalysis: {
     DataExport: {
-      OutputSchemaVersion: string;
-      Destination: OutDestinationItem;
-    };
-  };
+      OutputSchemaVersion: string
+      Destination: OutDestinationItem
+    }
+  }
 }
 
-interface OutAnalyticsConfig {
-  AnalyticsConfigurations: Array<OutAnalyticsItem>;
+export interface OutAnalyticsConfig {
+  AnalyticsConfigurations: Array<OutAnalyticsItem>
 }
-
-export { analyticsConfig };

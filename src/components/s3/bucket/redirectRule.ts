@@ -65,22 +65,24 @@ export interface InRedirRule {
   // HttpRedirectCode?: string throw in ext
 }
 
+export interface OutRule_wPrefixReplace {
+  HostName?: string
+  HttpRedirectCode?: string
+  Protocol?: string
+  ReplaceKeyPrefixWith?: string
+  ReplaceKeyWith?: never
+}
+
+export interface OutRule_wFullReplace {
+  HostName?: string
+  HttpRedirectCode?: string
+  Protocol?: string
+  ReplaceKeyPrefixWith?: never
+  ReplaceKeyWith?: string
+}
+
 export interface OutRouteRule {
-  RedirectRule:
-    | {
-        HostName?: string
-        HttpRedirectCode?: string
-        Protocol?: string
-        ReplaceKeyPrefixWith?: string
-        ReplaceKeyWith?: never
-      }
-    | {
-        HostName?: string
-        HttpRedirectCode?: string
-        Protocol?: string
-        ReplaceKeyPrefixWith?: never
-        ReplaceKeyWith?: string
-      }
+  RedirectRule: OutRule_wFullReplace | OutRule_wPrefixReplace
   RoutingRuleCondition: {
     HttpErrorCodeReturnedEquals?: string
     KeyPrefixEquals?: string

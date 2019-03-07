@@ -1,21 +1,10 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 var arn_1 = require("@sandfox/arn");
 /** @module S3Bucket */
 var parseFilter = function (filter) {
-    var Name = null;
-    var Value = null;
+    var Name = '';
+    var Value = '';
     if (filter.toString().startsWith('*')) {
         Name = 'prefix';
         Value = filter.slice(1);
@@ -29,43 +18,65 @@ var parseFilter = function (filter) {
     }
     return { Name: Name, Value: Value };
 };
-var notifConfig = function (notifList) {
-    // notifList = Array
-    // where items = {}
-    // notifList = [{},{}]
-    var NotificationConfiguration = {};
-    var LambdaConfigurations = [];
-    var QueueConfigurations = [];
-    var TopicConfigurations = [];
-    notifList.map(function (item) {
-        var svc = arn_1.parse(item.arn).service;
+/**
+ * Title.
+ *
+ * @description asdasd.
+ * @param notifList - Asd.
+ * @todo add functionality and testing to deal with ARN REFS so that you notifiucation rule can incorporate newly created funcs
+ * @example
+ *  var notif1 = notifConfig({event:"s3:ObjectCreated:*",
+ *                           arn:'aws:arn:lambda:somegreat.lambdafunc',
+ *                           filters:['Yosem*', '*.jpg']})
+ *  var notif2 = notifConfig([{ event:"s3:ObjectCreated:*",
+ *                             arn:'aws:arn:lambda:somegreat.lambdafunc',
+ *                             filters:['Yosem*', '*.jpg']},
+ *                           { event:"s3:ObjectCreated:*",
+ *                             arn:'aws:arn:lambda:somegreat.lambdafunc',
+ *                             filters:['YellowSto*', '*.jpg', '*.png']}
+ *                          ])
+ */
+exports.notifConfig = function (notifList) {
+    notifList = Array.isArray(notifList) ? notifList : new Array(notifList);
+    var data = notifList.reduce(function (prior, notif) {
+        var svc = arn_1.parse(notif.arn).service;
         switch (svc) {
             case 'lambda':
-                LambdaConfigurations.push(toAWSfmt(item, svc));
+                prior.l.push(exports.toAWSfmt(notif, svc));
                 break;
             case 'sqs':
-                QueueConfigurations.push(toAWSfmt(item, svc));
+                prior.q.push(exports.toAWSfmt(notif, svc));
                 break;
             case 'sns':
-                TopicConfigurations.push(toAWSfmt(item, svc));
+                prior.t.push(exports.toAWSfmt(notif, svc));
                 break;
             default:
                 throw new Error("the ARN type of the service receiving a notification should be lambda|sqs|sns ");
         }
-    });
-    if (LambdaConfigurations.length > 0) {
-        NotificationConfiguration = __assign({}, NotificationConfiguration, { LambdaConfigurations: LambdaConfigurations });
+        return prior;
+    }, { l: [], t: [], q: [] });
+    var ret = { NotificationConfiguration: {} };
+    if (data.l.length > 0) {
+        ret.NotificationConfiguration['LambdaConfigurations'] = data.l;
     }
-    if (QueueConfigurations.length > 0) {
-        NotificationConfiguration = __assign({}, NotificationConfiguration, { QueueConfigurations: QueueConfigurations });
+    if (data.q.length > 0) {
+        ret.NotificationConfiguration['QueueConfigurations'] = data.q;
     }
-    if (TopicConfigurations.length > 0) {
-        NotificationConfiguration = __assign({}, NotificationConfiguration, { TopicConfigurations: TopicConfigurations });
+    if (data.t.length > 0) {
+        ret.NotificationConfiguration['TopicConfigurations'] = data.t;
     }
-    return NotificationConfiguration;
+    return ret;
 };
-exports.notifConfig = notifConfig;
-var toAWSfmt = function (item, svc) { return function () {
+/**
+ * Title.
+ *
+ * @description this is a description
+ * @param item - A notification config.
+ * @param svc - An abbreviate string of an AWS service name.
+ * @example
+ * var a = toAWSfmt({event:'', arn:'', filters:['*.jpg']}, 'lambda')
+ */
+exports.toAWSfmt = function (item, svc) {
     // where items = {event: String, arn: String, filters=['*.jpg', 'Mrs.*']}
     // where items.filters MUST have a `*` denoting the filter is a `prefix` or `suffix`
     // where lambdaList(items).event = enum
@@ -84,23 +95,45 @@ var toAWSfmt = function (item, svc) { return function () {
         's3:ObjectRestore:Completed',
         's3:ReducedRedundancyLostObject'
     ];
-    var ret = {};
-    if (validValues.includes(item.event)) {
-        ret['Event'] = item.event;
+    if (!validValues.includes(item.event)) {
+        throw new Error('invalid notification event type');
     }
-    else {
-        throw new Error('lambda naotification list');
+    var Rules = item.filters ? item.filters.map(function (filter) { return parseFilter(filter); }) : [];
+    switch (svc) {
+        case 'lambda':
+            return Rules.length > 0
+                ? {
+                    Event: item.event,
+                    Function: item.arn,
+                    Filter: { S3Key: { Rules: Rules } }
+                }
+                : {
+                    Event: item.event,
+                    Function: item.arn
+                };
+        case 'sqs':
+            return Rules.length > 0
+                ? {
+                    Event: item.event,
+                    Queue: item.arn,
+                    Filter: { S3Key: { Rules: Rules } }
+                }
+                : {
+                    Event: item.event,
+                    Queue: item.arn
+                };
+        case 'sns':
+            return Rules.length > 0
+                ? {
+                    Event: item.event,
+                    Topic: item.arn,
+                    Filter: { S3Key: { Rules: Rules } }
+                }
+                : {
+                    Event: item.event,
+                    Topic: item.arn
+                };
+        default:
+            throw new Error('invalid notification event type');
     }
-    var Rules = item.filters
-        ? item.filters.map(function (filter) { return parseFilter(filter); })
-        : [];
-    if (Rules.length > 0)
-        ret['Filter'] = { S3Key: { Rules: Rules } };
-    if (svc === 'lambda')
-        ret['Function'] = item.arn;
-    if (svc === 'sqs')
-        ret['Queue'] = item.arn;
-    if (svc === 'sns')
-        ret['Topic'] = item.arn;
-    return ret;
-}; };
+};

@@ -66,5 +66,3 @@ export interface OutTags {
   Key: string
   Value: string
 }
-
-// export { TagFilters, Tags, tags };

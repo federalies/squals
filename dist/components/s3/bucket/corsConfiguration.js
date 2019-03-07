@@ -40,10 +40,6 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// @ts-nocheck
-// the dynamic key usage on the input params is causing a severe head-ache with TS check
-// it also seems like TS check is not ready to accept some newer js features like Object.values or js varibableName Property construction
-//
 var lodash_es_1 = require("lodash-es");
 /** @module S3Bucket */
 /**
@@ -74,9 +70,9 @@ exports.corsConfig = corsConfig;
  * AWS::S3 Cors Rule Config Method title.
  *
  * @description descrip.
- * @param {!inCorsRule|!Object<string, string|Array<string>>} params - Is a structured set of properties unless using the dynamic key options with methods separeted by a | and the domains are listed as a string or array.
- * @returns {outCorsRule} - Valid Cloudformation keys.
+ * @param params - Is a structured set of properties unless using the dynamic key options with methods separeted by a | and the domains are listed as a string or array.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-cors-corsrule.html>
+ * @todo analyse the Verb and origin inputs and perhaps output an array of corsRules - so that many rules could be reduced to 1 set of dense cofig - and the lib would spit out something more sensible than merely the cross product
  * @example
  * var cors1 = corsRule({id:"Local Development Rule1", methods:'GET', origins:'localhost', maxAge:3600*6})
  *  var cors2 = corsRule({id:"Local Development Rule2", methods:['GET', 'POST'], origins:['localhost'], maxAge:3600*6})
@@ -86,50 +82,48 @@ exports.corsConfig = corsConfig;
 var corsRule = function (params) {
     var _a = __assign({ methods: [], origins: [], headersExposed: [], headersAllowed: [], id: null, maxAge: null }, params), methods = _a.methods, origins = _a.origins, headersExposed = _a.headersExposed, headersAllowed = _a.headersAllowed, id = _a.id, maxAge = _a.maxAge, HTTPVERBS = __rest(_a, ["methods", "origins", "headersExposed", "headersAllowed", "id", "maxAge"]);
     var validMethods = ['GET', 'PUT', 'HEAD', 'POST', 'DELETE'];
-    var AllowedMethods;
-    if (Object.keys(HTTPVERBS).length > 0) {
-        methods = lodash_es_1.uniq(__spread(methods, Object.keys(HTTPVERBS)[0].split('|')));
-        if (Array.isArray(Object.values(HTTPVERBS)[0])) {
-            origins = lodash_es_1.uniq(__spread(origins, Object.values(HTTPVERBS)[0]));
-        }
-        else {
-            origins = lodash_es_1.uniq(__spread(origins, [Object.values(HTTPVERBS)[0]]));
-        }
+    // collect complex verb Keys into Verbs
+    var Verbs = Object.keys(HTTPVERBS);
+    Verbs = Verbs.reduce(function (p, verbCombo) {
+        verbCombo.split('|').map(function (verb) {
+            p.push(verb);
+        });
+        return p;
+    }, []);
+    // collect origin arrays into a single array
+    var Origins = Object.values(HTTPVERBS);
+    Origins = Origins.reduce(function (p, originSet) {
+        originSet.map(function (o) { return p.push(o); });
+        return p;
+    }, []);
+    // check for complex verbs to proces
+    if (!lodash_es_1.isEmpty(Verbs)) {
+        Verbs = lodash_es_1.uniq(__spread(methods, Verbs));
+        Origins = lodash_es_1.uniq(__spread(origins, Origins));
     }
-    if (methods &&
-        Array.isArray(methods) &&
-        methods.length > 0 &&
-        methods.every(function (elem) {
-            return validMethods.includes(elem.toString().toUpperCase());
-        })) {
-        AllowedMethods = methods;
-    }
-    else if (methods && validMethods.includes(methods.toString().toUpperCase())) {
-        AllowedMethods = [methods];
-    }
-    else {
-        throw new Error("\u0192.corsConfig - the param:methods must be an array with 1+ valid HTTP verb found:" + methods);
-    }
-    var AllowedOrigins;
-    if (origins && Array.isArray(origins) && origins.length > 0) {
-        AllowedOrigins = origins;
-    }
-    else if (origins) {
-        AllowedOrigins = [origins];
-    }
-    else {
+    var AllowedMethods = Array.isArray(methods) ? methods : new Array(methods);
+    var AllowedOrigins = Array.isArray(origins) ? origins : new Array(origins);
+    var rule = {
+        AllowedMethods: __spread(AllowedMethods, Verbs),
+        AllowedOrigins: __spread(AllowedMethods, Origins)
+    };
+    if (AllowedOrigins.length < 1) {
         throw new Error('in the corsConfig the origins param must be an array with 1+ domain listed');
     }
-    var rule = { AllowedMethods: AllowedMethods, AllowedOrigins: AllowedOrigins };
+    if (lodash_es_1.difference(rule.AllowedMethods, validMethods).length > 0) {
+        throw new Error("\u0192.corsRule requires the HTTP Verbs be valid spelling found: " + rule.AllowedMethods);
+    }
     if (id && id.length < 255)
         rule['Id'] = id.toString();
-    if (Number.isSafeInteger(maxAge))
+    if (maxAge && Number.isSafeInteger(maxAge))
         rule['MaxAge'] = maxAge;
     if (headersAllowed && headersAllowed.length > 0) {
-        rule['AllowedHeaders'] = headersAllowed.map(function (v) { return v.toString(); });
+        var hdrAllowed = headersAllowed;
+        rule['AllowedHeaders'] = hdrAllowed;
     }
     if (headersExposed && headersExposed.length > 0) {
-        rule['ExposedHeaders'] = headersExposed.map(function (v) { return v.toString(); });
+        var hdrExposed = headersExposed;
+        rule['ExposedHeaders'] = hdrExposed;
     }
     return rule;
 };

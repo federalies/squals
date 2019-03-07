@@ -72,4 +72,3 @@ exports.TagFilters = function (tagList) {
         TagFilters: exports.tags(tagList)
     };
 };
-// export { TagFilters, Tags, tags };

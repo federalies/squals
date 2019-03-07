@@ -13,15 +13,19 @@ var __assign = (this && this.__assign) || function () {
 Object.defineProperty(exports, "__esModule", { value: true });
 var tags_1 = require("./tags");
 /** @module S3Bucket */
-var metricsConfig = function (meterThese) {
-    return {
-        MetricsConfigurations: meterThese.map(function (v) { return metricsRule(v); })
-    };
+exports.metricsConfig = function (meterThese) {
+    return Array.isArray(meterThese)
+        ? {
+            MetricsConfigurations: meterThese.map(function (v) { return exports.metricsRule(v); })
+        }
+        : {
+            MetricsConfigurations: exports.metricsRule(meterThese)
+        };
 };
-exports.metricsConfig = metricsConfig;
-var metricsRule = function (params) {
-    // @ts-ignore
+exports.metricsRule = function (params) {
     var _a = __assign({ prefix: null, tagList: [] }, params), id = _a.id, prefix = _a.prefix, tagList = _a.tagList;
-    return __assign({ Id: id.toString(), Prefix: prefix.toString() }, tags_1.TagFilters(tagList));
+    var ret = __assign({ Id: id.toString() }, tags_1.TagFilters(tagList));
+    if (prefix)
+        ret['Prefix'] = prefix.toString();
+    return ret;
 };
-exports.metricsRule = metricsRule;

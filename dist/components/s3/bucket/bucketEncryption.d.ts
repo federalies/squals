@@ -28,7 +28,7 @@ export interface InParamSSRule {
     algo?: string;
     keyID?: string;
 }
-interface OutServerSideEncRule {
+export interface OutServerSideEncRule {
     ServerSideEncryptionByDefault: {
         SSEAlgorithm: string;
         KMSMasterKeyID?: string;

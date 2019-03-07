@@ -13,7 +13,7 @@
  *  var rcfg = replicationConfig({ iamARN:getActingIAMWhileReplcating(),
  *                                 rules: getTheRuleListWeNeedToConfigureTheTempalte() })
  */
-const replicationConfig = (params: InReplicaConfig): OutReplicaConfig => {
+export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig => {
   const { iamARN, rules } = params
   return Array.isArray(rules)
     ? {
@@ -43,7 +43,7 @@ const replicationConfig = (params: InReplicaConfig): OutReplicaConfig => {
  * @example
  *  var r = replicationRule()
  */
-const replicationRule = (
+export const replicationRule = (
   params: InReplicaRule = {
     dest: { bucket: '' },
     prefix: '',
@@ -78,25 +78,6 @@ const replicationRule = (
 
   return ret
 }
-export interface InReplicaRule {
-  dest: InReplicaDest
-  prefix: string // allows empty string here and in the Out interface
-  status?: boolean
-  replicateEncData?: boolean
-  id?: string
-}
-
-interface OutReplicationRule {
-  Destination: OutReplicaDestination
-  Prefix: string
-  Id?: string
-  Status: 'Enabled' | 'Disabled'
-  SourceSelectionCriteria?: {
-    SseKmsEncryptedObjects: {
-      Status: 'Enabled' | 'Disabled'
-    }
-  }
-}
 
 /**
  * TItle.
@@ -112,7 +93,7 @@ interface OutReplicationRule {
  * @example
  *  var d = replicationDest({bucket: 'myBucket'})
  */
-const replicationDest = (params: InReplicaDest): OutReplicaDestination => {
+export const replicationDest = (params: InReplicaDest): OutReplicaDestination => {
   const { bucket, account, kmsId, storageClass } = {
     account: null,
     kmsId: null,
@@ -143,6 +124,7 @@ const replicationDest = (params: InReplicaDest): OutReplicaDestination => {
 
   return ret
 }
+
 export interface InReplicaDest {
   bucket: string
   account?: string
@@ -151,7 +133,20 @@ export interface InReplicaDest {
   kmsId?: string
 }
 
-interface OutReplicaDestination {
+export interface InReplicaConfig {
+  iamARN: string
+  rules: InReplicaRule | Array<InReplicaRule>
+}
+
+export interface InReplicaRule {
+  dest: InReplicaDest
+  prefix: string // allows empty string here and in the Out interface
+  status?: boolean
+  replicateEncData?: boolean
+  id?: string
+}
+
+export interface OutReplicaDestination {
   Bucket: string
   StorageClass?: string
   Account?: string
@@ -163,16 +158,21 @@ interface OutReplicaDestination {
   }
 }
 
-export interface InReplicaConfig {
-  iamARN: string
-  rules: InReplicaRule | Array<InReplicaRule>
-}
-
-interface OutReplicaConfig {
-  ReplicationConfiguration: {
-    Role: string
-    Rules: Array<OutReplicationRule>
+export interface OutReplicationRule {
+  Destination: OutReplicaDestination
+  Prefix: string
+  Id?: string
+  Status: 'Enabled' | 'Disabled'
+  SourceSelectionCriteria?: {
+    SseKmsEncryptedObjects: {
+      Status: 'Enabled' | 'Disabled'
+    }
   }
 }
 
-export { replicationConfig, replicationRule, replicationDest }
+export interface OutReplicaConfig {
+  ReplicationConfiguration: {
+    Role: string
+    Rules: OutReplicationRule[]
+  }
+}

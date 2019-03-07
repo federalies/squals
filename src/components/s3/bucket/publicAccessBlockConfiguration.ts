@@ -32,7 +32,7 @@ export interface InPublicAccessConfig {
   publicBuckets: boolean
 }
 
-interface OutPublicAccessConfig {
+export interface OutPublicAccessConfig {
   BlockPublicAcls?: boolean
   BlockPublicPolicy?: boolean
   IgnorePublicAcls?: boolean

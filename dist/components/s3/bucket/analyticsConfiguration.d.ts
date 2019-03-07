@@ -1,5 +1,5 @@
-import { InDestination, OutDestinationItem } from "./destination";
-import { OutTags, InTags } from "./tags";
+import { InDestination, OutDestinationItem } from './destination';
+import { OutTags, InTags } from './tags';
 /** @module S3Bucket */
 /**
  * AWS:S3:: Analytics Configuration.
@@ -23,14 +23,14 @@ import { OutTags, InTags } from "./tags";
  *    }
  *  ])
  */
-declare const analyticsConfig: (config: InAnalyticsConfigItem | Array<InAnalyticsConfigItem>) => OutAnalyticsConfig;
+export declare const analyticsConfig: (config: InAnalyticsConfigItem | Array<InAnalyticsConfigItem>) => OutAnalyticsConfig;
 interface InAnalyticsConfigItem {
     id: string;
     dest: InDestination;
     prefix?: string;
     tagList: Array<InTags>;
 }
-interface OutAnalyticsItem {
+export interface OutAnalyticsItem {
     Id: string;
     Prefix?: string;
     TagFilter?: Array<OutTags>;
@@ -41,8 +41,8 @@ interface OutAnalyticsItem {
         };
     };
 }
-interface OutAnalyticsConfig {
+export interface OutAnalyticsConfig {
     AnalyticsConfigurations: Array<OutAnalyticsItem>;
 }
-export { analyticsConfig };
+export {};
 //# sourceMappingURL=analyticsConfiguration.d.ts.map

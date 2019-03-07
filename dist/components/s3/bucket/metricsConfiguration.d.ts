@@ -1,11 +1,22 @@
+import { InTags, OutTags } from './tags';
 /** @module S3Bucket */
-declare const metricsConfig: (meterThese: any) => {
-    MetricsConfigurations: any;
+export declare const metricsConfig: (meterThese: InMetricsRule | InMetricsRule[]) => {
+    MetricsConfigurations: OutMetricsRule[];
+} | {
+    MetricsConfigurations: OutMetricsRule;
 };
-declare const metricsRule: (params: any) => {
-    TagFilters: import("./tags").OutTags[];
-    Id: any;
-    Prefix: any;
-};
-export { metricsConfig, metricsRule };
+export declare const metricsRule: (params: InMetricsRule) => OutMetricsRule;
+export interface InMetricsRule {
+    id: string;
+    prefix?: string;
+    tagList?: InTags[];
+}
+export interface OutMetricsRule {
+    Id: string;
+    Prefix?: string;
+    TagFilters?: OutTags[];
+}
+export interface OutMetricsConfig {
+    MetricsConfigurations: OutMetricsRule[];
+}
 //# sourceMappingURL=metricsConfiguration.d.ts.map

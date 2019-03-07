@@ -1,3 +1,4 @@
+import { InDestination } from './destination';
 /** @module S3Bucket */
 /**
  *  Amazon S3 bucket inventory configuration.
@@ -14,15 +15,7 @@
  *        { id: 'myID2', dest: { arn: 'arn:aws:s3:bucket2' } }
  *   ])
  */
-declare const inventoryConfig: (configs: any) => {
-    InventoryConfigurations: {
-        Id: any;
-        Enabled: any;
-        IncludedObjectVersions: any;
-        ScheduleFrequency: any;
-        Destination: import("./destination").OutDestinationItem;
-    }[];
-};
+export declare const inventoryConfig: (configs: InInventoryRule | InInventoryRule[]) => OutInventoryConfig;
 /**
  * Make an invetory analysis rule.
  *
@@ -35,43 +28,26 @@ declare const inventoryConfig: (configs: any) => {
  *  var a = inventoryRule({ id: 'myID', dest: { arn: 'arn:aws:s3:bucket0' } })
  *  var b = inventoryRule([{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket1' }},{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket2' }} ] )
  */
-declare const inventoryRule: (params: any) => {
-    Id: any;
-    Enabled: any;
-    IncludedObjectVersions: any;
-    ScheduleFrequency: any;
-    Destination: import("./destination").OutDestinationItem;
-};
-/**
- * @typedef inInventoryRule
- * @type {!Object}
- * @property {!string} id - The ID that identifies the inventory configuration.
- * @property {!Object} dest - Information about where to publish the inventory results.
- * @property {?boolean} enabled - Specifies whether the inventory is enabled or disabled. If set to True, an inventory list is generated. If set to False, no inventory list is generated.
- * @property {?string} versions - Object versions to include in the inventory list. If set to All, the list includes all the object versions, which adds the version related fields VersionId, IsLatest, and DeleteMarker to the list. If set to Current, the list does not contain these version related fields.
- * @property {?string} frequency - The frequency of inventory results generation.
- * @property {?Array<string>} optionals - The optional fields that are included in the inventory results.
- * @property {?string} prefix - The prefix that is prepended to all inventory results.
- */
-/**
- * @typedef outInventoryRule
- * @type {!Object}
- * @property {!string} Id - The ID that identifies the inventory configuration.
- * @property {!boolean} Enabled - Specifies whether the inventory is enabled or disabled. If set to True, an inventory list is generated. If set to False, no inventory list is generated.
- * @property {!string} IncludedObjectVersions - Object versions to include in the inventory list. If set to All, the list includes all the object versions, which adds the version related fields VersionId, IsLatest, and DeleteMarker to the list. If set to Current, the list does not contain these version related fields.
- * @property {!string} ScheduleFrequency - The frequency of inventory results generation.
- * @property {!Object} Destination - Information about where to publish the inventory results.
- * @property {?Array<string>} OptionalFields - The optional fields that are included in the inventory results.
- * @property {?string} Prefix - The prefix that is prepended to all inventory results.
- */
-/**
- * @typedef inInventoryConfig
- * @type {!inInventoryRule|!Array<inInventoryRule>}
- */
-/**
- * @typedef outInventoryConfig
- * @type {Object}
- * @property {Array<outInventoryRule>} InventoryConfigurations - asd.
- */
-export { inventoryConfig, inventoryRule };
+export declare const inventoryRule: (params: InInventoryRule) => OutInventoryRule;
+export interface InInventoryRule {
+    id: string;
+    dest: InDestination;
+    enabled?: boolean;
+    versions?: string;
+    frequency?: string;
+    optionals?: Array<string>;
+    prefix?: string;
+}
+export interface OutInventoryRule {
+    Id: string;
+    Enabled: boolean;
+    Destination: Object;
+    ScheduleFrequency: string;
+    IncludedObjectVersions: string;
+    Prefix?: string;
+    OptionalFields?: string[];
+}
+export interface OutInventoryConfig {
+    InventoryConfigurations: OutInventoryRule[];
+}
 //# sourceMappingURL=inventoryConfiguration.d.ts.map
