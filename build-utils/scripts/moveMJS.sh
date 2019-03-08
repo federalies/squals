@@ -1,0 +1,1 @@
+for f in **/*.js; do cp "$f" "${f%.js}.mjs"; done

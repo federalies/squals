@@ -1,5 +1,5 @@
 {
-  "name": "squal",
+  "name": "squals",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -13,7 +13,7 @@
     "docs": "jsdoc -r -R readme.md -d ./docs/ src/* && open docs/index.html",
     "docs:new": "jsdoc -c .jsdoc.js -t ./node_modules/ink-docstrap/template -R README.md -r -d ./docs/ src/* && open docs/index.html",
     "typedocs": "typedoc && open typeDocs/index.html",
-    "mjs": "tsc -d && mv dist/copee.js dist/copee.mjs",
+    "mjs": "tsc -d && mv dist/*.js dist/copee.mjs",
     "cjs": "tsc -m commonjs",
     "umd": "tsc -m umd",
     "build": "npm run cjs && npm run mjs && npm run umd"
