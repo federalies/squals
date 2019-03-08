@@ -11,12 +11,11 @@
 
 const sum = (a, b) => a + b
 
-describe.skip('defaults', () => {
-  test('s3 all defaults', () => {
-    console.log(S3BucketPolicy)
-    expect(new S3Bucket()).toEqual({ Type: 'AWS::S3::Bucket' })
-  })
-})
+// describe.skip('defaults', () => {
+//   test('s3 all defaults', () => {
+//     expect(new S3Bucket()).toEqual({ Type: 'AWS::S3::Bucket' })
+//   })
+// })
 
 describe.skip('excercise validations', () => {
   test('adds 1 + 2 to equal 3', () => {
@@ -30,14 +29,14 @@ describe.skip('sanitations', () => {
   })
 })
 
-describe.skip('functionality', () => {
-  test('unit/self validate defaults', () => {
-    expect(new S3Bucket().validate().passes).toBe(true)
-  })
-  test('validate defaults', () => {
-    expect(new S3Bucket({ BucketName: 'Heya_There' }).validate().passes).toBe(true)
-  })
-  test('validate Bad Bucketname param', () => {
-    expect(new S3Bucket({ Bucketname: 'Heya_There' }).validate().passes).toBe(false)
-  })
-})
+// describe.skip('functionality', () => {
+//   test('unit/self validate defaults', () => {
+//     expect(new S3Bucket().validate().passes).toBe(true)
+//   })
+//   test('validate defaults', () => {
+//     expect(new S3Bucket({ BucketName: 'Heya_There' }).validate().passes).toBe(true)
+//   })
+//   test('validate Bad Bucketname param', () => {
+//     expect(new S3Bucket({ Bucketname: 'Heya_There' }).validate().passes).toBe(false)
+//   })
+// })

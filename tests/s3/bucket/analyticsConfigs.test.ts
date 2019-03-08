@@ -1,6 +1,3 @@
-// @ts-nocheck
-// until I figure out how to make typescript happy with JEST tests
-
 describe.skip('defaults', () => {
   const sum = (a: number, b: number) => a + b
 

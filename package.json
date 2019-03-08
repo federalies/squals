@@ -10,9 +10,7 @@
   "scripts": {
     "test": "jest",
     "test:watch": "npm run test -- --watchAll",
-    "docs": "jsdoc -r -R readme.md -d ./docs/ src/* && open docs/index.html",
-    "docs:new": "jsdoc -c .jsdoc.js -t ./node_modules/ink-docstrap/template -R README.md -r -d ./docs/ src/* && open docs/index.html",
-    "typedocs": "typedoc && open typeDocs/index.html",
+    "docs": "typedoc --out docs && open ./docs/index.html",
     "mjs": "tsc -d && mv dist/*.js dist/copee.mjs",
     "cjs": "tsc -m commonjs",
     "umd": "tsc -m umd",
