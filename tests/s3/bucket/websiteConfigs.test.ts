@@ -1,5 +1,3 @@
-// @ts-nocheck
-
 const Import = require('esm')(module)
 const { websiteConfig } = Import('../../../src/components/s3/bucket')
 
