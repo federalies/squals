@@ -234,7 +234,7 @@ const conditionTransitions = (input: IInRuleTransitions) => {
     )
   }
 }
-const transformtoAWSfmt = (input: IInAlllValidInRules) => {
+const transformtoAWSfmt = (input: IInAlllValidInRules): any => {
   /**
    * Condtion Options:
    * 1. { quitMultipartsAfterDays: Number }

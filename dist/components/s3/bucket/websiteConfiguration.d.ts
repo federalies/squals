@@ -14,28 +14,28 @@ import { OutRouteRule, InRedirRule } from './redirectRule';
  *  var webcfgPlain = websiteConfig()
  *  var webcfgWRedirRules = websiteConfig({redir:[{when:'docs/', to:'squals.readthedocs.io/', replacer:'', doFullReplace:true}]})
  */
-declare const websiteConfig: (param: inConfig) => OutWebsiteConfig;
-interface inConfig {
+declare const websiteConfig: (param: inWebsiteConfig) => OutWebsiteConfig;
+export interface inWebsiteConfig {
     indexPage?: string;
     errorPage?: string;
     redir?: string | InRedirRule[];
 }
-interface OutWebsiteConfig {
-    WebsiteConfiguration: OutWebsiteConfigElem;
+export interface OutWebsiteEnabled {
+    IndexDocument: string;
+    ErrorDocument: string;
 }
-declare type OutWebsiteConfigElem = OutWebsiteEnabled | OutWebsiteConfigRedirRules | OutWebsiteConfigRedirAll;
-interface OutWebsiteConfigRedirAll extends OutWebsiteEnabled {
+export interface OutWebsiteConfigRedirAll extends OutWebsiteEnabled {
     RedirectAllRequestsTo: {
         HostName: string;
         Protocol: string;
     };
 }
-interface OutWebsiteConfigRedirRules extends OutWebsiteEnabled {
-    RoutingRules: Array<OutRouteRule>;
+export interface OutWebsiteConfigRedirRules extends OutWebsiteEnabled {
+    RoutingRules: OutRouteRule[];
 }
-interface OutWebsiteEnabled {
-    IndexDocument: string;
-    ErrorDocument: string;
+export declare type OutWebsiteConfigElem = OutWebsiteEnabled | OutWebsiteConfigRedirRules | OutWebsiteConfigRedirAll;
+export interface OutWebsiteConfig {
+    WebsiteConfiguration: OutWebsiteConfigElem;
 }
 export { websiteConfig };
 //# sourceMappingURL=websiteConfiguration.d.ts.map

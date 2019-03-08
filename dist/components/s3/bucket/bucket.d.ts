@@ -10,12 +10,13 @@ import { OutMetricsRule } from './metricsConfiguration';
 import { OutSeparatedNotificationSets } from './notificationConfiguration';
 import { OutPublicAccessConfig } from './publicAccessBlockConfiguration';
 import { OutReplicationRule } from './replicationConfiguration';
-declare class S3Bucket {
+import { OutWebsiteConfigElem, inWebsiteConfig } from './websiteConfiguration';
+export declare class S3Bucket {
     name: string;
     Type: 'AWS::S3::Bucket';
     Properties?: {
         BucketName?: string;
-        AccessControl?: string;
+        AccessControl?: 'AuthenticatedRead' | 'AwsExecRead' | 'BucketOwnerRead' | 'BucketOwnerFullControl' | 'LogDeliveryWrite' | 'Private' | 'PublicRead' | 'PublicReadWrite';
         AccelerateConfiguration?: {
             AccelerationStatus: 'Enabled' | 'Suspended';
         };
@@ -40,8 +41,10 @@ declare class S3Bucket {
         };
         Tags?: OutTags;
         VersioningConfiguration?: OutVersioning;
-        WebsiteConfiguration?: 'OutWebsiteConfig';
+        WebsiteConfiguration?: OutWebsiteConfigElem;
     };
+    private properties;
+    private bucketACLS;
     /**
      * S3Bucket Class that models info needed for Cloudformation.
      *
@@ -54,13 +57,17 @@ declare class S3Bucket {
      *  console.log({myBucket})
      */
     constructor(props?: IInS3Bucket, name?: string);
-    website(config: IInS3Bucket): this;
     toJSON(): {
         [x: string]: {
             Type: "AWS::S3::Bucket";
             Properties: any;
         };
+    } | {
+        [x: string]: {
+            Type: "AWS::S3::Bucket";
+        };
     };
+    website(config: boolean | inWebsiteConfig): S3Bucket;
     Ref(): {
         Ref: string;
     };
@@ -77,12 +84,8 @@ declare class S3Bucket {
         'Fn::GetAtt': string[];
     };
     outputs(existingOutputs: any): any;
-    validate(): {
-        passes: any;
-        failMsgs: any;
-    };
 }
-export { S3Bucket };
 interface IInS3Bucket {
 }
+export {};
 //# sourceMappingURL=bucket.d.ts.map

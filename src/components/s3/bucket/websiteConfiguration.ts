@@ -17,7 +17,7 @@ import { isEmpty } from 'lodash-es'
  *  var webcfgPlain = websiteConfig()
  *  var webcfgWRedirRules = websiteConfig({redir:[{when:'docs/', to:'squals.readthedocs.io/', replacer:'', doFullReplace:true}]})
  */
-const websiteConfig = (param: inConfig): OutWebsiteConfig => {
+const websiteConfig = (param: inWebsiteConfig): OutWebsiteConfig => {
   const { redir, indexpage, errorpage } = {
     redir: '',
     indexpage: 'index.html',
@@ -74,32 +74,29 @@ const websiteConfig = (param: inConfig): OutWebsiteConfig => {
   }
 }
 
-interface inConfig {
+export interface inWebsiteConfig {
   indexPage?: string
   errorPage?: string
   redir?: string | InRedirRule[]
 }
 
-interface OutWebsiteConfig {
-  WebsiteConfiguration: OutWebsiteConfigElem
+export interface OutWebsiteEnabled {
+  IndexDocument: string
+  ErrorDocument: string
 }
-
-type OutWebsiteConfigElem =
+export interface OutWebsiteConfigRedirAll extends OutWebsiteEnabled {
+  RedirectAllRequestsTo: { HostName: string; Protocol: string }
+}
+export interface OutWebsiteConfigRedirRules extends OutWebsiteEnabled {
+  RoutingRules: OutRouteRule[]
+}
+export type OutWebsiteConfigElem =
   | OutWebsiteEnabled
   | OutWebsiteConfigRedirRules
   | OutWebsiteConfigRedirAll
 
-interface OutWebsiteConfigRedirAll extends OutWebsiteEnabled {
-  RedirectAllRequestsTo: { HostName: string; Protocol: string }
-}
-
-interface OutWebsiteConfigRedirRules extends OutWebsiteEnabled {
-  RoutingRules: Array<OutRouteRule>
-}
-
-interface OutWebsiteEnabled {
-  IndexDocument: string
-  ErrorDocument: string
+export interface OutWebsiteConfig {
+  WebsiteConfiguration: OutWebsiteConfigElem
 }
 
 export { websiteConfig }

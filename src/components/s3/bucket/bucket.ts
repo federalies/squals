@@ -1,9 +1,8 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import { isEmpty, intersection } from 'lodash-es'
-import { validations, properties as importedValidProperties } from './s3-validations.js'
 import { OutTags } from './tags.js'
 import { OutVersioning } from './versioningConfiguration.js'
-import { OutAccelerateConfig } from './accelerateConfiguration'
+// import { OutAccelerateConfig } from './accelerateConfiguration'
 import { OutAnalyticsItem } from './analyticsConfiguration'
 import { OutServerSideEncRule } from './bucketEncryption'
 import { OutCorsRule } from './corsConfiguration'
@@ -14,8 +13,9 @@ import { OutMetricsRule } from './metricsConfiguration'
 import { OutSeparatedNotificationSets } from './notificationConfiguration'
 import { OutPublicAccessConfig } from './publicAccessBlockConfiguration'
 import { OutReplicationRule } from './replicationConfiguration'
-import * as randomWord from 'random-word'
-import * as Randoma from 'randoma'
+import { OutWebsiteConfigElem, inWebsiteConfig } from './websiteConfiguration'
+import randomWord from 'random-word'
+import Randoma from 'randoma'
 
 /*
  * @todo Need a way to bootstrap an S3Bucket Object based on existin template.
@@ -29,12 +29,20 @@ import * as Randoma from 'randoma'
  *
  */
 
-class S3Bucket {
+export class S3Bucket {
   name: string
   Type: 'AWS::S3::Bucket'
   Properties?: {
     BucketName?: string
-    AccessControl?: string
+    AccessControl?:
+      | 'AuthenticatedRead'
+      | 'AwsExecRead'
+      | 'BucketOwnerRead'
+      | 'BucketOwnerFullControl'
+      | 'LogDeliveryWrite'
+      | 'Private'
+      | 'PublicRead'
+      | 'PublicReadWrite'
     AccelerateConfiguration?: { AccelerationStatus: 'Enabled' | 'Suspended' }
     AnalyticsConfigurations?: OutAnalyticsItem[]
     BucketEncryption?: { ServerSideEncryptionConfiguration: OutServerSideEncRule[] }
@@ -51,8 +59,37 @@ class S3Bucket {
     }
     Tags?: OutTags
     VersioningConfiguration?: OutVersioning
-    WebsiteConfiguration?: 'OutWebsiteConfig'
+    WebsiteConfiguration?: OutWebsiteConfigElem
   }
+  private properties = [
+    'BucketName',
+    'AccessControl',
+    'AccelerateConfiguration',
+    'AnalyticsConfiguration',
+    'BucketEncryption',
+    'CorsConfiguration',
+    'InventoryConfiguration',
+    'LifecycleConfiguration',
+    'LoggingConfiguration',
+    'MetricsConfiguration',
+    'NotificationConfiguration',
+    'PublicAccessBlockConfiguration',
+    'ReplicationConfiguration',
+    'Tags',
+    'VersioningConfiguration',
+    'WebsiteConfiguration'
+  ]
+
+  private bucketACLS = [
+    'AuthenticatedRead',
+    'AwsExecRead',
+    'BucketOwnerRead',
+    'BucketOwnerFullControl',
+    'LogDeliveryWrite',
+    'Private',
+    'PublicRead',
+    'PublicReadWrite'
+  ]
 
   /**
    * S3Bucket Class that models info needed for Cloudformation.
@@ -67,13 +104,38 @@ class S3Bucket {
    */
   constructor (props: IInS3Bucket = {}, name: string = '') {
     this.Type = 'AWS::S3::Bucket'
-    this.name = `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
-      seed: new Date().getTime()
-    }).integer()}`
+    this.name =
+      name.length > 0
+        ? name
+        : `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
+          seed: new Date().getTime()
+        }).integer()}`
+
     this.Properties = { ...props }
   }
 
-  website (config: IInS3Bucket) {
+  toJSON () {
+    if (this.Properties) {
+      const printable = Object.entries(this.Properties).reduce((a: any, [k, v]) => {
+        if (v && !isEmpty(v)) a[k] = v
+        return a
+      }, {})
+      return {
+        [this.name]: {
+          Type: this.Type,
+          Properties: { ...printable }
+        }
+      }
+    } else {
+      return {
+        [this.name]: {
+          Type: this.Type
+        }
+      }
+    }
+  }
+
+  website (config: boolean | inWebsiteConfig): S3Bucket {
     if (config) {
       const AccessControl = 'PublicRead'
       const WebsiteConfiguration = {
@@ -85,34 +147,23 @@ class S3Bucket {
         AccessControl,
         WebsiteConfiguration
       }
+
       // use RedirectAllRequestsTo XOR RoutingRules
-      const { RedirectAllRequestsTo, RoutingRules } = config
-      if (RoutingRules) {
-        this.Properties.WebsiteConfiguration.RoutingRules = []
-      } else if (RedirectAllRequestsTo) {
+
+      if (typeof config !== 'boolean' && 'redir' in config) {
+        const { redir } = config
+        if (Array.isArray(redir)) {
+          // got redir rules
+        } else {
+          const r = redir as string
+          // setup the redir all to `r`
+        }
       }
     } else {
-      // remove the website config
-      const { WebsiteConfiguration, ...everthingElse } = this.Properties // eslint-disable-line
-      this.Properties = { ...everthingElse }
+      if (this.Properties) delete this.Properties.WebsiteConfiguration
     }
-
     return this
   }
-
-  toJSON () {
-    const printable = Object.entries(this.Properties).reduce((a, [k, v]) => {
-      if (v && !isEmpty(v)) a[k] = v
-      return a
-    }, {})
-    return {
-      [this.name]: {
-        Type: this.Type,
-        Properties: { ...printable }
-      }
-    }
-  }
-
   Ref () {
     /**
      * When the logical ID of this resource is provided to the Ref intrinsic function,
@@ -159,7 +210,7 @@ class S3Bucket {
     return { 'Fn::GetAtt': [this.name, 'WebsiteURL'] }
   }
 
-  outputs (existingOutputs) {
+  outputs (existingOutputs: any) {
     return {
       ...existingOutputs,
       [`${this.name}-websiteURL`]: {
@@ -168,60 +219,27 @@ class S3Bucket {
       }
     }
   }
-  validate () {
-    const testStatusBuilder = (passing = true, msgAccum = {}) => {
-      return (pass, addMsg) => {
-        msgAccum = pass ? { ...msgAccum } : { ...msgAccum, ...addMsg }
-        passing = passing && pass
-        return {
-          test: pass,
-          allTestsPass: passing,
-          failMsgs: msgAccum
-        }
-      }
-    }
-    const didTestPass = testStatusBuilder()
 
-    // @ts-ignore
-    const { allTestsPass, failMsgs } = validations(this).reduce((p, t) => {
-      return didTestPass(t.test, t.msg)
-    })
-    return { passes: allTestsPass, failMsgs }
-  }
-}
-export { S3Bucket }
+  // validate () {
+  //   const testStatusBuilder = (passing = true, msgAccum = {}) => {
+  //     return (pass, addMsg) => {
+  //       msgAccum = pass ? { ...msgAccum } : { ...msgAccum, ...addMsg }
+  //       passing = passing && pass
+  //       return {
+  //         test: pass,
+  //         allTestsPass: passing,
+  //         failMsgs: msgAccum
+  //       }
+  //     }
+  //   }
+  //   const didTestPass = testStatusBuilder()
 
-interface IS3Bucket {
-  constructor(props: IInS3Bucket, name: string | undefined): IS3Bucket
-  website(config: IInS3Bucket): IS3Bucket
-  toJSON(): string
-  Ref(): IRef
-  Arn(): IGetAtt
-  DomainName(): IGetAtt
-  RegionalDomainName(): IGetAtt
-  WebsiteURL(): IGetAtt
-  outputs(existingOutputs: Object): Object
-  validate(): IValidation
-  name: string
-  Type: 'AWS::S3::Bucket'
-  Properties: {
-    BucketName: string
-    AccessControl: string
-    AccelerateConfiguration: 'AccelerateConfiguration'
-    AnalyticsConfigurations: ['AnalyticsConfiguration']
-    BucketEncryption: 'OutB'
-    CorsConfiguration?: 'CorsConfiguration'
-    InventoryConfigurations: ['InventoryConfiguration']
-    LifecycleConfiguration: 'LifecycleConfiguration'
-    LoggingConfiguration: 'LoggingConfiguration'
-    MetricsConfigurations: 'MetricsConfiguration'
-    NotificationConfiguration: 'NotificationConfiguration'
-    PublicAccessBlockConfiguration: 'PublicAccessBlockConfiguration'
-    ReplicationConfiguration: 'Out'
-    Tags: OutTags
-    VersioningConfiguration: OutVersioning
-    WebsiteConfiguration: 'OutWebsiteConfig'
-  }
+  //   // @ts-ignore
+  //   const { allTestsPass, failMsgs } = validations(this).reduce((p, t) => {
+  //     return didTestPass(t.test, t.msg)
+  //   })
+  //   return { passes: allTestsPass, failMsgs }
+  // }
 }
 
 interface IInS3Bucket {}

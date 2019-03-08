@@ -35,13 +35,9 @@ describe.skip('functionality', () => {
     expect(new S3Bucket().validate().passes).toBe(true)
   })
   test('validate defaults', () => {
-    expect(new S3Bucket({ BucketName: 'Heya_There' }).validate().passes).toBe(
-      true
-    )
+    expect(new S3Bucket({ BucketName: 'Heya_There' }).validate().passes).toBe(true)
   })
   test('validate Bad Bucketname param', () => {
-    expect(new S3Bucket({ Bucketname: 'Heya_There' }).validate().passes).toBe(
-      false
-    )
+    expect(new S3Bucket({ Bucketname: 'Heya_There' }).validate().passes).toBe(false)
   })
 })
