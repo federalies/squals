@@ -167,6 +167,9 @@ typings/
 # decided to include docs
 # docs/
 
+# dont check the dist folder into github?
+dist/
+
 #sketchSourcefiles
 *.sketch
 #_scratch folders

@@ -1,4 +1,5 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
+
 import { isEmpty, intersection } from 'lodash-es'
 import { OutTags } from './tags.js'
 import { OutVersioning } from './versioningConfiguration.js'
@@ -16,18 +17,6 @@ import { OutReplicationRule } from './replicationConfiguration'
 import { OutWebsiteConfigElem, inWebsiteConfig } from './websiteConfiguration'
 import randomWord from 'random-word'
 import Randoma from 'randoma'
-
-/*
- * @todo Need a way to bootstrap an S3Bucket Object based on existin template.
- *  - based on string
- *  - based on file buffer?
- *  - based on URL?
- *  - based on S3 location?
- *
- * All of the above make it more useful to update my tamplates once they are already out there...
- * Once I go with autoGen'd logical-names I have to stick with them, so that creates a point of great utility.
- *
- */
 
 export class S3Bucket {
   name: string

@@ -1,1 +1,0 @@
-{"version":3,"file":"accelerateConfiguration.d.ts","sourceRoot":"","sources":["../../../../src/components/s3/bucket/accelerateConfiguration.ts"],"names":[],"mappings":"AAAA,eAAO,MAAM,UAAU,EAAE,CAAC,cAAc,EAAE,OAAO,KAAK,mBAQrD,CAAA;AAED,MAAM,WAAW,mBAAmB;IAClC,uBAAuB,EAAE;QAAE,kBAAkB,EAAE,SAAS,GAAG,WAAW,CAAA;KAAE,CAAA;CACzE"}

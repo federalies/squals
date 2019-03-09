@@ -1,5 +1,7 @@
-const Import = require('esm')(module)
-const { websiteConfig } = Import('../../../src/components/s3/bucket')
+import { websiteConfig } from '../../../src/components/s3/bucket'
+
+// const Import = require('esm')(module)
+// const { websiteConfig } = Import('../../../src/components/s3/bucket')
 
 test('1. Website Bare Default', () => {
   const wc = websiteConfig()

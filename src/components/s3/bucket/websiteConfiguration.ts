@@ -17,7 +17,7 @@ import { isEmpty } from 'lodash-es'
  *  var webcfgPlain = websiteConfig()
  *  var webcfgWRedirRules = websiteConfig({redir:[{when:'docs/', to:'squals.readthedocs.io/', replacer:'', doFullReplace:true}]})
  */
-const websiteConfig = (param: inWebsiteConfig): OutWebsiteConfig => {
+const websiteConfig = (param?: inWebsiteConfig): OutWebsiteConfig => {
   const { redir, indexpage, errorpage } = {
     redir: '',
     indexpage: 'index.html',

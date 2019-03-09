@@ -1,1 +1,0 @@
-{"version":3,"file":"versioningConfiguration.d.ts","sourceRoot":"","sources":["../../../../src/components/s3/bucket/versioningConfiguration.ts"],"names":[],"mappings":"AAAA,uBAAuB;AAEvB;;;;;;;GAOG;AACH,QAAA,MAAM,UAAU,uCAIf,CAAA;AAED,MAAM,WAAW,aAAa;IAC5B,uBAAuB,EAAE;QAAE,MAAM,EAAE,WAAW,GAAG,SAAS,CAAA;KAAE,CAAA;CAC7D;AACD,OAAO,EAAE,UAAU,EAAE,CAAA"}

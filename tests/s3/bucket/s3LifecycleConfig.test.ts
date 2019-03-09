@@ -1,7 +1,10 @@
-// @ts-nocheck
+/**
+ * Things to test:
+ * 1.
+ * 2.
+ */
 
-// const Import = require('esm')(module)
-// const { lifecycleConfig } = Import('../../../src/components/s3/bucket/')
+import { lifecycleConfig } from '../../../src/components/s3/bucket/'
 
 // const log = data => {JSON.stringify(data, null, 2)}
 
