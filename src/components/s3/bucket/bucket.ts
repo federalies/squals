@@ -1,6 +1,6 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 
-import { isEmpty, intersection } from 'lodash-es'
+import { isEmpty } from 'lodash-es'
 import { OutTags } from './tags.js'
 import { OutVersioning } from './versioningConfiguration.js'
 // import { OutAccelerateConfig } from './accelerateConfiguration'
@@ -23,15 +23,7 @@ export class S3Bucket {
   Type: 'AWS::S3::Bucket'
   Properties?: {
     BucketName?: string
-    AccessControl?:
-      | 'AuthenticatedRead'
-      | 'AwsExecRead'
-      | 'BucketOwnerRead'
-      | 'BucketOwnerFullControl'
-      | 'LogDeliveryWrite'
-      | 'Private'
-      | 'PublicRead'
-      | 'PublicReadWrite'
+    AccessControl?: IValidPublicAccessControls
     AccelerateConfiguration?: { AccelerationStatus: 'Enabled' | 'Suspended' }
     AnalyticsConfigurations?: OutAnalyticsItem[]
     BucketEncryption?: { ServerSideEncryptionConfiguration: OutServerSideEncRule[] }
@@ -242,3 +234,13 @@ interface IValidation {
   passes: boolean
   failMsgs: string
 }
+
+type IValidPublicAccessControls =
+  | 'AuthenticatedRead'
+  | 'AwsExecRead'
+  | 'BucketOwnerRead'
+  | 'BucketOwnerFullControl'
+  | 'LogDeliveryWrite'
+  | 'Private'
+  | 'PublicRead'
+  | 'PublicReadWrite'

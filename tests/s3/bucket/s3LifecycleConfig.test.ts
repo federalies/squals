@@ -9,6 +9,7 @@ import { lifecycleConfig } from '../../../src/components/s3/bucket/'
 // const log = data => {JSON.stringify(data, null, 2)}
 
 test('sinple 2+2=4', () => {
+  const a = lifecycleConfig([])
   expect(2 + 2).toBe(4)
 })
 
