@@ -19,7 +19,7 @@ import { TagFilters, tags, OutTags, InTags } from './tags'
  *  var lifeCycle1 = lifecycleConfig({})
  *  var lifeCycle2 = lifecycleConfig([{},{}])
  */
-const lifecycleConfig = (rules: InRule | InRule[]): OutLifecycleConfig => {
+export const lifecycleConfig = (rules: InRule | InRule[]): OutLifecycleConfig => {
   rules = Array.isArray(rules) ? rules : new Array(rules)
   return {
     LifecycleConfiguration: {
@@ -44,7 +44,7 @@ const lifecycleConfig = (rules: InRule | InRule[]): OutLifecycleConfig => {
  *  var rulesA = lifecyleRule({opt:1})
  *  var rulesB = lifecyleRule([{opt:1},{opt:1}])
  */
-const lifecyleRule = (rule: InRule): OutValidLifeCycleRule => {
+export const lifecyleRule = (rule: InRule): OutValidLifeCycleRule => {
   const { status, id, prefix, tagList, ...inRuleConfig } = {
     status: true,
     id: null,
@@ -383,4 +383,3 @@ export interface OutLifecycleRule {
 export interface OutLifecycleConfig {
   LifecycleConfiguration: { Rules: OutLifecycleRule[] }
 }
-export { lifecycleConfig, lifecyleRule }

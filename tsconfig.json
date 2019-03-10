@@ -67,10 +67,10 @@
   },
   "compileOnSave": true,
   // "include": ["./src/**/*"],
-  "include": ["./src/**/*", "./tests/**/*"],
-  "exclude": ["*.json", "node_modules", "lib", "dist"],
+  "include": ["./src/**/*"],
+  "exclude": ["*.json", "node_modules", "lib", "dist", "./tests/**/*.test.js"],
   "typedocOptions": {
-    "mode": "modules",
+    "mode": "file",
     "out": "typeDocs"
   }
 }
