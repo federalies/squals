@@ -12,18 +12,13 @@
  *   var b = bucketEncryption({algo:'AES256'})
  *   var c = bucketEncryption([{algo:'AES256'}, {algo:'aws:kms',keyID:'1sf1f3fqws'}])
  */
-export const bucketEncryption = (encRules: InParamSSRule | Array<InParamSSRule>): OutBucketEnc => {
-  return Array.isArray(encRules)
-    ? {
-      BucketEncryption: {
-        ServerSideEncryptionConfiguration: encRules.map(item => serverSideEncryptionRule(item))
-      }
+export const bucketEncryption = (encRules: InParamSSRule | InParamSSRule[]): OutBucketEnc => {
+  const bucketEnc = Array.isArray(encRules) ? encRules : new Array(encRules)
+  return {
+    BucketEncryption: {
+      ServerSideEncryptionConfiguration: bucketEnc.map(item => serverSideEncryptionRule(item))
     }
-    : {
-      BucketEncryption: {
-        ServerSideEncryptionConfiguration: [serverSideEncryptionRule(encRules)]
-      }
-    }
+  }
 }
 
 /**
@@ -56,6 +51,6 @@ export interface OutServerSideEncRule {
   }
 }
 
-interface OutBucketEnc {
+export interface OutBucketEnc {
   BucketEncryption: { ServerSideEncryptionConfiguration: Array<OutServerSideEncRule> }
 }

@@ -1,6 +1,14 @@
 import { InDestination, destination } from './destination'
-import { difference } from 'lodash-es'
-/** @module S3Bucket */
+// import { difference } from 'lodash-es'
+
+const difference = (setA: any[], setB: any[]) => {
+  return Array.from(
+    setB.reduce((_difference, elem: any) => {
+      _difference.delete(elem)
+      return _difference
+    }, new Set(setA))
+  )
+}
 
 // * @param {string} configs.id -
 //  * @param {inDestination} configs.dest -
@@ -22,7 +30,7 @@ import { difference } from 'lodash-es'
  *   ])
  */
 export const inventoryConfig = (
-  configs: InInventoryRule | Array<InInventoryRule>
+  configs: InInventoryRule | InInventoryRule[]
 ): OutInventoryConfig => {
   return Array.isArray(configs)
     ? { InventoryConfigurations: configs.map(item => inventoryRule(item)) }

@@ -8,7 +8,7 @@
  * @example
  *  var version = versioning(true)
  */
-const versioning = (isEnabled: boolean): OutVersioning => {
+export const versioning = (isEnabled: boolean): OutVersioning => {
   return isEnabled
     ? { VersioningConfiguration: { Status: 'Suspended' } }
     : { VersioningConfiguration: { Status: 'Enabled' } }
@@ -17,4 +17,3 @@ const versioning = (isEnabled: boolean): OutVersioning => {
 export interface OutVersioning {
   VersioningConfiguration: { Status: 'Suspended' | 'Enabled' }
 }
-export { versioning }

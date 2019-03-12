@@ -1,7 +1,16 @@
 import * as Url from 'url'
 import { redirRule, OutRouteRule, InRedirRule } from './redirectRule'
-import { isEmpty } from 'lodash-es'
-/** @module S3Bucket */
+// import { isEmpty } from 'lodash-es'
+
+/**
+ * removing lodash since that is causing headaches with JEST that I dont yet know how to resolve.
+ * research found: https://github.com/kulshekhar/ts-jest/issues/494
+ *
+ * @todo
+ * 1. return `AccessControl` - since that changes the usability of the WebsiteConfig
+ * 2. Hnadle the case where Public Read = 0 AND where a CDN User ID gets read access instead
+ *
+ */
 
 /**
  * AWS:S3:: Website Configuration.
@@ -25,7 +34,7 @@ const websiteConfig = (param?: inWebsiteConfig): OutWebsiteConfig => {
     ...param
   }
 
-  if (isEmpty(redir)) {
+  if (redir.length === 0) {
     return {
       WebsiteConfiguration: {
         IndexDocument: indexpage,
@@ -50,7 +59,7 @@ const websiteConfig = (param?: inWebsiteConfig): OutWebsiteConfig => {
   } else {
     // redirect should be a URL
     try {
-      const uri = new URL(redir)
+      const uri = new Url.URL(redir)
       return {
         WebsiteConfiguration: {
           IndexDocument: indexpage,

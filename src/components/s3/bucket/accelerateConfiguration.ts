@@ -1,6 +1,4 @@
-export const accelerate: (shouldAccelate: boolean) => OutAccelerateConfig = function (
-  shouldAccelate
-) {
+export const accelerate = (shouldAccelate: boolean = true): OutAccelerateConfig => {
   return {
     AccelerateConfiguration: {
       AccelerationStatus: shouldAccelate ? 'Enabled' : 'Suspended'

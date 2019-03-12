@@ -12,7 +12,7 @@ export const tags: (tagList: InTags | Array<InTags>) => Array<OutTags> = functio
   const handleArray = (tagList: Array<InTags>) => {
     return tagList.map(v => ({
       Key: Object.keys(v)[0],
-      Value: Object.keys(v)[0]
+      Value: Object.values(v)[0]
     }))
   }
   const handleItem = (tagList: InTags) => {
@@ -33,9 +33,7 @@ export const tags: (tagList: InTags | Array<InTags>) => Array<OutTags> = functio
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
-export const Tags: (tagList: InTags | Array<InTags>) => { Tags: Array<OutTags> } = function (
-  tagList
-) {
+export const Tags = (tagList: InTags | Array<InTags>): IResourceTags => {
   return {
     Tags: tags(tagList)
   }
@@ -50,9 +48,7 @@ export const Tags: (tagList: InTags | Array<InTags>) => { Tags: Array<OutTags> }
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
-export const TagFilters: (
-  tagList: InTags | Array<InTags>
-) => { TagFilters: Array<OutTags> } = function (tagList) {
+export const TagFilters = (tagList: InTags | InTags[]): ITagFilters => {
   return {
     TagFilters: tags(tagList)
   }
@@ -65,4 +61,11 @@ export interface InTags {
 export interface OutTags {
   Key: string
   Value: string
+}
+export interface IResourceTags {
+  Tags: OutTags[]
+}
+
+export interface ITagFilters {
+  TagFilters: OutTags[]
 }

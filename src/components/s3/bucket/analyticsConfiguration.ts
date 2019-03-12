@@ -11,7 +11,7 @@ import { OutTags, InTags, TagFilters } from './tags'
  * @todo work on a way to imply the ID from the prefix, bucketname, date created, etc.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-analyticsconfiguration.html>
  * @example
- *  var analyticsItem = analyticsConfig([
+ *  var analyticsCfg = analyticsConfig([
  *    { id: 'testA', prefix: 'doc/', tagList: [{ keyy: 'value' }] },
  *    {
  *      id: 'testB',
@@ -26,11 +26,11 @@ import { OutTags, InTags, TagFilters } from './tags'
  *  ])
  */
 export const analyticsConfig: (
-  config: InAnalyticsConfigItem | Array<InAnalyticsConfigItem>
+  config: InAnalyticsConfigItem | InAnalyticsConfigItem[]
 ) => OutAnalyticsConfig = function (config) {
   return Array.isArray(config)
-    ? { AnalyticsConfigurations: config.map(item => makeItem(item)) }
-    : { AnalyticsConfigurations: [makeItem(config)] }
+    ? { AnalyticsConfigurations: config.map(item => analyticsItem(item)) }
+    : { AnalyticsConfigurations: [analyticsItem(config)] }
 }
 
 /**
@@ -40,9 +40,9 @@ export const analyticsConfig: (
  * @param config - The required config baed on required field desinations in AWS docs.
  * @todo work on a way to imply the ID from the prefix, bucketname, date created, etc - do it here first - and see if we can just make it not required first
  * @example
- *   var v = makeItem({ id:'heyThere', prefix:'myPrefix', tagList:[{key1:'val1'},{key1:'val2'}] })
+ *   var v = analyticsItem({ id:'heyThere', prefix:'myPrefix', tagList:[{key1:'val1'},{key1:'val2'}] })
  */
-const makeItem: (config: InAnalyticsConfigItem) => OutAnalyticsItem = function (config) {
+const analyticsItem = (config: InAnalyticsConfigItem): OutAnalyticsItem => {
   const { id, prefix, dest, tagList } = {
     // id*
     dest: null,
@@ -50,40 +50,48 @@ const makeItem: (config: InAnalyticsConfigItem) => OutAnalyticsItem = function (
     tagList: null,
     ...config
   }
+
   let item = tagList
     ? {
       Id: id,
       Prefix: '',
-      StorageClassAnalysis: {
-        DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
-      }
+      ...TagFilters(tagList),
+      StorageClassAnalysis: dest
+        ? {
+          DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
+        }
+        : {}
     }
     : {
       Id: id,
       Prefix: '',
-      ...TagFilters(tagList),
-      StorageClassAnalysis: {
-        DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
-      }
+      StorageClassAnalysis: dest
+        ? {
+          DataExport: { OutputSchemaVersion: 'V_1', ...destination(dest) }
+        }
+        : {}
     }
 
   if (prefix) item['Prefix'] = prefix
   return item
 }
 
-interface InAnalyticsConfigItem {
+/**
+ * @todo make ID not required
+ */
+export interface InAnalyticsConfigItem {
   id: string
-  dest: InDestination
+  dest?: InDestination
   prefix?: string
-  tagList: Array<InTags>
+  tagList?: InTags | InTags[]
 }
 
 export interface OutAnalyticsItem {
   Id: string
   Prefix?: string
-  TagFilter?: Array<OutTags>
+  TagFilters?: Array<OutTags>
   StorageClassAnalysis: {
-    DataExport: {
+    DataExport?: {
       OutputSchemaVersion: string
       Destination: OutDestinationItem
     }

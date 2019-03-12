@@ -1,5 +1,17 @@
-import { difference, isEmpty, uniq } from 'lodash-es'
-/** @module S3Bucket */
+// import { uniq } from 'lodash-es'
+
+const uniq = (dupppedList: any[]) => {
+  return Array.from(new Set(dupppedList))
+}
+
+const difference = (setA: any[], setB: any[]) => {
+  return Array.from(
+    setB.reduce((_difference, elem: any) => {
+      _difference.delete(elem)
+      return _difference
+    }, new Set(setA))
+  )
+}
 
 /**
  *
@@ -11,7 +23,7 @@ import { difference, isEmpty, uniq } from 'lodash-es'
  * @example
  *   var cfmCorsConfig = corsConfig([{methods:[],origins:[]}])
  */
-const corsConfig = (
+export const corsConfig = (
   rules: InCorsRule | InCorsRule[]
 ): { CorsConfiguration: { CorsRules: OutCorsRule[] } } => {
   return Array.isArray(rules)
@@ -40,7 +52,7 @@ const corsConfig = (
  *  var cors3 = corsRule({id:"Local Development Rule3", maxAge:3600*6,  GET:'localhost'})
  *  var cors4 = corsRule({id:"Local Development Rule4", maxAge:3600*6, 'GET|POST':['mydomain.com','localhost']})
  */
-const corsRule = (params: InCorsRule): OutCorsRule => {
+export const corsRule = (params: InCorsRule): OutCorsRule => {
   let { methods, origins, headersExposed, headersAllowed, id, maxAge, ...HTTPVERBS } = {
     methods: [],
     origins: [],
@@ -70,7 +82,7 @@ const corsRule = (params: InCorsRule): OutCorsRule => {
   }, [])
 
   // check for complex verbs to proces
-  if (!isEmpty(Verbs)) {
+  if (Verbs.length > 0) {
     Verbs = uniq([...methods, ...Verbs])
     Origins = uniq([...origins, ...Origins]) as string[]
   }
@@ -107,7 +119,7 @@ const corsRule = (params: InCorsRule): OutCorsRule => {
   return rule
 }
 
-interface InCorsRule {
+export interface InCorsRule {
   methods: string | Array<string>
   origins: string | Array<string>
   headersExposed?: Array<string>
@@ -124,5 +136,3 @@ export interface OutCorsRule {
   Id?: string
   MaxAge?: number
 }
-
-export { corsConfig, corsRule }

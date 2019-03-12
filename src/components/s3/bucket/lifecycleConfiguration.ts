@@ -1,4 +1,4 @@
-import { TagFilters, tags, OutTags, InTags } from './tags'
+import { TagFilters, OutTags, InTags } from './tags'
 
 /** @module S3Bucket */
 
@@ -19,7 +19,7 @@ import { TagFilters, tags, OutTags, InTags } from './tags'
  *  var lifeCycle1 = lifecycleConfig({})
  *  var lifeCycle2 = lifecycleConfig([{},{}])
  */
-export const lifecycleConfig = (rules: InRule | InRule[]): OutLifecycleConfig => {
+export const lifecycleConfig = (rules: InLifecycleRule | InLifecycleRule[]): OutLifecycleConfig => {
   rules = Array.isArray(rules) ? rules : new Array(rules)
   return {
     LifecycleConfiguration: {
@@ -44,7 +44,7 @@ export const lifecycleConfig = (rules: InRule | InRule[]): OutLifecycleConfig =>
  *  var rulesA = lifecyleRule({opt:1})
  *  var rulesB = lifecyleRule([{opt:1},{opt:1}])
  */
-export const lifecyleRule = (rule: InRule): OutValidLifeCycleRule => {
+export const lifecyleRule = (rule: InLifecycleRule): OutValidLifeCycleRule => {
   const { status, id, prefix, tagList, ...inRuleConfig } = {
     status: true,
     id: null,
@@ -260,29 +260,29 @@ const transformtoAWSfmt = (input: IInAlllValidInRules): any => {
       return conditionTransitions(input)
     default:
       let shouldNeverGetHere: never
-      return new Error('poorly formed inputs in the lifecycleConfig function')
+      return new Error(`poorly formed inputs in the lifecycleConfig functionn$`)
   }
 }
-interface IInRuleMoveOldVersionsItem {
+export interface IInRuleMoveOldVersionsItem {
   // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule-noncurrentversiontransition.html
   storage: string
   daysTillSlowDown: number
 }
 
-interface IInRuleTransitionItem_wDays {
+export interface IInRuleTransitionItem_wDays {
   storage: string
   atDate: never
   daysTillSlowDown: number
 }
 
-interface IInRuleTransitionItem_wDate {
+export interface IInRuleTransitionItem_wDate {
   storage: string
   atDate: string
   daysTillSlowDown: never
 }
 
 // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule.html
-type IInAlllValidInRules =
+export type IInAlllValidInRules =
   | IInRuleMultipartAbort
   | IInRuleExpirationDays
   | IInRuleMoveOldVersions
@@ -290,62 +290,62 @@ type IInAlllValidInRules =
   | IInRuleTransitions
   | IInRuleMoveOldVersionsAfterDays
 
-interface IInRuleMultipartAbort extends InRule {
+export interface IInRuleMultipartAbort extends InLifecycleRule {
   readonly ruleName: 'AbortIncompleteMultipartUpload'
   quitMultipartsAfterDays: number
 }
 
-interface IInRuleExpiryDate extends InRule {
+export interface IInRuleExpiryDate extends InLifecycleRule {
   readonly ruleName: 'ExpirationDate'
   expiryDate?: string
 }
 
-interface IInRuleExpirationDays extends InRule {
+export interface IInRuleExpirationDays extends InLifecycleRule {
   readonly ruleName: 'ExpirationInDays'
   expiryDays: number
 }
 
-interface IInRuleMoveOldVersionsAfterDays extends InRule {
+export interface IInRuleMoveOldVersionsAfterDays extends InLifecycleRule {
   readonly ruleName: 'NoncurrentVersionExpirationInDays'
   keepOldVersionForDays?: number
 }
 
-interface IInRuleMoveOldVersions extends InRule {
+export interface IInRuleMoveOldVersions extends InLifecycleRule {
   readonly ruleName: 'NoncurrentVersionTransitions'
   moveOldVersionRules: IInRuleMoveOldVersionsItem | IInRuleMoveOldVersionsItem[]
 }
 
-type IInRuleTransitions = IInRuleTransitionsDated | IInRuleTransitionsDurationed
+export type IInRuleTransitions = IInRuleTransitionsDated | IInRuleTransitionsDurationed
 
-interface IInRuleTransitionsDated extends InRule {
+export interface IInRuleTransitionsDated extends InLifecycleRule {
   readonly ruleName: 'Transitions'
   transitions: IInRuleTransitionItem_wDays | IInRuleTransitionItem_wDays[]
 }
 
-interface IInRuleTransitionsDurationed extends InRule {
+export interface IInRuleTransitionsDurationed extends InLifecycleRule {
   readonly ruleName: 'Transitions'
   transitions: IInRuleTransitionItem_wDate | IInRuleTransitionItem_wDate[]
 }
 
-interface InRule {
+export interface InLifecycleRule {
   id?: string
   prefix?: string
   status?: boolean
   tagList?: InTags
 }
 
-interface OutMoveOldVersionsItem {
+export interface OutMoveOldVersionsItem {
   StorageClass: string
   TransitionInDays: number
 }
 
-interface OutTransitionItem {
+export interface OutTransitionItem {
   StorageClass: string
   TransitionDate?: string
   TransitionInDays?: number
 }
 
-type OutValidLifeCycleRule =
+export type OutValidLifeCycleRule =
   | OutMultiPartCancel
   | OutExpirationDate
   | OutExpirationInDays
@@ -353,24 +353,24 @@ type OutValidLifeCycleRule =
   | OutNonCurrentTrans
   | OutTransitions
 
-interface OutMultiPartCancel extends OutLifecycleRule {
+export interface OutMultiPartCancel extends OutLifecycleRule {
   AbortIncompleteMultipartUpload: {
     DaysAfterInitiation: number
   }
 }
-interface OutExpirationDate extends OutLifecycleRule {
+export interface OutExpirationDate extends OutLifecycleRule {
   ExpirationDate: string
 }
-interface OutExpirationInDays extends OutLifecycleRule {
+export interface OutExpirationInDays extends OutLifecycleRule {
   ExpirationInDays: number
 }
-interface OutNoncurrentVer extends OutLifecycleRule {
+export interface OutNoncurrentVer extends OutLifecycleRule {
   NoncurrentVersionExpirationInDays?: number
 }
-interface OutNonCurrentTrans extends OutLifecycleRule {
+export interface OutNonCurrentTrans extends OutLifecycleRule {
   NoncurrentVersionTransitions: OutMoveOldVersionsItem[]
 }
-interface OutTransitions extends OutLifecycleRule {
+export interface OutTransitions extends OutLifecycleRule {
   Transitions: OutTransitionItem[]
 }
 export interface OutLifecycleRule {
