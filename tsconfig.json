@@ -67,8 +67,9 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
   "compileOnSave": true,
-  "include": ["./src/**/*"],
-  "exclude": ["node_modules", "lib", "dist", "*.json"],
+  // "include": ["./src/**/*"],
+  "include": ["./src/**/*", "./tests/**/*"],
+  "exclude": ["lib", "dist", "*.json"],
   "typedocOptions": {
     "mode": "file",
     "out": "typeDocs"

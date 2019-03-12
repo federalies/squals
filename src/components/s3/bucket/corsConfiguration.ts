@@ -4,6 +4,20 @@ const uniq = (dupppedList: any[]) => {
   return Array.from(new Set(dupppedList))
 }
 
+// in (string | string[])[]
+// out string[]
+// and now it supports any type
+const fold = <T extends {}>(list: (T | T[])[]): T[] => {
+  return list.reduce((acc: T[], c) => {
+    if (Array.isArray(c)) {
+      c.map(s => acc.push(s))
+    } else {
+      acc.push(c)
+    }
+    return acc
+  }, [])
+}
+
 const difference = (setA: any[], setB: any[]) => {
   return Array.from(
     setB.reduce((_difference, elem: any) => {
@@ -53,7 +67,15 @@ export const corsConfig = (
  *  var cors4 = corsRule({id:"Local Development Rule4", maxAge:3600*6, 'GET|POST':['mydomain.com','localhost']})
  */
 export const corsRule = (params: InCorsRule): OutCorsRule => {
-  let { methods, origins, headersExposed, headersAllowed, id, maxAge, ...HTTPVERBS } = {
+  let {
+    methods,
+    origins,
+    headersExposed,
+    headersAllowed,
+    id,
+    maxAge,
+    _: { ...HTTPVERBS }
+  } = {
     methods: [],
     origins: [],
     headersExposed: [],
@@ -74,12 +96,7 @@ export const corsRule = (params: InCorsRule): OutCorsRule => {
     return p
   }, [])
 
-  // collect origin arrays into a single array
-  let Origins = Object.values(HTTPVERBS)
-  Origins = Origins.reduce((p: string[], originSet: string[]) => {
-    originSet.map(o => p.push(o))
-    return p
-  }, [])
+  let Origins = fold(Object.values(HTTPVERBS))
 
   // check for complex verbs to proces
   if (Verbs.length > 0) {
@@ -92,11 +109,11 @@ export const corsRule = (params: InCorsRule): OutCorsRule => {
 
   const rule: OutCorsRule = {
     AllowedMethods: [...AllowedMethods, ...Verbs],
-    AllowedOrigins: [...AllowedMethods, ...Origins]
+    AllowedOrigins: [...AllowedOrigins, ...Origins]
   }
 
-  if (AllowedOrigins.length < 1) {
-    throw new Error('in the corsConfig the origins param must be an array with 1+ domain listed')
+  if (rule.AllowedOrigins.length < 1) {
+    throw new Error('The corsConfig the origins param must be an array with 1+ domain listed')
   }
   if (difference(rule.AllowedMethods, validMethods).length > 0) {
     throw new Error(
@@ -119,20 +136,35 @@ export const corsRule = (params: InCorsRule): OutCorsRule => {
   return rule
 }
 
-export interface InCorsRule {
-  methods: string | Array<string>
-  origins: string | Array<string>
-  headersExposed?: Array<string>
-  headersAllowed?: Array<string>
+export type InCorsRule = IInCorsRule_methodsOrigins | IInCorsRule_VerbsOrigins
+
+// "at least one" logic is pushed into the type system
+export interface IInCorsRule_methodsOrigins extends IInCorsRule_opts {
+  methods: string | string[]
+  origins: string | string[]
+  _?: { [key: string]: string | string[] }
+}
+
+export interface IInCorsRule_VerbsOrigins extends IInCorsRule_opts {
+  methods?: string | string[]
+  origins?: string | string[]
+  // @todo : determine how this key can be removed so that
+  // the 'GET|POST' keys can be top level
+  _: { [key: string]: string | string[] }
+}
+
+export interface IInCorsRule_opts {
+  headersExposed?: string[]
+  headersAllowed?: string[]
   id?: string
   maxAge?: number
 }
 
 export interface OutCorsRule {
-  AllowedMethods: Array<string>
-  AllowedOrigins: Array<string>
-  AllowedHeaders?: Array<string>
-  ExposedHeaders?: Array<string>
+  AllowedMethods: string[]
+  AllowedOrigins: string[]
+  AllowedHeaders?: string[]
+  ExposedHeaders?: string[]
   Id?: string
   MaxAge?: number
 }

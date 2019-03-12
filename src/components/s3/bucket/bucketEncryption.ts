@@ -12,7 +12,7 @@
  *   var b = bucketEncryption({algo:'AES256'})
  *   var c = bucketEncryption([{algo:'AES256'}, {algo:'aws:kms',keyID:'1sf1f3fqws'}])
  */
-export const bucketEncryption = (encRules: InParamSSRule | InParamSSRule[]): OutBucketEnc => {
+export const bucketEncryption = (encRules: InParamSSRule | InParamSSRule[] = {}): OutBucketEnc => {
   const bucketEnc = Array.isArray(encRules) ? encRules : new Array(encRules)
   return {
     BucketEncryption: {

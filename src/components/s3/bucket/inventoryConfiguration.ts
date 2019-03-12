@@ -1,5 +1,4 @@
-import { InDestination, destination } from './destination'
-// import { difference } from 'lodash-es'
+import { InDestination, destination, OutDestinationItem } from './destination'
 
 const difference = (setA: any[], setB: any[]) => {
   return Array.from(
@@ -62,15 +61,9 @@ export const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
     ...params
   }
 
-  // assert data presence
-  if (!id || !dest || !versions || !frequency) {
-    let msg = 'ƒ.inventoryRule has missing required data: [ '
-    if (!id) msg += ' id'
-    if (!dest) msg += ' dest'
-    if (!versions) msg += ' versions'
-    if (!frequency) msg += ' frequency'
-    msg += ' ]'
-    throw new Error(msg)
+  // assert data presence for js callers
+  if (!id || !dest) {
+    throw new Error(`ƒ.inventoryRule has missing required data: id:string + dest:{}`)
   }
 
   // assert validity
@@ -98,7 +91,8 @@ export const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
       `ƒ.inventoryRule frequency only has two valid values: 'Daily' + 'Weekly' - found the value: ${frequency}`
     )
   }
-  if (difference(optionals, validOptionals).length > 1) {
+
+  if (difference(optionals, validOptionals).length > 0) {
     throw new Error(
       `ƒ.inventoryRule param: optionals have a defined of properties that can be requested as included in invetory analysis - found: ${optionals}`
     )
@@ -122,16 +116,16 @@ export interface InInventoryRule {
   id: string
   dest: InDestination
   enabled?: boolean
+  prefix?: string
   versions?: string
   frequency?: string
-  optionals?: Array<string>
-  prefix?: string
+  optionals?: string[]
 }
 
 export interface OutInventoryRule {
   Id: string
   Enabled: boolean
-  Destination: Object
+  Destination: OutDestinationItem
   ScheduleFrequency: string
   IncludedObjectVersions: string
   Prefix?: string

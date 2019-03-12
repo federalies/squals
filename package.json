@@ -9,7 +9,7 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "jest --env=node --colors --coverage test",
+    "test": "rm -rf dist/ && jest --env=node --colors --coverage test",
     "jest": "jest",
     "test:watch": "npm run test -- --watchAll",
     "docs": "typedoc --out docs && open ./docs/index.html",

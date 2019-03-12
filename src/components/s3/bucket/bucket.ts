@@ -90,15 +90,16 @@ export class S3Bucket implements IndexSignature {
    *  var myBucket = new S3Bucket()
    *  console.log({myBucket})
    */
-  constructor (props: IInS3Bucket = {}, name: string = '') {
+  constructor (props: IndexSignature = {}) {
     this.Type = 'AWS::S3::Bucket'
-    this.name =
-      name.length > 0
-        ? name
-        : `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
-          seed: new Date().getTime()
-        }).integer()}`
-    this.Properties = { ...props }
+    const defaultName = `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
+      seed: new Date().getTime()
+    }).integer()}`
+
+    let { name, ...inprops } = { name: defaultName, ...props }
+    this.name = name
+
+    this.Properties = inprops
 
     const noop = (input: any) => {
       return input

@@ -1,13 +1,15 @@
 // @ts-nocheck
-/**
- * Things to test:
- * 1.
- * 2.
- */
 
-describe.skip('defaults', () => {
-  test.skip('1+2=3', () => {
-    expect(1 + 2).toBe(3)
+import { lifecycleConfig } from '../../../src/components/s3/bucket'
+describe('defaults', () => {
+  test('simple starter', () => {
+    const a = lifecycleConfig({})
+    const exp: any = {
+      LifecycleConfiguration: {
+        Rules: []
+      }
+    }
+    expect(a).toEqual()
   })
 })
 

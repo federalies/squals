@@ -9,10 +9,8 @@
  * @example
  *  var dest = destination()
  */
-export const destination: (
-  config: InDestination
-) => { Destination: OutDestinationItem } = function (config) {
-  const { arn, format, acctId, prefix } = config
+export const destination = (config: InDestination): { Destination: OutDestinationItem } => {
+  const { arn, format, acctId, prefix } = { format: 'CSV', ...config }
 
   let ret: { Destination: OutDestinationItem }
 
@@ -21,7 +19,7 @@ export const destination: (
       ret = {
         Destination: {
           BucketArn: arn.toString(),
-          Format: format || 'CSV'
+          Format: format
         }
       }
     } else {

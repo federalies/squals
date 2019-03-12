@@ -1,14 +1,5 @@
 import { TagFilters, OutTags, InTags } from './tags'
 
-/** @module S3Bucket */
-
-/**
- * @typeDef outLifecycleConfig
- * @type {Object}
- * @property {Object} LifecycleConfiguration - asd
- * @property {Array<outRule>} LifecycleConfiguration.Rules - asd
- */
-
 /**
  * Config the Lifecycle Rules.
  *
