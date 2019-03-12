@@ -7,14 +7,14 @@
 
 ## Convention
 
-- List type properties also accept a single config object - which is trnaslated into a List of 1
+- List type properties **always** accept a single config object or list -
 
 ## Checklist
 
-- JSDoc shows ? or ! for every property
-- JSDoc uses the typedefs for params but shows some embeded property values
-- When embedding propery values, omit the description allowing the verbose description to exist in the typeDef
-- @see an AWS documentation deeplink
-- @typedefs should use
+- interfaces starts with `I`< logical name >
+- tests
+- jsdoc w/ @description @example< short && simple >
 
-  - `module:< modName >.< typeName >`
+## Docs
+
+[WIP](https://raw.githack.com/federalies/squals/master/docs/index.html)

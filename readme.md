@@ -31,4 +31,4 @@ or
 
 ## Docs
 
-[WIP Documentation](https://rawcdn.githack.com/federalies/squals/3dbe6d52d92cd589eafe9946dd3cbdfe17f6e194/docs/index.html)
+[WIP Docs](https://raw.githack.com/federalies/squals/master/docs/index.html)
