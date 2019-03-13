@@ -1,33 +1,25 @@
-/** @module S3Bucket */
-
 /**
  * Title.
  *
  * @description descrip.
- * @param {Object} param - Asd.
- * @param {string} param.iamARN - Asd.
- * @param {Array<Object>} param.rules - Asd.
- * @returns {Object} - Asd.
+ * @param param - Asd.
+ * @param param.iamARN - Asd.
+ * @param param.rules - Asd.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-replicationconfiguration.html>
  * @example
  *  var rcfg = replicationConfig({ iamARN:getActingIAMWhileReplcating(),
  *                                 rules: getTheRuleListWeNeedToConfigureTheTempalte() })
  */
 export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig => {
-  const { iamARN, rules } = params
-  return Array.isArray(rules)
-    ? {
-      ReplicationConfiguration: {
-        Role: iamARN,
-        Rules: rules.map(r => replicationRule(r))
-      }
+  const { iamARN } = params
+  let { rules } = params
+  rules = Array.isArray(rules) ? rules : new Array(rules)
+  return {
+    ReplicationConfiguration: {
+      Role: iamARN,
+      Rules: rules.map(r => replicationRule(r))
     }
-    : {
-      ReplicationConfiguration: {
-        Role: iamARN,
-        Rules: [replicationRule(rules)]
-      }
-    }
+  }
 }
 
 /**
@@ -47,18 +39,27 @@ export const replicationRule = (
   params: InReplicaRule = {
     dest: { bucket: '' },
     prefix: '',
-    id: '',
+    id: undefined,
     replicateEncData: false,
     status: true
   }
 ): OutReplicationRule => {
-  const { id, prefix, replicateEncData, status } = {
-    // dest*
+  const {
+    dest: { bucket },
+    id,
+    prefix,
+    replicateEncData,
+    status
+  } = {
+    id: null,
     prefix: '',
     status: true,
     replicateEncData: false,
-    id: null,
     ...params
+  }
+
+  if (bucket === '') {
+    throw new Error(`ƒ.replicationRule requries a 'dest.bucket' input`)
   }
 
   const ret: OutReplicationRule = {
@@ -67,7 +68,7 @@ export const replicationRule = (
     Status: status ? 'Enabled' : 'Disabled'
   }
 
-  if (replicateEncData) {
+  if ('replicateEncData' in params) {
     ret['SourceSelectionCriteria'] = {
       SseKmsEncryptedObjects: {
         Status: replicateEncData ? 'Enabled' : 'Disabled'
@@ -97,7 +98,7 @@ export const replicationDest = (params: InReplicaDest): OutReplicaDestination =>
   const { bucket, account, kmsId, storageClass } = {
     account: null,
     kmsId: null,
-    storageClass: 'STANDARD',
+    storageClass: undefined,
     ...params
   }
 
@@ -125,25 +126,24 @@ export const replicationDest = (params: InReplicaDest): OutReplicaDestination =>
   return ret
 }
 
-export interface InReplicaDest {
-  bucket: string
-  account?: string
-  storageClass?: string
-  owner?: string
-  kmsId?: string
-}
-
 export interface InReplicaConfig {
   iamARN: string
-  rules: InReplicaRule | Array<InReplicaRule>
+  rules: InReplicaRule | InReplicaRule[]
 }
 
 export interface InReplicaRule {
   dest: InReplicaDest
-  prefix: string // allows empty string here and in the Out interface
+  id?: string
+  prefix?: string // output allows empty string - represents ALL - chosen as default
   status?: boolean
   replicateEncData?: boolean
-  id?: string
+}
+
+export interface InReplicaDest {
+  bucket: string
+  account?: string
+  storageClass?: string
+  kmsId?: string
 }
 
 export interface OutReplicaDestination {

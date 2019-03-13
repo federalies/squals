@@ -1,12 +1,4 @@
 // @ts-nocheck
-/**
- *
- *
- * Things to test:
- * 1.
- * 2.
- *
- */
 
 import { accelerate } from '../../../src/components/s3'
 

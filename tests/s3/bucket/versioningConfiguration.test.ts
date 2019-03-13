@@ -1,15 +1,17 @@
 // @ts-nocheck
-/**
- * Things to test:
- * 1.
- * 2.
- */
 
-describe.skip('defaults', () => {
-  const Import = require('esm')(module)
-  const { websiteConfig } = Import('../../../src/components/s3/bucket')
+import { versioning } from '../../../src/components/s3/bucket'
 
-  test.skip('1+2=3', () => {
-    expect(1 + 2).toBe(3)
+describe('defaults', () => {
+  test('jsdoc example', () => {
+    const a = versioning(true)
+    const e = { VersioningConfiguration: { Status: 'Enabled' } }
+    expect(a).toEqual(e)
+  })
+
+  test('set to false', () => {
+    const a = versioning(false)
+    const e = { VersioningConfiguration: { Status: 'Suspended' } }
+    expect(a).toEqual(e)
   })
 })

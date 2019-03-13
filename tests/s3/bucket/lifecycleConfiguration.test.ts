@@ -1,15 +1,96 @@
 // @ts-nocheck
 
-import { lifecycleConfig } from '../../../src/components/s3/bucket'
+import { lifecycleConfig, IlifecycleValidRules } from '../../../src/components/s3/bucket'
 describe('defaults', () => {
-  test('simple starter', () => {
-    const a = lifecycleConfig({})
+  test('expiryDays starter', () => {
+    // fix this so that the readonly prop is not required
+    const rule: IlifecycleValidRules = { expiryDays: 42, ruleName: 'ExpirationInDays' }
+    const a = lifecycleConfig(rule)
     const exp: any = {
       LifecycleConfiguration: {
-        Rules: []
+        Rules: [{ ExpirationInDays: 42, Status: 'Enabled' }]
       }
     }
-    expect(a).toEqual()
+    expect(a).toEqual(exp)
+  })
+
+  test('keepOldVersionForDays example', () => {
+    // fix this so that the readonly prop is not required
+    const rule: IlifecycleValidRules = {
+      keepOldVersionForDays: 42,
+      ruleName: 'NoncurrentVersionExpirationInDays'
+    }
+    const a = lifecycleConfig(rule)
+    const e: any = {
+      LifecycleConfiguration: {
+        Rules: [{ NoncurrentVersionExpirationInDays: 42, Status: 'Enabled' }]
+      }
+    }
+
+    expect(a).toEqual(e)
+  })
+
+  test.skip('transitions example', () => {
+    // fix this so that the readonly prop is not required
+    const rule: any = {
+      ruleName: 'Transitions',
+      storage: 'somestorage',
+      daysTillSlowDown: 42
+    }
+    const a = lifecycleConfig(rule)
+    const e: any = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Transitions: [{ StorageClass: 'somestorage', TransitionInDays: 42 }],
+            Status: 'Enabled'
+          }
+        ]
+      }
+    }
+    console.error(JSON.stringify(e, null, 2))
+    console.error(JSON.stringify(a, null, 2))
+
+    expect(a).toEqual(e)
+  })
+  test.skip('transitions list example', () => {
+    const rule: any = [
+      {
+        ruleName: 'Transitions',
+        transitions: [{ storage: '', daysTillSlowDown: 42 }]
+      },
+      {
+        ruleName: 'Transitions',
+        transitions: [{ storage: '', daysTillSlowDown: 42 }]
+      }
+    ]
+    const a = lifecycleConfig(rule)
+    const e = {}
+    expect(a).toEqual(e)
+  })
+  test.skip('transitions list example', () => {
+    const rule: any = {}
+    const a = {}
+    const exp = {}
+    expect(a).toEqual(exp)
+  })
+  test.skip('moveOldVersionRule example', () => {
+    const rule: any = {}
+    const a = {}
+    const exp = {}
+    expect(a).toEqual(exp)
+  })
+  test.skip('expiryDate example', () => {
+    const rule: any = {}
+    const a = {}
+    const exp = {}
+    expect(a).toEqual(exp)
+  })
+  test.skip('quitMultipartsAfterDays example', () => {
+    const rule: any = {}
+    const a = {}
+    const exp = {}
+    expect(a).toEqual(exp)
   })
 })
 

@@ -43,14 +43,12 @@ const websiteConfig = (param?: inWebsiteConfig): OutWebsiteConfig => {
     }
   } else if (Array.isArray(redir)) {
     // redirect is an Array of Rules
-
     // oh what if we pre-empt and pass
     return {
       WebsiteConfiguration: {
         IndexDocument: indexpage,
         ErrorDocument: errorpage,
         RoutingRules: redir.map(arg => {
-          // @ts-ignore
           const { to, when, replacer, doFullReplace } = { ...arg }
           return redirRule({ to, when, replacer, doFullReplace })
         })

@@ -2,14 +2,14 @@ export as namespace arn
 export = arn
 
 declare namespace arn {
-  function parse(arn: string): IARNreturn
-  function toString(arn: string): string
+  function parse(arn: string): IARNobject
+  function toString(arnO: IARNobject): string
 
-  interface IARNreturn {
+  interface IARNobject {
     partition: string
     service: string
-    region: string
-    accountID: string
+    region?: string
+    accountID?: string
     resource: string
   }
 }

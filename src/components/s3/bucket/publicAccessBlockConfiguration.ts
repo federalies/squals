@@ -18,18 +18,19 @@
 export const publicAccesConfig = (params: InPublicAccessConfig) => {
   const { publicAclBlock, publicPolciy, pulicAclIgnore, publicBuckets } = params
   let config: OutPublicAccessConfig = {}
-  if (publicAclBlock) config['BlockPublicAcls'] = publicAclBlock
-  if (publicPolciy) config['BlockPublicPolicy'] = publicPolciy
-  if (pulicAclIgnore) config['IgnorePublicAcls'] = pulicAclIgnore
-  if (publicBuckets) config['RestrictPublicBuckets'] = publicBuckets
+  if ('publicAclBlock' in params) config['BlockPublicAcls'] = publicAclBlock as boolean
+  if ('publicPolciy' in params) config['BlockPublicPolicy'] = publicPolciy as boolean
+  if ('pulicAclIgnore' in params) config['IgnorePublicAcls'] = pulicAclIgnore as boolean
+  if ('publicBuckets' in params) config['RestrictPublicBuckets'] = publicBuckets as boolean
+
   return { PublicAccessBlockConfiguration: config }
 }
 
 export interface InPublicAccessConfig {
-  publicAclBlock: boolean
-  pulicAclIgnore: boolean
-  publicPolciy: boolean
-  publicBuckets: boolean
+  publicAclBlock?: boolean
+  pulicAclIgnore?: boolean
+  publicPolciy?: boolean
+  publicBuckets?: boolean
 }
 
 export interface OutPublicAccessConfig {

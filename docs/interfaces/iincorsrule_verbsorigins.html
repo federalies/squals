@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>OutExpirationDate | squals</title>
+	<title>IInCorsRule_VerbsOrigins | squals</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="outexpirationdate.html">OutExpirationDate</a>
+					<a href="iincorsrule_verbsorigins.html">IInCorsRule_VerbsOrigins</a>
 				</li>
 			</ul>
-			<h1>Interface OutExpirationDate</h1>
+			<h1>Interface IInCorsRule_VerbsOrigins</h1>
 		</div>
 	</div>
 </header>
@@ -70,10 +70,10 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<a href="outlifecyclerule.html" class="tsd-signature-type">OutLifecycleRule</a>
+						<a href="iincorsrule_opts.html" class="tsd-signature-type">IInCorsRule_opts</a>
 						<ul class="tsd-hierarchy">
 							<li>
-								<span class="target">OutExpirationDate</span>
+								<span class="target">IInCorsRule_VerbsOrigins</span>
 							</li>
 						</ul>
 					</li>
@@ -86,11 +86,13 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="outexpirationdate.html#expirationdate" class="tsd-kind-icon">Expiration<wbr>Date</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="outexpirationdate.html#id" class="tsd-kind-icon">Id</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="outexpirationdate.html#prefix" class="tsd-kind-icon">Prefix</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="outexpirationdate.html#status" class="tsd-kind-icon">Status</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="outexpirationdate.html#tagfilters" class="tsd-kind-icon">Tag<wbr>Filters</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iincorsrule_verbsorigins.html#_" class="tsd-kind-icon">_</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="iincorsrule_verbsorigins.html#headersallowed" class="tsd-kind-icon">headers<wbr>Allowed</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="iincorsrule_verbsorigins.html#headersexposed" class="tsd-kind-icon">headers<wbr>Exposed</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="iincorsrule_verbsorigins.html#id" class="tsd-kind-icon">id</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface tsd-is-inherited"><a href="iincorsrule_verbsorigins.html#maxage" class="tsd-kind-icon">max<wbr>Age</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iincorsrule_verbsorigins.html#methods" class="tsd-kind-icon">methods</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iincorsrule_verbsorigins.html#origins" class="tsd-kind-icon">origins</a></li>
 							</ul>
 						</section>
 					</div>
@@ -99,56 +101,84 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="expirationdate" class="tsd-anchor"></a>
-					<h3>Expiration<wbr>Date</h3>
-					<div class="tsd-signature tsd-kind-icon">Expiration<wbr>Date<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="_" class="tsd-anchor"></a>
+					<h3>_</h3>
+					<div class="tsd-signature tsd-kind-icon">_<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L362">bucket/lifecycleConfiguration.ts:362</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L153">src/components/s3/bucket/corsConfiguration.ts:153</a></li>
+						</ul>
+					</aside>
+					<div class="tsd-type-declaration">
+						<h4>Type declaration</h4>
+						<ul class="tsd-parameters">
+							<li class="tsd-parameter-index-signature">
+								<h5><span class="tsd-signature-symbol">[</span>key: <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">]: </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></h5>
+							</li>
+						</ul>
+					</div>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="headersallowed" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> headers<wbr>Allowed</h3>
+					<div class="tsd-signature tsd-kind-icon">headers<wbr>Allowed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="iincorsrule_opts.html">IInCorsRule_opts</a>.<a href="iincorsrule_opts.html#headersallowed">headersAllowed</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L158">src/components/s3/bucket/corsConfiguration.ts:158</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
+					<a name="headersexposed" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> headers<wbr>Exposed</h3>
+					<div class="tsd-signature tsd-kind-icon">headers<wbr>Exposed<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<p>Inherited from <a href="iincorsrule_opts.html">IInCorsRule_opts</a>.<a href="iincorsrule_opts.html#headersexposed">headersExposed</a></p>
+						<ul>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L157">src/components/s3/bucket/corsConfiguration.ts:157</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
 					<a name="id" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> Id</h3>
-					<div class="tsd-signature tsd-kind-icon">Id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> id</h3>
+					<div class="tsd-signature tsd-kind-icon">id<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="outlifecyclerule.html">OutLifecycleRule</a>.<a href="outlifecyclerule.html#id">Id</a></p>
+						<p>Inherited from <a href="iincorsrule_opts.html">IInCorsRule_opts</a>.<a href="iincorsrule_opts.html#id">id</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L378">bucket/lifecycleConfiguration.ts:378</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L159">src/components/s3/bucket/corsConfiguration.ts:159</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="prefix" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> Prefix</h3>
-					<div class="tsd-signature tsd-kind-icon">Prefix<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<a name="maxage" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> max<wbr>Age</h3>
+					<div class="tsd-signature tsd-kind-icon">max<wbr>Age<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="outlifecyclerule.html">OutLifecycleRule</a>.<a href="outlifecyclerule.html#prefix">Prefix</a></p>
+						<p>Inherited from <a href="iincorsrule_opts.html">IInCorsRule_opts</a>.<a href="iincorsrule_opts.html#maxage">maxAge</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L379">bucket/lifecycleConfiguration.ts:379</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L160">src/components/s3/bucket/corsConfiguration.ts:160</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="status" class="tsd-anchor"></a>
-					<h3>Status</h3>
-					<div class="tsd-signature tsd-kind-icon">Status<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">"Enabled"</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">"Disabled"</span></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="methods" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> methods</h3>
+					<div class="tsd-signature tsd-kind-icon">methods<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="outlifecyclerule.html">OutLifecycleRule</a>.<a href="outlifecyclerule.html#status">Status</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L377">bucket/lifecycleConfiguration.ts:377</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L149">src/components/s3/bucket/corsConfiguration.ts:149</a></li>
 						</ul>
 					</aside>
 				</section>
-				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-					<a name="tagfilters" class="tsd-anchor"></a>
-					<h3><span class="tsd-flag ts-flagOptional">Optional</span> Tag<wbr>Filters</h3>
-					<div class="tsd-signature tsd-kind-icon">Tag<wbr>Filters<span class="tsd-signature-symbol">:</span> <a href="outtags.html" class="tsd-signature-type">OutTags</a></div>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="origins" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> origins</h3>
+					<div class="tsd-signature tsd-kind-icon">origins<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span><span class="tsd-signature-symbol">[]</span></div>
 					<aside class="tsd-sources">
-						<p>Inherited from <a href="outlifecyclerule.html">OutLifecycleRule</a>.<a href="outlifecyclerule.html#tagfilters">TagFilters</a></p>
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L380">bucket/lifecycleConfiguration.ts:380</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/corsConfiguration.ts#L150">src/components/s3/bucket/corsConfiguration.ts:150</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -167,22 +197,28 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="outexpirationdate.html" class="tsd-kind-icon">Out<wbr>Expiration<wbr>Date</a>
+						<a href="iincorsrule_verbsorigins.html" class="tsd-kind-icon">IIn<wbr>Cors<wbr>Rule_<wbr><wbr>Verbs<wbr>Origins</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="outexpirationdate.html#expirationdate" class="tsd-kind-icon">Expiration<wbr>Date</a>
+								<a href="iincorsrule_verbsorigins.html#_" class="tsd-kind-icon">_</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="outexpirationdate.html#id" class="tsd-kind-icon">Id</a>
+								<a href="iincorsrule_verbsorigins.html#headersallowed" class="tsd-kind-icon">headers<wbr>Allowed</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="outexpirationdate.html#prefix" class="tsd-kind-icon">Prefix</a>
+								<a href="iincorsrule_verbsorigins.html#headersexposed" class="tsd-kind-icon">headers<wbr>Exposed</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="outexpirationdate.html#status" class="tsd-kind-icon">Status</a>
+								<a href="iincorsrule_verbsorigins.html#id" class="tsd-kind-icon">id</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface tsd-is-inherited">
-								<a href="outexpirationdate.html#tagfilters" class="tsd-kind-icon">Tag<wbr>Filters</a>
+								<a href="iincorsrule_verbsorigins.html#maxage" class="tsd-kind-icon">max<wbr>Age</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="iincorsrule_verbsorigins.html#methods" class="tsd-kind-icon">methods</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="iincorsrule_verbsorigins.html#origins" class="tsd-kind-icon">origins</a>
 							</li>
 						</ul>
 					</li>

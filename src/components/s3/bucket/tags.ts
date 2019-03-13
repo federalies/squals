@@ -8,16 +8,15 @@
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
-export const tags: (tagList: InTags | Array<InTags>) => Array<OutTags> = function (tagList) {
-  const handleArray = (tagList: Array<InTags>) => {
-    return tagList.map(v => ({
-      Key: Object.keys(v)[0],
-      Value: Object.values(v)[0]
-    }))
-  }
+export const tags: (tagList: InTags | InTags[]) => OutTags[] = function (tagList) {
   const handleItem = (tagList: InTags) => {
-    return Object.entries(tagList).reduce((p: Array<OutTags>, [k, v]) => {
+    return Object.entries(tagList).reduce((p: OutTags[], [k, v]) => {
       return [...p, { Key: k, Value: v }]
+    }, [])
+  }
+  const handleArray = (tagList: InTags[]) => {
+    return tagList.reduce((p: OutTags[], c) => {
+      return [...p, ...handleItem(c)]
     }, [])
   }
 
@@ -28,12 +27,11 @@ export const tags: (tagList: InTags | Array<InTags>) => Array<OutTags> = functio
  * AWS::S3:Bucket Tags.
  *
  * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
- * @param {Array<{string:string}>} tagList - * asdasd.
- * @returns {{Tags:Array<{Key:string,Value:string}>}} - Asd.
+ * @param tagList - Asd.
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
-export const Tags = (tagList: InTags | Array<InTags>): IResourceTags => {
+export const Tags = (tagList: InTags | InTags[]): IResourceTags => {
   return {
     Tags: tags(tagList)
   }
@@ -43,8 +41,7 @@ export const Tags = (tagList: InTags | Array<InTags>): IResourceTags => {
  * AWS::S3:Bucket Tags.
  *
  * @description Transform JS Array of Object Key:values ot the AWS Cloudformation representation
- * @param {Array<{string: string}>} tagList - Incoming tagList.
- * @returns {{TagFilters:Array<{Key: string, Value:string}>}} - Asd.
+ * @param tagList - Incoming tagList.
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */

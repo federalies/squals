@@ -10,8 +10,8 @@
  */
 export const versioning = (isEnabled: boolean): OutVersioning => {
   return isEnabled
-    ? { VersioningConfiguration: { Status: 'Suspended' } }
-    : { VersioningConfiguration: { Status: 'Enabled' } }
+    ? { VersioningConfiguration: { Status: 'Enabled' } }
+    : { VersioningConfiguration: { Status: 'Suspended' } }
 }
 
 export interface OutVersioning {

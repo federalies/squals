@@ -1,9 +1,4 @@
 // @ts-nocheck
-/**
- * Things to test:
- * 1.
- * 2.
- */
 
 import { analyticsConfig, OutAnalyticsConfig } from '../../../src/components/s3/bucket'
 

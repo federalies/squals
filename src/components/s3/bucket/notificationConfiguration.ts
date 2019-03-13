@@ -2,15 +2,25 @@ import { parse } from '@sandfox/arn'
 
 /** @module S3Bucket */
 
+/**
+ * Parse S3 Key/Notification Filter.
+ *
+ * @description the notification input syntax allows the objects to use a `*` delimiter to show prefix or suffix
+ * @param filter - The filter string that includes a * or not.
+ * @see <https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTnotification.html#RESTBucketPUTnotification-requests-request-elements>
+ * @example
+ *  var {Name, Value} = parseFilter('*.jpg')
+ *  console.log({Name, Value}) // {Name:'suffix', Value:'.jpg'}
+ */
 const parseFilter = (filter: string): OutNotifFilterRule => {
   let Name = ''
   let Value = ''
 
   if (filter.toString().startsWith('*')) {
-    Name = 'prefix'
+    Name = 'suffix'
     Value = filter.slice(1)
   } else if (filter.toString().endsWith('*')) {
-    Name = 'suffix'
+    Name = 'prefix'
     Value = filter.slice(0, -1)
   } else {
     throw new Error(
@@ -28,8 +38,8 @@ const parseFilter = (filter: string): OutNotifFilterRule => {
  * @todo add functionality and testing to deal with ARN REFS so that you notifiucation rule can incorporate newly created funcs
  * @example
  *  var notif1 = notifConfig({event:"s3:ObjectCreated:*",
- *                           arn:'aws:arn:lambda:somegreat.lambdafunc',
- *                           filters:['Yosem*', '*.jpg']})
+ *                           arn:'arn:aws:lambda::123456789012:resourceA/division_abc',
+ *                           filterList:'Yosem*'})
  *  var notif2 = notifConfig([{ event:"s3:ObjectCreated:*",
  *                             arn:'aws:arn:lambda:somegreat.lambdafunc',
  *                             filters:['Yosem*', '*.jpg']},
@@ -46,13 +56,13 @@ export const notifConfig = (notifList: InNotifs | InNotifs[]) => {
       const svc = parse(notif.arn).service
       switch (svc) {
         case 'lambda':
-          prior.l.push(toAWSfmt(notif, svc) as OutLambdaConfig)
+          prior.l.push(toAWSfmt('lambda', notif) as OutLambdaConfig)
           break
         case 'sqs':
-          prior.q.push(toAWSfmt(notif, svc) as OutQueueConfig)
+          prior.q.push(toAWSfmt('sqs', notif) as OutQueueConfig)
           break
         case 'sns':
-          prior.t.push(toAWSfmt(notif, svc) as OutTopicConfig)
+          prior.t.push(toAWSfmt('sns', notif) as OutTopicConfig)
           break
         default:
           throw new Error(
@@ -80,23 +90,22 @@ export const notifConfig = (notifList: InNotifs | InNotifs[]) => {
 }
 
 /**
- * Title.
+ * `toAWSfmt` transforms simple ARN-based notification lists into segmetned various Service Type lists.
  *
- * @description this is a description
+ * @description parses ARN names and transforms them into OUTPUT values for CFM.
+ * @note Bad `svc` names have already been filtered out in the ƒ.upstrea
  * @param item - A notification config.
  * @param svc - An abbreviate string of an AWS service name.
+ * @see <https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html#supported-notification-event-types>
+ * @see <https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces>
  * @example
  * var a = toAWSfmt({event:'', arn:'', filters:['*.jpg']}, 'lambda')
  */
-export const toAWSfmt = (
-  item: InNotifs,
-  svc: string
+const toAWSfmt = (
+  svc: 'lambda' | 'sns' | 'sqs',
+  item: InNotifs
 ): OutLambdaConfig | OutQueueConfig | OutTopicConfig => {
-  // where items = {event: String, arn: String, filters=['*.jpg', 'Mrs.*']}
-  // where items.filters MUST have a `*` denoting the filter is a `prefix` or `suffix`
-  // where lambdaList(items).event = enum
-  // where s3 notifcation validValues actually live @ <https://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html#supported-notification-event-types>
-  // where aws service name abbreviateions actually live @ <https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html#genref-aws-service-namespaces>
+  //
   const validValues = [
     's3:ObjectCreated:*',
     's3:ObjectCreated:Put',
@@ -115,7 +124,8 @@ export const toAWSfmt = (
     throw new Error('invalid notification event type')
   }
 
-  let Rules = item.filters ? item.filters.map(filter => parseFilter(filter)) : []
+  const filters = Array.isArray(item.filterList) ? item.filterList : new Array(item.filterList)
+  let Rules = filters.map(filter => parseFilter(filter))
 
   switch (svc) {
     case 'lambda':
@@ -153,15 +163,13 @@ export const toAWSfmt = (
           Event: item.event,
           Topic: item.arn
         }
-    default:
-      throw new Error('invalid notification event type')
   }
 }
 
 export interface InNotifs {
   arn: string
   event: string
-  filters: string[]
+  filterList: string | string[]
 }
 
 interface SeparatedReducer {

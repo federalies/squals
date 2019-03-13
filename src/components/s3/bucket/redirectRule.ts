@@ -16,9 +16,8 @@ import * as url from 'url'
  *  var output1 = redirRule({ to:'https://federali.es', when: '/docs' , replacer:'/documents', doFullReplace:true})
  *  var output2 = redirRule({ to:'https://federali.es', when: 404 })
  *  var output3 = redirRule({ to:'https://federali.es/', when: '/doc', replacer: '/docs', doFullReplace: true })
- * @returns {outRuleElem} Cloudoformation object.
  */
-export const redirRule = (param: InRedirRule): OutRouteRule | unknown => {
+export const redirRule = (param: InRedirRule): OutRouteRule => {
   const { to, when, replacer, doFullReplace, ext } = {
     to: '',
     when: '',
@@ -42,7 +41,7 @@ export const redirRule = (param: InRedirRule): OutRouteRule | unknown => {
       }
     }
 
-    if (replacer && (typeof when === 'string' || (when as any) instanceof String)) {
+    if (replacer && typeof when === 'string') {
       doFullReplace
         ? (ret.RedirectRule['ReplaceKeyWith'] = replacer)
         : (ret.RedirectRule['ReplaceKeyPrefixWith'] = replacer)

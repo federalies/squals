@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>IInRuleMoveOldVersionsItem | squals</title>
+	<title>ILifecycleTransitionItem | squals</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="iinrulemoveoldversionsitem.html">IInRuleMoveOldVersionsItem</a>
+					<a href="ilifecycletransitionitem.html">ILifecycleTransitionItem</a>
 				</li>
 			</ul>
-			<h1>Interface IInRuleMoveOldVersionsItem</h1>
+			<h1>Interface ILifecycleTransitionItem</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +70,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">IInRuleMoveOldVersionsItem</span>
+						<span class="target">ILifecycleTransitionItem</span>
 					</li>
 				</ul>
 			</section>
@@ -81,8 +81,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iinrulemoveoldversionsitem.html#daystillslowdown" class="tsd-kind-icon">days<wbr>Till<wbr>Slow<wbr>Down</a></li>
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iinrulemoveoldversionsitem.html#storage" class="tsd-kind-icon">storage</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ilifecycletransitionitem.html#storageclass" class="tsd-kind-icon">Storage<wbr>Class</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ilifecycletransitionitem.html#transitiondate" class="tsd-kind-icon">Transition<wbr>Date</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="ilifecycletransitionitem.html#transitionindays" class="tsd-kind-icon">Transition<wbr>InDays</a></li>
 							</ul>
 						</section>
 					</div>
@@ -91,22 +92,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="daystillslowdown" class="tsd-anchor"></a>
-					<h3>days<wbr>Till<wbr>Slow<wbr>Down</h3>
-					<div class="tsd-signature tsd-kind-icon">days<wbr>Till<wbr>Slow<wbr>Down<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">number</span></div>
+					<a name="storageclass" class="tsd-anchor"></a>
+					<h3>Storage<wbr>Class</h3>
+					<div class="tsd-signature tsd-kind-icon">Storage<wbr>Class<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L269">bucket/lifecycleConfiguration.ts:269</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/lifecycleConfiguration.ts#L360">src/components/s3/bucket/lifecycleConfiguration.ts:360</a></li>
 						</ul>
 					</aside>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="storage" class="tsd-anchor"></a>
-					<h3>storage</h3>
-					<div class="tsd-signature tsd-kind-icon">storage<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
+					<a name="transitiondate" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> Transition<wbr>Date</h3>
+					<div class="tsd-signature tsd-kind-icon">Transition<wbr>Date<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/deb2732/src/components/s3/bucket/lifecycleConfiguration.ts#L268">bucket/lifecycleConfiguration.ts:268</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/lifecycleConfiguration.ts#L361">src/components/s3/bucket/lifecycleConfiguration.ts:361</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="transitionindays" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> Transition<wbr>InDays</h3>
+					<div class="tsd-signature tsd-kind-icon">Transition<wbr>InDays<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/25ad23e/src/components/s3/bucket/lifecycleConfiguration.ts#L362">src/components/s3/bucket/lifecycleConfiguration.ts:362</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -125,13 +136,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="iinrulemoveoldversionsitem.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Move<wbr>Old<wbr>Versions<wbr>Item</a>
+						<a href="ilifecycletransitionitem.html" class="tsd-kind-icon">ILifecycle<wbr>Transition<wbr>Item</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="iinrulemoveoldversionsitem.html#daystillslowdown" class="tsd-kind-icon">days<wbr>Till<wbr>Slow<wbr>Down</a>
+								<a href="ilifecycletransitionitem.html#storageclass" class="tsd-kind-icon">Storage<wbr>Class</a>
 							</li>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="iinrulemoveoldversionsitem.html#storage" class="tsd-kind-icon">storage</a>
+								<a href="ilifecycletransitionitem.html#transitiondate" class="tsd-kind-icon">Transition<wbr>Date</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="ilifecycletransitionitem.html#transitionindays" class="tsd-kind-icon">Transition<wbr>InDays</a>
 							</li>
 						</ul>
 					</li>

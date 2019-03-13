@@ -10,7 +10,7 @@
  * @example
  *  var lc = loggingConfg({saveLogsToBucket:'otherbucket', logPrefix:'logs/'})
  */
-export const loggingConfg = (params: InLoggingConfig) => {
+export const loggingConfg = (params: InLoggingConfig = {}) => {
   const { saveLogsToBucket, logPrefix } = params
   const data: OutLogging = {}
   if (logPrefix) data['LogFilePrefix'] = logPrefix

@@ -4,25 +4,29 @@ import { InTags, OutTags, TagFilters } from './tags'
 
 export const metricsConfig = (meterThese: InMetricsRule | InMetricsRule[]) => {
   meterThese = Array.isArray(meterThese) ? meterThese : new Array(meterThese)
-
   return {
     MetricsConfigurations: meterThese.map(v => metricsItem(v))
   }
 }
 
-function isOutReady(rule: InMetricsRule | OutMetricsRule): rule is OutMetricsRule {
-  return (<OutMetricsRule>rule).Id !== undefined
-}
+// function isOutReady(rule: InMetricsRule | OutMetricsRule): rule is OutMetricsRule {
+//   return (<OutMetricsRule>rule).Id !== undefined
+// }
 
-export const metricsItem = (params: InMetricsRule | OutMetricsRule): OutMetricsRule => {
-  if (isOutReady(params)) {
-    return params
-  }
-  const { id, prefix, tagList } = { prefix: null, tagList: [], ...params }
-  const ret: OutMetricsRule = {
-    Id: id.toString(),
-    ...TagFilters(tagList)
-  }
+export const metricsItem = (params: InMetricsRule): OutMetricsRule => {
+  // if (isOutReady(params)) {
+  //   return params
+  // }
+  const { id, prefix, tagList } = { prefix: null, tagList: null, ...params }
+  const ret: OutMetricsRule = tagList
+    ? {
+      Id: id.toString(),
+      ...TagFilters(tagList)
+    }
+    : {
+      Id: id.toString()
+    }
+
   if (prefix) ret['Prefix'] = prefix.toString()
   return ret
 }
@@ -30,7 +34,7 @@ export const metricsItem = (params: InMetricsRule | OutMetricsRule): OutMetricsR
 export interface InMetricsRule {
   id: string
   prefix?: string
-  tagList?: InTags[]
+  tagList?: InTags | InTags[]
 }
 export interface OutMetricsRule {
   Id: string

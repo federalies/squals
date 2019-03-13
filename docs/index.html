@@ -72,20 +72,16 @@
 				</ul>
 				<h2 id="convention">Convention</h2>
 				<ul>
-					<li>List type properties also accept a single config object - which is trnaslated into a List of 1</li>
+					<li>List type properties <strong>always</strong> accept a single config object or list -</li>
 				</ul>
 				<h2 id="checklist">Checklist</h2>
 				<ul>
-					<li>JSDoc shows ? or ! for every property</li>
-					<li>JSDoc uses the typedefs for params but shows some embeded property values</li>
-					<li>When embedding propery values, omit the description allowing the verbose description to exist in the typeDef</li>
-					<li>@see an AWS documentation deeplink</li>
-					<li><p>@typedefs should use</p>
-						<ul>
-							<li><code>module:&lt; modName &gt;.&lt; typeName &gt;</code></li>
-						</ul>
-					</li>
+					<li>interfaces starts with <code>I</code>&lt; logical name &gt;</li>
+					<li>tests</li>
+					<li>jsdoc w/ @description @example&lt; short &amp;&amp; simple &gt;</li>
 				</ul>
+				<h2 id="docs">Docs</h2>
+				<p><a href="https://raw.githack.com/federalies/squals/master/docs/index.html">WIP</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -114,6 +110,15 @@
 						<a href="interfaces/igetatt.html" class="tsd-kind-icon">IGet<wbr>Att</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="interfaces/iincorsrule_verbsorigins.html" class="tsd-kind-icon">IIn<wbr>Cors<wbr>Rule_<wbr><wbr>Verbs<wbr>Origins</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iincorsrule_methodsorigins.html" class="tsd-kind-icon">IIn<wbr>Cors<wbr>Rule_<wbr>methods<wbr>Origins</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/iincorsrule_opts.html" class="tsd-kind-icon">IIn<wbr>Cors<wbr>Rule_<wbr>opts</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/iinruleexpirationdays.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Expiration<wbr>Days</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -126,16 +131,7 @@
 						<a href="interfaces/iinrulemoveoldversionsafterdays.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Move<wbr>Old<wbr>Versions<wbr>After<wbr>Days</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/iinrulemoveoldversionsitem.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Move<wbr>Old<wbr>Versions<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/iinrulemultipartabort.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Multipart<wbr>Abort</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iinruletransitionitem_wdate.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transition<wbr>Item_<wbr>w<wbr>Date</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/iinruletransitionitem_wdays.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transition<wbr>Item_<wbr>w<wbr>Days</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/iinruletransitionsdated.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transitions<wbr>Dated</a>
@@ -145,6 +141,36 @@
 					</li>
 					<li class=" tsd-kind-interface tsd-is-not-exported">
 						<a href="interfaces/iins3bucket.html" class="tsd-kind-icon">IIn<wbr>S3Bucket</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycleconfig.html" class="tsd-kind-icon">ILifecycle<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycleexpirationdate.html" class="tsd-kind-icon">ILifecycle<wbr>Expiration<wbr>Date</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycleexpirationindays.html" class="tsd-kind-icon">ILifecycle<wbr>Expiration<wbr>InDays</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycleitem.html" class="tsd-kind-icon">ILifecycle<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecyclemoveoldversionsitem.html" class="tsd-kind-icon">ILifecycle<wbr>Move<wbr>Old<wbr>Versions<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecyclemultipartcancel.html" class="tsd-kind-icon">ILifecycle<wbr>Multi<wbr>Part<wbr>Cancel</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecyclenoncurrenttrans.html" class="tsd-kind-icon">ILifecycle<wbr>Non<wbr>Current<wbr>Trans</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecyclenoncurrentver.html" class="tsd-kind-icon">ILifecycle<wbr>Noncurrent<wbr>Ver</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycletransitionitem.html" class="tsd-kind-icon">ILifecycle<wbr>Transition<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycletransitions.html" class="tsd-kind-icon">ILifecycle<wbr>Transitions</a>
 					</li>
 					<li class=" tsd-kind-interface tsd-is-not-exported">
 						<a href="interfaces/iref.html" class="tsd-kind-icon">IRef</a>
@@ -156,19 +182,25 @@
 						<a href="interfaces/itagfilters.html" class="tsd-kind-icon">ITag<wbr>Filters</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/inanalyticsconfigitem.html" class="tsd-kind-icon">In<wbr>Analytics<wbr>Config<wbr>Item</a>
+						<a href="interfaces/ilifecyclerule.html" class="tsd-kind-icon">Ilifecycle<wbr>Rule</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/incorsrule.html" class="tsd-kind-icon">In<wbr>Cors<wbr>Rule</a>
+						<a href="interfaces/ilifecyclerulemoveoldversionsitem.html" class="tsd-kind-icon">Ilifecycle<wbr>Rule<wbr>Move<wbr>Old<wbr>Versions<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycleruletransitionitem_wdate.html" class="tsd-kind-icon">Ilifecycle<wbr>Rule<wbr>Transition<wbr>Item_<wbr>w<wbr>Date</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/ilifecycleruletransitionitem_wdays.html" class="tsd-kind-icon">Ilifecycle<wbr>Rule<wbr>Transition<wbr>Item_<wbr>w<wbr>Days</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/inanalyticsconfigitem.html" class="tsd-kind-icon">In<wbr>Analytics<wbr>Config<wbr>Item</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/indestination.html" class="tsd-kind-icon">In<wbr>Destination</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ininventoryrule.html" class="tsd-kind-icon">In<wbr>Inventory<wbr>Rule</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/inlifecyclerule.html" class="tsd-kind-icon">In<wbr>Lifecycle<wbr>Rule</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/inloggingconfig.html" class="tsd-kind-icon">In<wbr>Logging<wbr>Config</a>
@@ -222,12 +254,6 @@
 						<a href="interfaces/outdestinationitem.html" class="tsd-kind-icon">Out<wbr>Destination<wbr>Item</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/outexpirationdate.html" class="tsd-kind-icon">Out<wbr>Expiration<wbr>Date</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outexpirationindays.html" class="tsd-kind-icon">Out<wbr>Expiration<wbr>InDays</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/outinventoryconfig.html" class="tsd-kind-icon">Out<wbr>Inventory<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -235,12 +261,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/outlambdaconfig.html" class="tsd-kind-icon">Out<wbr>Lambda<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outlifecycleconfig.html" class="tsd-kind-icon">Out<wbr>Lifecycle<wbr>Config</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outlifecyclerule.html" class="tsd-kind-icon">Out<wbr>Lifecycle<wbr>Rule</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/outlogging.html" class="tsd-kind-icon">Out<wbr>Logging</a>
@@ -253,18 +273,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/outmetricsrule.html" class="tsd-kind-icon">Out<wbr>Metrics<wbr>Rule</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outmoveoldversionsitem.html" class="tsd-kind-icon">Out<wbr>Move<wbr>Old<wbr>Versions<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outmultipartcancel.html" class="tsd-kind-icon">Out<wbr>Multi<wbr>Part<wbr>Cancel</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outnoncurrenttrans.html" class="tsd-kind-icon">Out<wbr>Non<wbr>Current<wbr>Trans</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outnoncurrentver.html" class="tsd-kind-icon">Out<wbr>Noncurrent<wbr>Ver</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/outnotiffilterrule.html" class="tsd-kind-icon">Out<wbr>Notif<wbr>Filter<wbr>Rule</a>
@@ -312,12 +320,6 @@
 						<a href="interfaces/outtopicconfig.html" class="tsd-kind-icon">Out<wbr>Topic<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="interfaces/outtransitionitem.html" class="tsd-kind-icon">Out<wbr>Transition<wbr>Item</a>
-					</li>
-					<li class=" tsd-kind-interface">
-						<a href="interfaces/outtransitions.html" class="tsd-kind-icon">Out<wbr>Transitions</a>
-					</li>
-					<li class=" tsd-kind-interface">
 						<a href="interfaces/outversioning.html" class="tsd-kind-icon">Out<wbr>Versioning</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -345,16 +347,19 @@
 						<a href="globals.html#iaccesss3permission" class="tsd-kind-icon">IAccess<wbr>S3Permission</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#iinalllvalidinrules" class="tsd-kind-icon">IIn<wbr>Alll<wbr>Valid<wbr>InRules</a>
+						<a href="globals.html#iinruletransitions" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transitions</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#iinruletransitions" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transitions</a>
+						<a href="globals.html#ilifecyclevalid" class="tsd-kind-icon">ILifecycle<wbr>Valid</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-not-exported">
 						<a href="globals.html#ivalidpublicaccesscontrols" class="tsd-kind-icon">IValid<wbr>Public<wbr>Access<wbr>Controls</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="globals.html#outvalidlifecyclerule" class="tsd-kind-icon">Out<wbr>Valid<wbr>Life<wbr>Cycle<wbr>Rule</a>
+						<a href="globals.html#ilifecyclevalidrules" class="tsd-kind-icon">Ilifecycle<wbr>Valid<wbr>Rules</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#incorsrule" class="tsd-kind-icon">In<wbr>Cors<wbr>Rule</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#outwebsiteconfigelem" class="tsd-kind-icon">Out<wbr>Website<wbr>Config<wbr>Elem</a>
@@ -407,14 +412,14 @@
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#difference" class="tsd-kind-icon">difference</a>
 					</li>
+					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-not-exported">
+						<a href="globals.html#fold" class="tsd-kind-icon">fold</a>
+					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#inventoryconfig" class="tsd-kind-icon">inventory<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#inventoryrule" class="tsd-kind-icon">inventory<wbr>Rule</a>
-					</li>
-					<li class=" tsd-kind-function tsd-is-not-exported">
-						<a href="globals.html#isoutready" class="tsd-kind-icon">is<wbr>Out<wbr>Ready</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#lifecycleconfig" class="tsd-kind-icon">lifecycle<wbr>Config</a>
@@ -458,7 +463,7 @@
 					<li class=" tsd-kind-function">
 						<a href="globals.html#tags" class="tsd-kind-icon">tags</a>
 					</li>
-					<li class=" tsd-kind-function">
+					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#toawsfmt" class="tsd-kind-icon">toAWSfmt</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">

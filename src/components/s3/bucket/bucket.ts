@@ -9,7 +9,7 @@ import { OutAnalyticsItem, InAnalyticsConfigItem, analyticsConfig } from './anal
 import { OutServerSideEncRule, InParamSSRule, bucketEncryption } from './bucketEncryption'
 import { OutCorsRule, corsConfig, InCorsRule } from './corsConfiguration'
 import { OutInventoryRule, InInventoryRule, inventoryConfig } from './inventoryConfiguration'
-import { OutLifecycleRule, InLifecycleRule, lifecycleConfig } from './lifecycleConfiguration'
+import { ILifecycleItem, lifecycleConfig, IlifecycleValidRules } from './lifecycleConfiguration'
 import { OutLogging, loggingConfg, InLoggingConfig } from './loggingConfiguration'
 import { OutMetricsRule, InMetricsRule, metricsConfig } from './metricsConfiguration'
 import { OutSeparatedNotificationSets, InNotifs, notifConfig } from './notificationConfiguration'
@@ -34,7 +34,7 @@ export class S3Bucket implements IndexSignature {
     BucketEncryption?: { ServerSideEncryptionConfiguration: OutServerSideEncRule[] }
     CorsConfiguration?: { CorsRules: OutCorsRule[] }
     InventoryConfigurations?: OutInventoryRule[]
-    LifecycleConfiguration?: { Rules: OutLifecycleRule[] }
+    LifecycleConfiguration?: { Rules: ILifecycleItem[] }
     LoggingConfiguration?: OutLogging
     MetricsConfigurations?: OutMetricsRule[]
     NotificationConfiguration?: OutSeparatedNotificationSets
@@ -214,7 +214,7 @@ export class S3Bucket implements IndexSignature {
     }
     return _this
   }
-  lifecycle (rules: InLifecycleRule | InLifecycleRule[]): S3Bucket {
+  lifecycle (rules: IlifecycleValidRules | IlifecycleValidRules[]): S3Bucket {
     const _this: S3Bucket = this
     _this.Properties = {
       ..._this.Properties,

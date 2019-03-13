@@ -1,26 +1,70 @@
+// @ts-nocheck
+
 import { S3Bucket, websiteConfig } from '../../../src/components/s3/bucket'
 
-describe('website', () => {
-  const noop = (input: any) => {
-    return input
-  }
-  test.skip('sdsd', () => {
-    const myB = new S3Bucket()
-    noop(myB)
-  })
-})
+// describe('website', () => {
+//   const noop = (input: any) => {
+//     return input
+//   }
+//   test.skip('sdsd', () => {
+//     const myB = new S3Bucket()
+//     noop(myB)
+//   })
+// })
 
 describe('Website Default Configuration Options', () => {
-  // const Import = require('esm')(module)
-
-  test.skip('1. Website Bare Default', () => {
-    const wc = websiteConfig()
-    expect(wc).toEqual({
+  test('Website Config Defaults from JsDocs', () => {
+    const actual = websiteConfig()
+    const expected = {
       WebsiteConfiguration: {
         IndexDocument: 'index.html',
         ErrorDocument: 'search.html'
       }
-    })
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('invalid redirect URL string', () => {
+    const a = () => websiteConfig({ redir: 'notavlidIURL' })
+    expect(a).toThrow()
+  })
+
+  test('redirect all to URL string', () => {
+    const a = websiteConfig({ redir: 'https://federali.es' })
+    const e = {
+      WebsiteConfiguration: {
+        IndexDocument: 'index.html',
+        ErrorDocument: 'search.html',
+        RedirectAllRequestsTo: {
+          Protocol: 'https',
+          HostName: 'federali.es'
+        }
+      }
+    }
+    expect(a).toEqual(e)
+  })
+
+  test('array of redirect rules', () => {
+    const a = websiteConfig({ redir: [{ when: 'docs/', to: 'https://example.com' }] })
+    const e = {
+      WebsiteConfiguration: {
+        IndexDocument: 'index.html',
+        ErrorDocument: 'search.html',
+        RoutingRules: [
+          {
+            RoutingRuleCondition: {
+              KeyPrefixEquals: 'docs/'
+            },
+            RedirectRule: {
+              HttpRedirectCode: '302',
+              Protocol: 'https',
+              HostName: 'example.com'
+            }
+          }
+        ]
+      }
+    }
+    expect(a).toEqual(e)
   })
 
   test.skip('2. Redirect Rule Config', () => {
