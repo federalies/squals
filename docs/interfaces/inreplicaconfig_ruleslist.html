@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>OutServerSideEncRule | squals</title>
+	<title>InReplicaConfig_rulesList | squals</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="outserversideencrule.html">OutServerSideEncRule</a>
+					<a href="inreplicaconfig_ruleslist.html">InReplicaConfig_rulesList</a>
 				</li>
 			</ul>
-			<h1>Interface OutServerSideEncRule</h1>
+			<h1>Interface InReplicaConfig_rulesList</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +70,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">OutServerSideEncRule</span>
+						<span class="target">InReplicaConfig_rulesList</span>
 					</li>
 				</ul>
 			</section>
@@ -81,7 +81,8 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="outserversideencrule.html#serversideencryptionbydefault" class="tsd-kind-icon">Server<wbr>Side<wbr>Encryption<wbr>ByDefault</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="inreplicaconfig_ruleslist.html#iamarn" class="tsd-kind-icon">iamARN</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="inreplicaconfig_ruleslist.html#rules" class="tsd-kind-icon">rules</a></li>
 							</ul>
 						</section>
 					</div>
@@ -90,25 +91,24 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="serversideencryptionbydefault" class="tsd-anchor"></a>
-					<h3>Server<wbr>Side<wbr>Encryption<wbr>ByDefault</h3>
-					<div class="tsd-signature tsd-kind-icon">Server<wbr>Side<wbr>Encryption<wbr>ByDefault<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">object</span></div>
+					<a name="iamarn" class="tsd-anchor"></a>
+					<h3>iamARN</h3>
+					<div class="tsd-signature tsd-kind-icon">iamARN<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">string</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in <a href="https://github.com/federalies/squals/blob/d9c7ead/src/components/s3/bucket/bucketEncryption.ts#L60">src/components/s3/bucket/bucketEncryption.ts:60</a></li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/d9c7ead/src/components/s3/bucket/replicationConfiguration.ts#L163">src/components/s3/bucket/replicationConfiguration.ts:163</a></li>
 						</ul>
 					</aside>
-					<div class="tsd-type-declaration">
-						<h4>Type declaration</h4>
-						<ul class="tsd-parameters">
-							<li class="tsd-parameter">
-								<h5><span class="tsd-flag ts-flagOptional">Optional</span> KMSMaster<wbr>KeyID<span class="tsd-signature-symbol">?: </span><span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></h5>
-							</li>
-							<li class="tsd-parameter">
-								<h5>SSEAlgorithm<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span></h5>
-							</li>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="rules" class="tsd-anchor"></a>
+					<h3>rules</h3>
+					<div class="tsd-signature tsd-kind-icon">rules<span class="tsd-signature-symbol">:</span> <a href="inreplicarule.html" class="tsd-signature-type">InReplicaRule</a><span class="tsd-signature-symbol"> | </span><a href="inreplicarule.html" class="tsd-signature-type">InReplicaRule</a><span class="tsd-signature-symbol">[]</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/d9c7ead/src/components/s3/bucket/replicationConfiguration.ts#L164">src/components/s3/bucket/replicationConfiguration.ts:164</a></li>
 						</ul>
-					</div>
+					</aside>
 				</section>
 			</section>
 		</div>
@@ -125,10 +125,13 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="outserversideencrule.html" class="tsd-kind-icon">Out<wbr>Server<wbr>Side<wbr>Enc<wbr>Rule</a>
+						<a href="inreplicaconfig_ruleslist.html" class="tsd-kind-icon">In<wbr>Replica<wbr>Config_<wbr>rules<wbr>List</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="outserversideencrule.html#serversideencryptionbydefault" class="tsd-kind-icon">Server<wbr>Side<wbr>Encryption<wbr>ByDefault</a>
+								<a href="inreplicaconfig_ruleslist.html#iamarn" class="tsd-kind-icon">iamARN</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="inreplicaconfig_ruleslist.html#rules" class="tsd-kind-icon">rules</a>
 							</li>
 						</ul>
 					</li>
