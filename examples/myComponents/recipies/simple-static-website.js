@@ -5,12 +5,7 @@
  * - or `node -r esm validtor.js examples/simple-static-website.js`
  */
 
-import {
-  Template,
-  S3Bucket,
-  CloudFrontCDN,
-  Route53RecordSet
-} from '../../../src/components'
+import { Template, S3Bucket, CloudFrontCDN, Route53RecordSet } from '../../../src/components'
 
 import simpleWebsite from '../../../src/higher-order-comps/staticWebsite'
 
@@ -18,16 +13,16 @@ const webContent = new S3Bucket()
 const MyCDN = new CloudFrontCDN()
 const DomainRecordsForCDN = new Route53RecordSet()
 
-const t = new Template({
+const tstart = new Template({
   Description: `A simple website template`
 })
 
-const t2 = simpleWebsite(t, 'www.mywebsite.com', {
+const tSimpleWebsite = simpleWebsite(tstart, 'www.mywebsite.com', {
   bucket: webContent,
   distribution: MyCDN,
   recordSet: DomainRecordsForCDN
 })
 
-console.log({ t2 })
+console.log({ tSimpleWebsite.clean() })
 
 export default t2

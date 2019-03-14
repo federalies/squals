@@ -25,9 +25,9 @@ import { OutTags, InTags, TagFilters } from './tags'
  *    }
  *  ])
  */
-export const analyticsConfig: (
+export const analyticsConfig = (
   config: InAnalyticsConfigItem | InAnalyticsConfigItem[]
-) => OutAnalyticsConfig = function (config) {
+): OutAnalyticsConfig => {
   return Array.isArray(config)
     ? { AnalyticsConfigurations: config.map(item => analyticsItem(item)) }
     : { AnalyticsConfigurations: [analyticsItem(config)] }

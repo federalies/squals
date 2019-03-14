@@ -70,9 +70,28 @@
 					<li>Class Constructor</li>
 					<li>Many Helper funcitons to create various parameters using defaults and guarenteeing enough info to properly create a template</li>
 				</ul>
-				<h2 id="convention">Convention</h2>
+				<h2 id="conventions">Conventions</h2>
+				<h3 id="conventions">Conventions</h3>
 				<ul>
-					<li>List type properties <strong>always</strong> accept a single config object or list -</li>
+					<li><p>every class method needs a sane default</p>
+					</li>
+					<li><p>any property named <code>&lt;X&gt; list</code> <strong>always</strong> intelligently handle inputs of an &#39;item&#39; or a &#39;list&#39;</p>
+						<ul>
+							<li>what if it was &quot;ends in <code>s</code>&quot; for brevity -vs- &#39;ends in <code>list</code>&#39;</li>
+						</ul>
+					</li>
+					<li><p>JSdoc for even private functions - as a future contributor affordance</p>
+					</li>
+					<li><p>the JSDoc Example should correspond to the first test in the corresponding <strong>test</strong> file</p>
+					</li>
+					<li><p>interface names all start with <code>I</code> and then followed by a submodule name</p>
+					</li>
+					<li><p>interface for outbound types start with <code>I&lt;toUpperCase&gt;</code></p>
+					</li>
+					<li><p>interface for inbound types start with <code>I&lt;toLowerCase&gt;</code></p>
+					</li>
+					<li><p>look through the codebase and promote <code>@todo</code>| <code>@idea</code> to &#39;real tracked issues&#39;</p>
+					</li>
 				</ul>
 				<h2 id="checklist">Checklist</h2>
 				<ul>
@@ -379,9 +398,6 @@
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#analyticsitem" class="tsd-kind-icon">analytics<wbr>Item</a>
 					</li>
-					<li class=" tsd-kind-function">
-						<a href="globals.html#bucketencryption" class="tsd-kind-icon">bucket<wbr>Encryption</a>
-					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#conditionabortincompletemultipartupload" class="tsd-kind-icon">condition<wbr>Abort<wbr>Incomplete<wbr>Multipart<wbr>Upload</a>
 					</li>
@@ -411,6 +427,9 @@
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#difference" class="tsd-kind-icon">difference</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#encryptionconfig" class="tsd-kind-icon">encryption<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function tsd-has-type-parameter tsd-is-not-exported">
 						<a href="globals.html#fold" class="tsd-kind-icon">fold</a>
@@ -473,7 +492,7 @@
 						<a href="globals.html#uniq" class="tsd-kind-icon">uniq</a>
 					</li>
 					<li class=" tsd-kind-function">
-						<a href="globals.html#versioning" class="tsd-kind-icon">versioning</a>
+						<a href="globals.html#versioningconfig" class="tsd-kind-icon">versioning<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#websiteconfig" class="tsd-kind-icon">website<wbr>Config</a>

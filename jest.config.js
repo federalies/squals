@@ -8,7 +8,8 @@ module.exports = {
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   testPathIgnorePatterns: ['/lib/', '/node_modules/'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  collectCoverage: true
+  collectCoverage: true,
+  coveragePathIgnorePatterns: ['/node_modules/']
 }
 
 const alternateConfig = {

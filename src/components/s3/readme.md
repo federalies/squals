@@ -40,21 +40,3 @@ const a = new S3Bucket()
 ### Simplified
 
 - [] Analytics
-
-### Conventions
-
-- any property named `<X> list` intelligently handles you giving an 'item' or a 'list'
-
-  - what if it was ends in `s` for brevity?
-
-- JSdoc for even private functions - for contributor affordance
-
-- the JSDoc Example should correspond to the first test in the corresponding **test** file
-
-- interface names all start with `I` and then followed by a submodule name
-
-- interface for outbound types start with `I<toUpperCase>`
-
-- interface for inbound types start with `I<toLowerCase>`
-
-- look through the codebase and promote `@todo`| `@idea` to 'real tracked issues'

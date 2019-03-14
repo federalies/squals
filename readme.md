@@ -4,9 +4,15 @@
 
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
 
-**Squals** is an idiomatic cloudformation generator that makes it incredibly easy to share your setup via `npm` or similair.
+**Squals** is an idiomatic cloudformation generator that makes it incredibly easy to share your setups via `npm`, `gist` or similair service.
 
-The project goals are to make the system more composeable, contextual, shareable, and done in modern js (actually built in typescript) patterns.
+AWS (+ Google Cloud, + Azure) have wonderfuly robust infrastructure offerings, but with that comes a not so wonderfully complicated system, documentation, and methods to make all your cloud components.
+
+Much like React/Vue/Hyperapp have added a reaonable encapulation levels to working with HTMLnodes in their various trees. Squals aims to make resuable components. that can be shared, easily added, and most importantly understood with much of the obtuse details ecapsulated away in to the framework.
+
+Because the benefits significantly outweigh the downsides - a declarative componet manifest approach makes the most sense to acomplish creating cloud components. So for squals will support AWS cloudformation, and (eventually) Azure Resource Manager, Google Cloud Resourece Manager too.
+
+The project goals are to make systems more composeable, contextual, shareable, and done in modern js (or typescript) patterns.
 
 ## Goals:
 

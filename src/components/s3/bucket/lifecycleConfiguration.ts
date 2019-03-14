@@ -25,12 +25,11 @@ export const lifecycleConfig = (
  * Title.
  *
  * @description description.
- * @param {Object<string, boolean|string|Array<string>>} rule -
- * @param {?boolean} [rule.status] -
- * @param {?string} [rule.id] -
- * @param {?string} [rule.prefix] -
- * @param {?Array<{string:string}>} [rule.tagList]-.
- * @returns {Object} -
+ * @param rule -
+ * @param rule.status -
+ * @param rule.id -
+ * @param rule.prefix -
+ * @param rule.tagList - .
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule.html>
  * @todo Add more validations to cover the covariance requirements on input variable -namely choose a unit and stick with it
  * @example
@@ -86,42 +85,12 @@ export const lifecyleRule = (rule: IlifecycleRule): ILifecycleValid => {
   return ret
 }
 
-/*
- * "Type '{
-      Status: \"Enabled\" | \"Disabled\";
-      TagFilters: OutTags[];
-      AbortIncompleteMultipartUpload: { DaysAfterInitiation: number; };
-    }
-   | {
-     TagFilters: OutTags[];
-     ExpirationDate: string | undefined;
-     Status: \"Enabled\" | \"Disabled\";
-    }
-    | ... 4 more ... | { ...; }'
-
-    is not assignable to type 'OutValidLifeCycleRule'.
-
-    Type '{ TagFilters: OutTags[];
-      AbortIncompleteMultipartUpload: { DaysAfterInitiation: number; };
-      Status: \"Enabled\" | \"Disabled\"; }' is not assignable to type 'OutValidLifeCycleRule'.
-
-    Type '{ TagFilters: OutTags[];
-      AbortIncompleteMultipartUpload: { DaysAfterInitiation: number; };
-      Status: \"Enabled\" | \"Disabled\"; }' is not assignable to type 'OutMultiPartCancel'
-
-      Types of property 'TagFilters' are incompatible.\n
-
-      Type 'OutTags[]' is missing the following properties from type 'OutTags': Key, Value",
- *
- */
-
 /**
  * Title.
  *
  * @description descrip.
- * @param {Object} input -
- * @param {!number} input.quiteMultipartsAfterDays -
- * @returns {Object} Cloudformation S3::AbortIncompleteMultipartUpload property.
+ * @param input -
+ * @param input.quiteMultipartsAfterDays -
  * @example
  * var v = conditionAbortIncompleteMultipartUpload()
  */
@@ -233,6 +202,15 @@ const conditionTransitions = (input: IInRuleTransitions) => {
     )
   }
 }
+
+/**
+ * Title.
+ *
+ * @description asd.
+ * @param input
+ * @example
+ * var awsFormated = transformtoAWSfmt({ ruleName:"ExpirationInDays", expiryDays: 42 })
+ */
 const transformtoAWSfmt = (input: IlifecycleValidRules): any => {
   /**
    * Condtion Options:
@@ -244,33 +222,33 @@ const transformtoAWSfmt = (input: IlifecycleValidRules): any => {
    * 6. { transitions: [{storage: "class1", atDate:"YYYY-MM-DD", daysTillslowdown:Number}] }
    */
 
-  switch (input.ruleName) {
-    case 'AbortIncompleteMultipartUpload':
-      return conditionAbortIncompleteMultipartUpload(input)
-    case 'ExpirationDate':
-      return conditionExpirationDate(input)
-    case 'ExpirationInDays':
-      return conditionExpirationInDays(input)
-    case 'NoncurrentVersionExpirationInDays':
-      return conditionNoncurrentVersionExpirationInDays(input)
-    case 'NoncurrentVersionTransitions':
-      return conditionNoncurrentVersionTransitions(input)
-    case 'Transitions':
-      return conditionTransitions(input)
-    default:
-      let complilerShouldNeverGetHere: never
-      return new Error(`poorly formed inputs in the lifecycleConfig functionn$`)
+  if ('quitMultipartsAfterDays' in input) {
+    return conditionAbortIncompleteMultipartUpload(input)
+  } else if ('expiryDays' in input) {
+    return conditionExpirationInDays(input)
+  } else if ('expiryDate' in input) {
+    return conditionExpirationDate(input)
+  } else if ('keepOldVersionForDays' in input) {
+    return conditionNoncurrentVersionExpirationInDays(input)
+  } else if ('moveOldVersionRules' in input) {
+    return conditionNoncurrentVersionTransitions(input)
+  } else if ('transitions' in input) {
+    return conditionTransitions(input)
   }
+  // compiler needs to guarentee we never reach here
+  // other wise we have an unreturned/void function
 }
 
-// make some mermaid diagram for these types
+// @todo: make some mermaid diagram for these types
+// this module has a lot of intractable type complexity
 // as much as is reasonable - types should represent shapes - not meta-meta-logic
+// this one makes it hard
 
 export interface IlifecycleRule {
   id?: string
   prefix?: string
   status?: boolean
-  tagList?: InTags
+  tagList?: InTags | InTags[]
 }
 
 export interface IlifecycleRuleMoveOldVersionsItem {
@@ -294,37 +272,30 @@ export interface IlifecycleRuleTransitionItem_wDate {
 }
 
 export interface IInRuleMultipartAbort extends IlifecycleRule {
-  readonly ruleName: 'AbortIncompleteMultipartUpload'
   quitMultipartsAfterDays: number
 }
 
 export interface IInRuleExpiryDate extends IlifecycleRule {
-  readonly ruleName: 'ExpirationDate'
   expiryDate?: string
 }
 
 export interface IInRuleExpirationDays extends IlifecycleRule {
-  readonly ruleName: 'ExpirationInDays'
   expiryDays: number
 }
 
 export interface IInRuleMoveOldVersionsAfterDays extends IlifecycleRule {
-  readonly ruleName: 'NoncurrentVersionExpirationInDays'
   keepOldVersionForDays?: number
 }
 
 export interface IInRuleMoveOldVersions extends IlifecycleRule {
-  readonly ruleName: 'NoncurrentVersionTransitions'
   moveOldVersionRules: IlifecycleRuleMoveOldVersionsItem | IlifecycleRuleMoveOldVersionsItem[]
 }
 
-export interface IInRuleTransitionsDated extends IlifecycleRule {
-  readonly ruleName: 'Transitions'
+export interface IInRuleTransitionsDurationed extends IlifecycleRule {
   transitions: IlifecycleRuleTransitionItem_wDays | IlifecycleRuleTransitionItem_wDays[]
 }
 
-export interface IInRuleTransitionsDurationed extends IlifecycleRule {
-  readonly ruleName: 'Transitions'
+export interface IInRuleTransitionsDated extends IlifecycleRule {
   transitions: IlifecycleRuleTransitionItem_wDate | IlifecycleRuleTransitionItem_wDate[]
 }
 

@@ -1,11 +1,11 @@
 // @ts-nocheck
 
-import { lifecycleConfig, IlifecycleValidRules } from '../../../src/components/s3/bucket'
+import { lifecycleConfig } from '../../../src/components/s3/bucket'
+
 describe('defaults', () => {
   test('expiryDays starter', () => {
     // fix this so that the readonly prop is not required
-    const rule: IlifecycleValidRules = { expiryDays: 42, ruleName: 'ExpirationInDays' }
-    const a = lifecycleConfig(rule)
+    const a = lifecycleConfig({ expiryDays: 42 })
     const exp: any = {
       LifecycleConfiguration: {
         Rules: [{ ExpirationInDays: 42, Status: 'Enabled' }]
@@ -14,13 +14,34 @@ describe('defaults', () => {
     expect(a).toEqual(exp)
   })
 
-  test('keepOldVersionForDays example', () => {
+  test('expiryDays starter', () => {
     // fix this so that the readonly prop is not required
-    const rule: IlifecycleValidRules = {
-      keepOldVersionForDays: 42,
-      ruleName: 'NoncurrentVersionExpirationInDays'
+    const rule: any = {
+      id: 'ThisIsANameForTheRule',
+      prefix: 'onlyAppliedToTheseKeys/',
+      tagList: { myTag: 'isMine' },
+      status: false,
+      expiryDays: 42
     }
     const a = lifecycleConfig(rule)
+    const exp: any = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Id: 'ThisIsANameForTheRule',
+            Status: 'Disabled',
+            Prefix: 'onlyAppliedToTheseKeys/',
+            TagFilters: [{ Key: 'myTag', Value: 'isMine' }],
+            ExpirationInDays: 42
+          }
+        ]
+      }
+    }
+    expect(a).toEqual(exp)
+  })
+
+  test('keepOldVersionForDays example', () => {
+    const a = lifecycleConfig({ keepOldVersionForDays: 42 })
     const e: any = {
       LifecycleConfiguration: {
         Rules: [{ NoncurrentVersionExpirationInDays: 42, Status: 'Enabled' }]
@@ -30,14 +51,10 @@ describe('defaults', () => {
     expect(a).toEqual(e)
   })
 
-  test.skip('transitions example', () => {
-    // fix this so that the readonly prop is not required
-    const rule: any = {
-      ruleName: 'Transitions',
-      storage: 'somestorage',
-      daysTillSlowDown: 42
-    }
-    const a = lifecycleConfig(rule)
+  test('transitions duration example', () => {
+    const a = lifecycleConfig({
+      transitions: { storage: 'somestorage', daysTillSlowDown: 42 }
+    })
     const e: any = {
       LifecycleConfiguration: {
         Rules: [
@@ -48,102 +65,188 @@ describe('defaults', () => {
         ]
       }
     }
-    console.error(JSON.stringify(e, null, 2))
-    console.error(JSON.stringify(a, null, 2))
-
     expect(a).toEqual(e)
   })
-  test.skip('transitions list example', () => {
+
+  test('transitions absolute date example (no tagList)', () => {
+    const a = lifecycleConfig({
+      id: '#myID',
+      status: false,
+      prefix: '2019-',
+      transitions: [
+        { storage: 'STANDARD_IA', atDate: '2019-10-01' },
+        { storage: 'GLACIER', atDate: '2020-12-01' }
+      ]
+    })
+    const e: any = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Disabled',
+            Id: '#myID',
+            Prefix: '2019-',
+            Transitions: [
+              { StorageClass: 'STANDARD_IA', TransitionDate: '2019-10-01' },
+              { StorageClass: 'GLACIER', TransitionDate: '2020-12-01' }
+            ]
+          }
+        ]
+      }
+    }
+    expect(a).toEqual(e)
+  })
+
+  test('transitions absolute date example (with tagList)', () => {
+    const a = lifecycleConfig({
+      id: '#myID',
+      status: true,
+      tagList: { myTag: '12' },
+      prefix: '2019-',
+      transitions: [
+        { storage: 'STANDARD_IA', atDate: '2019-10-01' },
+        { storage: 'GLACIER', atDate: '2020-12-01' }
+      ]
+    })
+    const e: any = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Enabled',
+            Id: '#myID',
+            TagFilters: [{ Key: 'myTag', Value: '12' }],
+            Prefix: '2019-',
+            Transitions: [
+              { StorageClass: 'STANDARD_IA', TransitionDate: '2019-10-01' },
+              { StorageClass: 'GLACIER', TransitionDate: '2020-12-01' }
+            ]
+          }
+        ]
+      }
+    }
+    expect(a).toEqual(e)
+  })
+
+  test('transitions list example', () => {
     const rule: any = [
       {
-        ruleName: 'Transitions',
-        transitions: [{ storage: '', daysTillSlowDown: 42 }]
+        transitions: [
+          { storage: 'STANDARD_IA', daysTillSlowDown: 12 },
+          { storage: 'GLACIER', daysTillSlowDown: 22 }
+        ]
       },
       {
-        ruleName: 'Transitions',
-        transitions: [{ storage: '', daysTillSlowDown: 42 }]
+        expiryDays: 42
       }
     ]
     const a = lifecycleConfig(rule)
-    const e = {}
+    const e = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Enabled',
+            Transitions: [
+              {
+                StorageClass: 'STANDARD_IA',
+                TransitionInDays: 12
+              },
+              {
+                StorageClass: 'GLACIER',
+                TransitionInDays: 22
+              }
+            ]
+          },
+          {
+            Status: 'Enabled',
+            ExpirationInDays: 42
+          }
+        ]
+      }
+    }
     expect(a).toEqual(e)
   })
-  test.skip('transitions list example', () => {
-    const rule: any = {}
-    const a = {}
-    const exp = {}
+
+  test('moveOldVersionRule example', () => {
+    const rule: any = { moveOldVersionRules: { storage: 'STANDARD_IA', daysTillSlowDown: 42 } }
+    const a = lifecycleConfig(rule)
+    const exp = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Enabled',
+            NoncurrentVersionTransitions: [
+              {
+                StorageClass: 'STANDARD_IA',
+                TransitionInDays: 42
+              }
+            ]
+          }
+        ]
+      }
+    }
     expect(a).toEqual(exp)
   })
-  test.skip('moveOldVersionRule example', () => {
-    const rule: any = {}
-    const a = {}
-    const exp = {}
+
+  test('moveOldVersionRule List example', () => {
+    const rule: any = {
+      moveOldVersionRules: [
+        { storage: 'STANDARD', daysTillSlowDown: 12 },
+        { storage: 'STANDARD_IA', daysTillSlowDown: 42 }
+      ]
+    }
+    const a = lifecycleConfig(rule)
+    const exp = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Enabled',
+            NoncurrentVersionTransitions: [
+              {
+                StorageClass: 'STANDARD',
+                TransitionInDays: 12
+              },
+              {
+                StorageClass: 'STANDARD_IA',
+                TransitionInDays: 42
+              }
+            ]
+          }
+        ]
+      }
+    }
     expect(a).toEqual(exp)
   })
-  test.skip('expiryDate example', () => {
-    const rule: any = {}
-    const a = {}
-    const exp = {}
+
+  test('expiryDate example', () => {
+    const rule: any = { expiryDate: '2019-12-31' }
+    const a = lifecycleConfig(rule)
+    const exp = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Enabled',
+            ExpirationDate: '2019-12-31'
+          }
+        ]
+      }
+    }
     expect(a).toEqual(exp)
   })
-  test.skip('quitMultipartsAfterDays example', () => {
-    const rule: any = {}
-    const a = {}
-    const exp = {}
+
+  test('quitMultipartsAfterDays example', () => {
+    const rule: any = { quitMultipartsAfterDays: 2 }
+    const a = lifecycleConfig(rule)
+    const exp = {
+      LifecycleConfiguration: {
+        Rules: [
+          {
+            Status: 'Enabled',
+            AbortIncompleteMultipartUpload: {
+              DaysAfterInitiation: 2
+            }
+          }
+        ]
+      }
+    }
     expect(a).toEqual(exp)
   })
 })
-
-// log({ 1: lifecycleConfig({ c: [{ expiryDate: '2020-01-01' }] }) })
-
-// log({
-//   2: lifecycleConfig({
-//     c: [{ expiryDays: 5 }],
-//     o: {
-//       status: false,
-//       id: 'someid',
-//       prefix: 'pre/',
-//       tagList: [{ myTag: 'value' }, { otherTag: 'its value' }]
-//     }
-//   })
-// })
-
-// log({
-//   3: lifecycleConfig(
-//     {
-//       c: [{ expiryDays: 5 }],
-//       o: {
-//         status: false,
-//         id: 'someid',
-//         prefix: 'pre/',
-//         tagList: [{ myTag: 'value' }, { otherTag: 'its value' }]
-//       }
-//     },
-//     [{ c: [{ keepOldVersionForDays: 2 }], o: {} }]
-//   )
-// })
-
-// log({ 4: lifecycleConfig({ c: [{ quiteMultipartsAfterDays: 2 }] }) })
-// log({
-//   5: lifecycleConfig({ c: [{ keepOldVersionForDays: 2 }] }, [
-//     { c: [{ expiryDays: 5 }] }
-//   ])
-// })
-// log({
-//   6: lifecycleConfig({
-//     c: [
-//       {
-//         moveOldVersion: [{ storage: 'STANDARD_IA', daysTillslowdown: 2 }]
-//       }
-//     ]
-//   })
-// })
-// log({
-//   7: lifecycleConfig({
-//     c: [
-//       {
-//         transitions: [{ storage: 'STANDARD_IA', atDate: '2020-01-01' }]
-//       }
-//     ]
-//   })
-// })

@@ -3,10 +3,10 @@
 // import * as url from 'url'
 // import { isEmpty } from 'lodash-es'
 import { OutTags, InTags, Tags } from './tags'
-import { versioning } from './versioningConfiguration'
+import { versioningConfig } from './versioningConfiguration'
 import { accelerate } from './accelerateConfiguration'
 import { OutAnalyticsItem, InAnalyticsConfigItem, analyticsConfig } from './analyticsConfiguration'
-import { OutServerSideEncRule, InParamSSRule, bucketEncryption } from './bucketEncryption'
+import { OutServerSideEncRule, InParamSSRule, encryptionConfig } from './bucketEncryption'
 import { OutCorsRule, corsConfig, InCorsRule } from './corsConfiguration'
 import { OutInventoryRule, InInventoryRule, inventoryConfig } from './inventoryConfiguration'
 import { ILifecycleItem, lifecycleConfig, IlifecycleValidRules } from './lifecycleConfiguration'
@@ -49,35 +49,35 @@ export class S3Bucket implements IndexSignature {
     [prop: string]: any
   }
   [key: string]: any
-  private properties = [
-    'BucketName',
-    'AccessControl',
-    'AccelerateConfiguration',
-    'AnalyticsConfiguration',
-    'BucketEncryption',
-    'CorsConfiguration',
-    'InventoryConfiguration',
-    'LifecycleConfiguration',
-    'LoggingConfiguration',
-    'MetricsConfiguration',
-    'NotificationConfiguration',
-    'PublicAccessBlockConfiguration',
-    'ReplicationConfiguration',
-    'Tags',
-    'VersioningConfiguration',
-    'WebsiteConfiguration'
-  ]
+  // private properties = [
+  //   'BucketName',
+  //   'AccessControl',
+  //   'AccelerateConfiguration',
+  //   'AnalyticsConfiguration',
+  //   'BucketEncryption',
+  //   'CorsConfiguration',
+  //   'InventoryConfiguration',
+  //   'LifecycleConfiguration',
+  //   'LoggingConfiguration',
+  //   'MetricsConfiguration',
+  //   'NotificationConfiguration',
+  //   'PublicAccessBlockConfiguration',
+  //   'ReplicationConfiguration',
+  //   'Tags',
+  //   'VersioningConfiguration',
+  //   'WebsiteConfiguration'
+  // ]
 
-  private bucketACLS = [
-    'AuthenticatedRead',
-    'AwsExecRead',
-    'BucketOwnerRead',
-    'BucketOwnerFullControl',
-    'LogDeliveryWrite',
-    'Private',
-    'PublicRead',
-    'PublicReadWrite'
-  ]
+  // private bucketACLS = [
+  //   'AuthenticatedRead',
+  //   'AwsExecRead',
+  //   'BucketOwnerRead',
+  //   'BucketOwnerFullControl',
+  //   'LogDeliveryWrite',
+  //   'Private',
+  //   'PublicRead',
+  //   'PublicReadWrite'
+  // ]
 
   /**
    * S3Bucket Class that models info needed for Cloudformation.
@@ -101,22 +101,22 @@ export class S3Bucket implements IndexSignature {
 
     this.Properties = inprops
 
-    const noop = (input: any) => {
-      return input
-    }
-
-    noop(this.bucketACLS) // @todo use these sans noop
-    noop(this.properties)
+    // const noop = (input: any) => {
+    //   return input
+    // }
+    //
+    // noop(this.bucketACLS) // @todo use these sans noop
+    // noop(this.properties)
   }
 
   clean (): S3Bucket {
     let _this: S3Bucket = this
     let propNameCheckList: string[] = [...Object.getOwnPropertyNames(_this)]
-    let propRemovePrivate: string[] = ['bucketACLS', 'properties']
+    // let propRemovePrivate: string[] = ['bucketACLS', 'properties']
 
-    propRemovePrivate.forEach(removeMe => {
-      delete _this[removeMe]
-    })
+    // propRemovePrivate.forEach(removeMe => {
+    //   delete _this[removeMe]
+    // })
 
     propNameCheckList.forEach(propName => {
       if (_this[propName] === null || _this[propName] === undefined || _this[propName] === {}) {
@@ -127,7 +127,7 @@ export class S3Bucket implements IndexSignature {
     return _this
   }
 
-  toJSON (replacer: any, space: any): string {
+  toJSON (replacer?: any, space?: any) {
     const removeEmpty = (obj: any) => {
       Object.keys(obj).forEach(key => {
         if (obj[key] && typeof obj[key] === 'object') removeEmpty(obj[key])
@@ -149,16 +149,8 @@ export class S3Bucket implements IndexSignature {
             Type: this.Type
           }
         }
-
-    return JSON.stringify(
-      {
-        [this.name]: {
-          Type: this.Type
-        }
-      },
-      replacer,
-      space
-    )
+    return _this
+    // return JSON.stringify(_this, replacer, space)
   }
 
   clearOut (propName: string): S3Bucket {
@@ -171,7 +163,7 @@ export class S3Bucket implements IndexSignature {
     return _this
   }
 
-  accelerate (status?: boolean): S3Bucket {
+  accelerate (status: boolean = true): S3Bucket {
     // true = Enabled
     // false = Suspened
     // use clearOut for removal
@@ -190,11 +182,11 @@ export class S3Bucket implements IndexSignature {
     }
     return _this
   }
-  encryption (rules: InParamSSRule | InParamSSRule[]): S3Bucket {
+  encryption (rules: InParamSSRule | InParamSSRule[] = {}): S3Bucket {
     const _this: S3Bucket = this
     _this.Properties = {
       ..._this.Properties,
-      ...bucketEncryption(rules)
+      ...encryptionConfig(rules)
     }
     return _this
   }
@@ -222,7 +214,7 @@ export class S3Bucket implements IndexSignature {
     }
     return _this
   }
-  logging (loggingCfg: InLoggingConfig): S3Bucket {
+  logging (loggingCfg: InLoggingConfig = {}): S3Bucket {
     const _this: S3Bucket = this
     _this.Properties = {
       ..._this.Properties,
@@ -239,7 +231,7 @@ export class S3Bucket implements IndexSignature {
     return _this
   }
 
-  publicAccess (params: InPublicAccessConfig): S3Bucket {
+  publicAccess (params: InPublicAccessConfig = {}): S3Bucket {
     const _this: S3Bucket = this
 
     _this.Properties = {
@@ -264,11 +256,11 @@ export class S3Bucket implements IndexSignature {
     }
     return _this
   }
-  version (isEnabled: boolean = true): S3Bucket {
+  versions (isEnabled: boolean = true): S3Bucket {
     const _this: S3Bucket = this
     _this.Properties = {
       ..._this.Properties,
-      ...versioning(isEnabled)
+      ...versioningConfig(isEnabled)
     }
     return _this
   }
@@ -282,20 +274,17 @@ export class S3Bucket implements IndexSignature {
   }
   website (config: boolean | inWebsiteConfig = true): S3Bucket {
     let AccessControl: IValidPublicAccessControls = 'PublicRead'
-
-    if (config === false) {
-      if (this.Properties) delete this.Properties.WebsiteConfiguration
-      return this
-    } else if (config && config === true) {
+    if (config === true) {
       this.Properties = {
         ...this.Properties,
-        ...websiteConfig(),
-        AccessControl
+        AccessControl,
+        ...websiteConfig()
       }
       return this
     } else if (config) {
       this.Properties = {
         ...this.Properties,
+        AccessControl,
         ...websiteConfig(config)
       }
       return this

@@ -13,22 +13,6 @@ describe('defaults', () => {
     expect(s.clean()).toEqual(expected)
   })
 
-  test('Default Website Configuration', () => {
-    const actual = new S3Bucket({ name: 'ItsMyName' }).website()
-    const expected: any = {
-      name: 'ItsMyName',
-      Type: 'AWS::S3::Bucket',
-      Properties: {
-        AccessControl: 'PublicRead',
-        WebsiteConfiguration: {
-          IndexDocument: 'index.html',
-          ErrorDocument: 'search.html'
-        }
-      }
-    }
-    expect(actual.clean()).toEqual(expected)
-  })
-
   test('CFM Ref', () => {
     // ordered param is terrible... fix this mess.
     const actual = new S3Bucket({ name: 'MyBucket' })
@@ -55,6 +39,336 @@ describe('defaults', () => {
   test('CFM GetAtt:WebsiteURL', () => {
     const actual = new S3Bucket({ name: 'MyBucket' })
     expect(actual.WebsiteURL()).toEqual({ 'Fn::GetAtt': ['MyBucket', 'WebsiteURL'] })
+  })
+
+  test('toJSON on simple S3Bucket', () => {
+    const a = new S3Bucket({ name: 'myBucket' })
+    const e = `{"myBucket":{"Type":"AWS::S3::Bucket"}}`
+    expect(JSON.stringify(a)).toEqual(e)
+  })
+
+  test('clearOut ', () => {
+    // make a bucket, alter the bucket state via a mutator
+    // but then clear out the mutation
+    const a1 = new S3Bucket({ name: 'WebsiteBucket' })
+      .website()
+      .clearOut('WebsiteConfiguration')
+      .clearOut('AccessControl')
+    const e1 = new S3Bucket({ name: 'WebsiteBucket' })
+
+    const a2 = new S3Bucket({ name: 'WebsiteBucket2' })
+      .logging()
+      .website()
+      .clearOut('LoggingConfiguration')
+    const e2 = new S3Bucket({ name: 'WebsiteBucket2' }).website()
+
+    expect(a1).toEqual(e1)
+    expect(a2).toEqual(e2)
+  })
+
+  // @todo double check for better words - other than mutator
+  test('accelerate mutator', () => {
+    const name = 'coolS3Bucket'
+    const a = new S3Bucket({ name }).accelerate()
+    const e = {
+      name,
+      Type: 'AWS::S3::Bucket',
+      Properties: {
+        AccelerateConfiguration: {
+          AccelerationStatus: 'Enabled'
+        }
+      }
+    }
+    expect(a).toEqual(e)
+  })
+
+  test('analytics mutator', () => {
+    const name = 'coolS3Bucket'
+    const a = new S3Bucket({ name }).analytics({ id: 'analyzeItAll' })
+    const e = {
+      name,
+      Type: 'AWS::S3::Bucket',
+      Properties: {
+        AnalyticsConfigurations: [
+          {
+            Id: 'analyzeItAll',
+            Prefix: '',
+            StorageClassAnalysis: {}
+          }
+        ]
+      }
+    }
+    expect(a).toEqual(e)
+  })
+
+  test('encryption mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).encryption()
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        BucketEncryption: {
+          ServerSideEncryptionConfiguration: [
+            {
+              ServerSideEncryptionByDefault: {
+                SSEAlgorithm: 'aws:kms'
+              }
+            }
+          ]
+        }
+      }
+    }
+
+    expect(actual).toEqual(expected)
+  })
+
+  test('cors mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).cors({ _: { 'GET|PUT|POST': ['localhost'] } })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        CorsConfiguration: {
+          CorsRules: [
+            {
+              AllowedMethods: ['GET', 'PUT', 'POST'],
+              AllowedOrigins: ['localhost']
+            }
+          ]
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('inventory mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).inventory({
+      id: 'InvRuleID.1',
+      dest: { arn: 'arn:s3:bucketName' }
+    })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        InventoryConfigurations: [
+          {
+            Destination: {
+              BucketArn: 'arn:s3:bucketName',
+              Format: 'CSV'
+            },
+            Enabled: true,
+            Id: 'InvRuleID.1',
+            IncludedObjectVersions: 'All',
+            ScheduleFrequency: 'Weekly'
+          }
+        ]
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('lifecycle mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).lifecycle({ expiryDays: 42 })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        LifecycleConfiguration: {
+          Rules: [
+            {
+              ExpirationInDays: 42,
+              Status: 'Enabled'
+            }
+          ]
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('logging mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).logging()
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        LoggingConfiguration: {}
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('metrics mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).metrics({ id: 'metricsRuleID' })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        MetricsConfigurations: [
+          {
+            Id: 'metricsRuleID'
+          }
+        ]
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('publicAccess mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).publicAccess()
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        PublicAccessBlockConfiguration: {}
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('notifications mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).notifications({
+      filterList: 'Yosem*',
+      arn: 'arn:aws:lambda::123456789012:resA/div_abc',
+      event: 's3:ObjectCreated:*'
+    })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        NotificationConfiguration: {
+          LambdaConfigurations: [
+            {
+              Event: 's3:ObjectCreated:*',
+              Function: 'arn:aws:lambda::123456789012:resA/div_abc',
+              Filter: {
+                S3Key: {
+                  Rules: [
+                    {
+                      Name: 'prefix',
+                      Value: 'Yosem'
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('replication mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).replication({
+      iamARN: 'thisIsMyArn',
+      rules: {
+        replicateEncData: true,
+        dest: { kmsId: 'myKeyID', bucket: 'BucketToCatchReplicatedData' }
+      }
+    })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        ReplicationConfiguration: {
+          Role: 'thisIsMyArn',
+          Rules: [
+            {
+              Destination: {
+                Bucket: 'BucketToCatchReplicatedData',
+                EncryptionConfiguration: {
+                  ReplicaKmsKeyID: 'myKeyID'
+                }
+              },
+              Prefix: '',
+              Status: 'Enabled',
+              SourceSelectionCriteria: {
+                SseKmsEncryptedObjects: {
+                  Status: 'Enabled'
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('versions mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).versions()
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        VersioningConfiguration: {
+          Status: 'Enabled'
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('tags mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).tags({ my: 'tag' })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        Tags: [{ Key: 'my', Value: 'tag' }]
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('default website mutator', () => {
+    const name = 'ItsMyName'
+    const actual = new S3Bucket({ name }).website()
+    const expected: any = {
+      name,
+      Type: 'AWS::S3::Bucket',
+      Properties: {
+        AccessControl: 'PublicRead',
+        WebsiteConfiguration: {
+          IndexDocument: 'index.html',
+          ErrorDocument: 'search.html'
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
+  })
+
+  test('website mutator', () => {
+    const name = 'coolS3Bucket'
+    const actual = new S3Bucket({ name }).website({ redir: 'https://federali.es' })
+    const expected = {
+      Type: 'AWS::S3::Bucket',
+      name,
+      Properties: {
+        AccessControl: 'PublicRead',
+        WebsiteConfiguration: {
+          IndexDocument: 'index.html',
+          ErrorDocument: 'search.html',
+          RedirectAllRequestsTo: {
+            Protocol: 'https',
+            HostName: 'federali.es'
+          }
+        }
+      }
+    }
+    expect(actual).toEqual(expected)
   })
 
   test.skip('Bucket Based on Other Bucket', () => {})

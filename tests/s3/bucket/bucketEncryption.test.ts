@@ -1,10 +1,10 @@
 // @ts-nocheck
 
-import { bucketEncryption } from '../../../src/components/s3'
+import { encryptionConfig } from '../../../src/components/s3'
 
 describe('happy path for bucketEncryption', () => {
   test('default encryption rules', () => {
-    const myBucketEnc = bucketEncryption()
+    const myBucketEnc = encryptionConfig()
 
     const expected: any = {
       BucketEncryption: {
@@ -20,7 +20,7 @@ describe('happy path for bucketEncryption', () => {
     expect(myBucketEnc).toEqual(expected)
   })
   test('with object passed in', () => {
-    const myBucketEnc = bucketEncryption({ algo: 'aws:kms' })
+    const myBucketEnc = encryptionConfig({ algo: 'aws:kms' })
 
     const expected: any = {
       BucketEncryption: {
@@ -36,7 +36,7 @@ describe('happy path for bucketEncryption', () => {
     expect(myBucketEnc).toEqual(expected)
   })
   test('with list passed in', () => {
-    const myBucketEnc = bucketEncryption([
+    const myBucketEnc = encryptionConfig([
       { algo: 'aws:kms', keyID: '1234567890' },
       { algo: 'AES256', keyID: '0987654321' }
     ])
