@@ -31,8 +31,21 @@ export const encryptionConfig = (encRules: InParamSSRule | InParamSSRule[] = {})
  * @example
  *   var a = serverSideEncryptionRule()
  */
-export const serverSideEncryptionRule = (params: InParamSSRule): OutServerSideEncRule => {
+export const serverSideEncryptionRule = (params: InParamSSRule = {}): OutServerSideEncRule => {
   const { algo, keyID } = { algo: 'aws:kms', keyID: null, ...params }
+  if (!['aws:kms', 'AES256'].includes(algo)) {
+    throw new Error(
+      `ƒ.serverSideEncryptionRule needed an input algo of ['aws:kms', 'AES256'] - but instead got: ${algo}`
+    )
+  }
+
+  // @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-serversideencryptionbydefault.html>
+  if (algo === 'AES256' && 'keyID' in params) {
+    throw new Error(
+      `ƒ.serverSideEncryptionRule requies that KeyId is only used with aws:kms - and not using the default aws/s3 master key`
+    )
+  }
+
   const ret: OutServerSideEncRule = { ServerSideEncryptionByDefault: { SSEAlgorithm: algo } }
   if (keyID) ret.ServerSideEncryptionByDefault['KMSMasterKeyID'] = keyID
   return ret

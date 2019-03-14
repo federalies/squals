@@ -10,14 +10,35 @@
  *  var rcfg = replicationConfig({ iamARN:getActingIAMWhileReplcating(),
  *                                 rules: getTheRuleListWeNeedToConfigureTheTempalte() })
  */
-export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig => {
-  const { iamARN } = params
-  let { rules } = params
-  rules = Array.isArray(rules) ? rules : new Array(rules)
-  return {
-    ReplicationConfiguration: {
-      Role: iamARN,
-      Rules: rules.map(r => replicationRule(r))
+export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig | undefined => {
+  const { iamARN, destBucket } = params
+
+  if (!iamARN || !(destBucket || 'rules' in params)) {
+    throw new Error('ƒ.replicationConfig needs "iamARN*(destBucket+rules)"')
+  } else {
+    // setup the default rule - what is the easiest config here?
+    // IamRole + DestBucket Name
+    // perhap it's reducible to just the bucket
+    // replciate "everything" to some other bucket
+    // where "eveything" still includes SSE objects
+    const complierEnsuredBucket = destBucket as string
+    const defaultRule: InReplicaRule = {
+      id: 'Squals_DefaultRule_ReplicateAll',
+      prefix: '',
+      status: true,
+      replicateEncData: true,
+      dest: { bucket: complierEnsuredBucket }
+    }
+    let { rules } = { rules: defaultRule, ...params }
+
+    rules = Array.isArray(rules) ? rules : new Array(rules)
+    const complierEnsuredRules = rules as InReplicaRule[]
+
+    return {
+      ReplicationConfiguration: {
+        Role: iamARN,
+        Rules: complierEnsuredRules.map(r => replicationRule(r))
+      }
     }
   }
 }
@@ -126,16 +147,28 @@ export const replicationDest = (params: InReplicaDest): OutReplicaDestination =>
   return ret
 }
 
+// type InReplicaConfig = InReplicaConfig_destBucket | InReplicaConfig_rulesList
+
 export interface InReplicaConfig {
+  iamARN: string
+  destBucket?: string
+  rules?: InReplicaRule | InReplicaRule[]
+}
+
+export interface InReplicaConfig_destBucket {
+  iamARN: string
+  destBucket: string
+}
+export interface InReplicaConfig_rulesList {
   iamARN: string
   rules: InReplicaRule | InReplicaRule[]
 }
 
 export interface InReplicaRule {
-  dest: InReplicaDest
   id?: string
   prefix?: string // output allows empty string - represents ALL - chosen as default
   status?: boolean
+  dest: InReplicaDest
   replicateEncData?: boolean
 }
 

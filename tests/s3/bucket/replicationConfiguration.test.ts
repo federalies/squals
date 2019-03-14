@@ -144,22 +144,56 @@ describe('Defaults', () => {
     expect(a).toThrow()
   })
 
-  test.skip('empty rules parma throws error', () => {
+  test('empty rules throws error', () => {
+    const iamARN = 'arn:aws:iam::someIAMValue'
+    const destBucket = 'someBucket'
+    const a = replicationConfig({ iamARN, destBucket })
+    const e = {
+      ReplicationConfiguration: {
+        Role: iamARN,
+        Rules: [
+          {
+            Prefix: '',
+            Id: 'Squals_DefaultRule_ReplicateAll',
+            Status: 'Enabled',
+            Destination: {
+              Bucket: destBucket
+            },
+            SourceSelectionCriteria: {
+              SseKmsEncryptedObjects: {
+                Status: 'Enabled'
+              }
+            }
+          }
+        ]
+      }
+    }
+    expect(a).toEqual(e)
+  })
+
+  test('empty rules throws error', () => {
     // @todo !research perhaps this is valid to have an empty RULE:[] in the output
     // catch this via the JSON schema | AWS network call
-    const a = () => replicationConfig({ iamARN: 'arn:aws:iam::someIAMValue', rules: [] })
+    const input: any = { iamARN: 'arn:aws:iam::someIAMValue' }
+    const a = () => replicationConfig(input)
     expect(a).toThrow()
   })
 
-  test.skip('Example D', () => {
-    const a = {}
-    const e = {}
-    expect(a).toEqual(e)
+  test('empty rules throws error', () => {
+    const input: any = { destBucket: 'someBucket' }
+    const a = () => replicationConfig(input)
+    expect(a).toThrow()
   })
+
+  // test.skip('Example D', () => {
+  //   const a = {}
+  //   const e = {}
+  //   expect(a).toEqual(e)
+  // })
 })
 
-describe.skip('Validations', () => {
-  test.skip('1+2=3', () => {
-    expect(1 + 2).toBe(3)
-  })
-})
+// describe.skip('Validations', () => {
+//   test.skip('1+2=3', () => {
+//     expect(1 + 2).toBe(3)
+//   })
+// })
