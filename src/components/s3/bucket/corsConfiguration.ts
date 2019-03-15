@@ -32,8 +32,7 @@ const difference = (setA: any[], setB: any[]) => {
  * Cors Config.
  *
  * @description asdf.
- * @param {inCorsConfig} rules - * Array of Objects with methods, origins, & opts.
- * @returns {Object} - Asd.
+ * @param rules - * Array of Objects with methods, origins, & opts.
  * @example
  *   var cfmCorsConfig = corsConfig([{methods:[],origins:[]}])
  */

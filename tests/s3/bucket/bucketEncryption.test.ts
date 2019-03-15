@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { encryptionConfig, S3Bucket } from '../../../src/components/s3'
+import { encryptionConfig } from '../../../src/components/s3'
 
 describe('happy path for bucketEncryption', () => {
   test('default encryption rules', () => {

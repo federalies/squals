@@ -1,5 +1,3 @@
-/** @module S3Bucket */
-
 /**
  * AWS::S3:Bucket Tags.
  *

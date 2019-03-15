@@ -1,48 +1,48 @@
 // @ts-nocheck
 
-import { S3Bucket } from '../../../src/components/s3/bucket'
+import { S3 } from '../../../src/components/s3'
 
 describe('defaults', () => {
   test('Unamed All Default Bucket', () => {
-    expect(new S3Bucket()).toHaveProperty('Type', 'AWS::S3::Bucket')
+    expect(new S3.Bucket()).toHaveProperty('Type', 'AWS::S3::Bucket')
   })
 
   test('Named Default Bucket', () => {
-    const s = new S3Bucket({ name: 'IhaveAName' })
+    const s = new S3.Bucket({ name: 'IhaveAName' })
     const expected: any = { Type: 'AWS::S3::Bucket', name: 'IhaveAName', Properties: {} }
     expect(s.clean()).toEqual(expected)
   })
 
   test('CFM Ref', () => {
     // ordered param is terrible... fix this mess.
-    const actual = new S3Bucket({ name: 'MyBucket' })
+    const actual = new S3.Bucket({ name: 'MyBucket' })
     expect(actual.Ref()).toEqual({ Ref: 'MyBucket' })
   })
 
   test('CFM GetAtt:Arn', () => {
-    const actual = new S3Bucket({ name: 'MyBucket' })
+    const actual = new S3.Bucket({ name: 'MyBucket' })
     expect(actual.Arn()).toEqual({ 'Fn::GetAtt': ['MyBucket', 'Arn'] })
   })
 
   test('CFM GetAtt:DomainName', () => {
-    const actual = new S3Bucket({ name: 'MyBucket' })
+    const actual = new S3.Bucket({ name: 'MyBucket' })
     expect(actual.DomainName()).toEqual({ 'Fn::GetAtt': ['MyBucket', 'DomainName'] })
   })
 
   test('CFM GetAtt:RegionalDomainName', () => {
-    const actual = new S3Bucket({ name: 'MyBucket' })
+    const actual = new S3.Bucket({ name: 'MyBucket' })
     expect(actual.RegionalDomainName()).toEqual({
       'Fn::GetAtt': ['MyBucket', 'RegionalDomainName']
     })
   })
 
   test('CFM GetAtt:WebsiteURL', () => {
-    const actual = new S3Bucket({ name: 'MyBucket' })
+    const actual = new S3.Bucket({ name: 'MyBucket' })
     expect(actual.WebsiteURL()).toEqual({ 'Fn::GetAtt': ['MyBucket', 'WebsiteURL'] })
   })
 
-  test('toJSON on simple S3Bucket', () => {
-    const a = new S3Bucket({ name: 'myBucket' })
+  test('toJSON on simple S3.Bucket', () => {
+    const a = new S3.Bucket({ name: 'myBucket' })
     const e = `{"myBucket":{"Type":"AWS::S3::Bucket"}}`
     expect(JSON.stringify(a)).toEqual(e)
   })
@@ -50,17 +50,17 @@ describe('defaults', () => {
   test('clearOut ', () => {
     // make a bucket, alter the bucket state via a mutator
     // but then clear out the mutation
-    const a1 = new S3Bucket({ name: 'WebsiteBucket' })
+    const a1 = new S3.Bucket({ name: 'WebsiteBucket' })
       .website()
       .clearOut('WebsiteConfiguration')
       .clearOut('AccessControl')
-    const e1 = new S3Bucket({ name: 'WebsiteBucket' })
+    const e1 = new S3.Bucket({ name: 'WebsiteBucket' })
 
-    const a2 = new S3Bucket({ name: 'WebsiteBucket2' })
+    const a2 = new S3.Bucket({ name: 'WebsiteBucket2' })
       .logging()
       .website()
       .clearOut('LoggingConfiguration')
-    const e2 = new S3Bucket({ name: 'WebsiteBucket2' }).website()
+    const e2 = new S3.Bucket({ name: 'WebsiteBucket2' }).website()
 
     expect(a1).toEqual(e1)
     expect(a2).toEqual(e2)
@@ -68,8 +68,8 @@ describe('defaults', () => {
 
   // @todo double check for better words - other than mutator
   test('accelerate mutator', () => {
-    const name = 'coolS3Bucket'
-    const a = new S3Bucket({ name }).accelerate()
+    const name = 'coolS3.Bucket'
+    const a = new S3.Bucket({ name }).accelerate()
     const e = {
       name,
       Type: 'AWS::S3::Bucket',
@@ -83,8 +83,8 @@ describe('defaults', () => {
   })
 
   test('analytics mutator', () => {
-    const name = 'coolS3Bucket'
-    const a = new S3Bucket({ name }).analytics({ id: 'analyzeItAll' })
+    const name = 'coolS3.Bucket'
+    const a = new S3.Bucket({ name }).analytics({ id: 'analyzeItAll' })
     const e = {
       name,
       Type: 'AWS::S3::Bucket',
@@ -102,8 +102,8 @@ describe('defaults', () => {
   })
 
   test('encryption mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).encryption()
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).encryption()
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -124,8 +124,8 @@ describe('defaults', () => {
   })
 
   test('cors mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).cors({ _: { 'GET|PUT|POST': ['localhost'] } })
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).cors({ _: { 'GET|PUT|POST': ['localhost'] } })
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -144,8 +144,8 @@ describe('defaults', () => {
   })
 
   test('inventory mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).inventory({
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).inventory({
       id: 'InvRuleID.1',
       dest: { arn: 'arn:s3:bucketName' }
     })
@@ -171,8 +171,8 @@ describe('defaults', () => {
   })
 
   test('lifecycle mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).lifecycle({ expiryDays: 42 })
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).lifecycle({ expiryDays: 42 })
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -191,8 +191,8 @@ describe('defaults', () => {
   })
 
   test('logging mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).logging()
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).logging()
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -204,8 +204,8 @@ describe('defaults', () => {
   })
 
   test('metrics mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).metrics({ id: 'metricsRuleID' })
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).metrics({ id: 'metricsRuleID' })
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -221,8 +221,8 @@ describe('defaults', () => {
   })
 
   test('publicAccess mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).publicAccess()
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).publicAccess()
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -234,8 +234,8 @@ describe('defaults', () => {
   })
 
   test('notifications mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).notifications({
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).notifications({
       filterList: 'Yosem*',
       arn: 'arn:aws:lambda::123456789012:resA/div_abc',
       event: 's3:ObjectCreated:*'
@@ -268,8 +268,8 @@ describe('defaults', () => {
   })
 
   test('replication mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).replication({
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).replication({
       iamARN: 'thisIsMyArn',
       rules: {
         replicateEncData: true,
@@ -306,8 +306,8 @@ describe('defaults', () => {
   })
 
   test('versions mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).versions()
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).versions()
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -321,8 +321,8 @@ describe('defaults', () => {
   })
 
   test('tags mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).tags({ my: 'tag' })
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).tags({ my: 'tag' })
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,
@@ -335,7 +335,7 @@ describe('defaults', () => {
 
   test('default website mutator', () => {
     const name = 'ItsMyName'
-    const actual = new S3Bucket({ name }).website()
+    const actual = new S3.Bucket({ name }).website()
     const expected: any = {
       name,
       Type: 'AWS::S3::Bucket',
@@ -351,8 +351,8 @@ describe('defaults', () => {
   })
 
   test('website mutator', () => {
-    const name = 'coolS3Bucket'
-    const actual = new S3Bucket({ name }).website({ redir: 'https://federali.es' })
+    const name = 'coolS3.Bucket'
+    const actual = new S3.Bucket({ name }).website({ redir: 'https://federali.es' })
     const expected = {
       Type: 'AWS::S3::Bucket',
       name,

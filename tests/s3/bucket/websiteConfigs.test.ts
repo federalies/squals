@@ -1,13 +1,13 @@
 // @ts-nocheck
 
-import { S3Bucket, websiteConfig } from '../../../src/components/s3/bucket'
+import { S3, websiteConfig } from '../../../src/components/s3/bucket'
 
 // describe('website', () => {
 //   const noop = (input: any) => {
 //     return input
 //   }
 //   test.skip('sdsd', () => {
-//     const myB = new S3Bucket()
+//     const myB = new S3.Bucket()
 //     noop(myB)
 //   })
 // })

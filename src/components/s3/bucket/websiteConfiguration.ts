@@ -20,7 +20,6 @@ import { redirRule, OutRouteRule, InRedirRule } from './redirectRule'
  * @param param.redir - String: redirects all traffic to the `protocol://host` provided in the string - Array: goes in as redir rules.
  * @param param.indexpage -'index.html'] - Asd.
  * @param param.errorpage -'search.html'] - Asd.
- * @returns  Cloudformation obj.
  * @todo BUILD Out better output type/interfaces showing Object shape/properties
  * @example
  *  var webcfgPlain = websiteConfig()

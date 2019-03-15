@@ -26,6 +26,10 @@ As much as possible of the above story should all happen in the browser.
 
 I may need a different phrase other than "Shareable Infracture" because it is almost the antithesis of "Shared Cloud Infrastructure".
 
+search code base for
+
+`@\w+` `@todo` `@idea` `@help`
+
 ## Conclusion
 
 Don't share lovers ; share love.

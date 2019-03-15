@@ -9,16 +9,11 @@ const difference = (setA: any[], setB: any[]) => {
   )
 }
 
-// * @param {string} configs.id -
-//  * @param {inDestination} configs.dest -
-//  * @param {!string} configs.dest.arn -
-
 /**
  *  Amazon S3 bucket inventory configuration.
  *
  * @description The inventory configuration for an Amazon S3 bucket. Duplicate rules not allowed.
- * @param {inInventoryConfig } configs -
- * @returns {outInventoryConfig} -
+ * @param configs -
  * @todo Validate no duplicates.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html>
  * @example
@@ -41,7 +36,6 @@ export const inventoryConfig = (
  *
  * @description make on inventory configuration rule for the inventory config.
  * @param { !inInventoryRule } params - Input variables to make an inventoryConfig.
- * @returns { !outInventoryRule } - Asd.
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-inventoryconfiguration.html>
  * @see <https://docs.aws.amazon.com/AWSJavaScriptSDK/latest/AWS/S3.html#putBucketInventoryConfiguration-property>
  * @example

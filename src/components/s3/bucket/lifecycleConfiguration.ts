@@ -137,7 +137,6 @@ const conditionExpirationInDays = (params: IInRuleExpirationDays) => {
  * @description descrip.
  * @param input -
  * @param input.keepOldVersionForDays -
- * @returns Cloudformation S3:: property.
  * @example
  * var v = conditionNoncurrentVersionExpirationInDays()
  */

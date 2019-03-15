@@ -1,8 +1,6 @@
 import { destination, InDestination, OutDestinationItem } from './destination'
 import { OutTags, InTags, TagFilters } from './tags'
 
-/** @module S3Bucket */
-
 /**
  * AWS:S3:: Analytics Configuration.
  *

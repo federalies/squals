@@ -111,7 +111,6 @@ export const replicationRule = (
  * @param params.kmsID - Asd.
  * @param params.storageClass - Asd.
  * @see <https://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketPUTreplication.html#RESTBucketPUTreplication-requests-request-elements>
- * @returns {Object} - Asd.
  * @example
  *  var d = replicationDest({bucket: 'myBucket'})
  */

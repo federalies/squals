@@ -64,43 +64,93 @@
 	<div class="row">
 		<div class="col-8 col-content">
 			<div class="tsd-panel tsd-typography">
-				<h1 id="aws-s3bucket-module">AWS S3Bucket Module</h1>
-				<h2 id="includes">Includes</h2>
+				<h1 id="squals-components">Squals Components</h1>
+				<h2 id="principles">Principles</h2>
+				<ol>
+					<li>Sane Defaults</li>
+					<li>Highly Documented in ways that help intellisense, documnetation generation</li>
+					<li>Idiomatic meaning keeping with comfy language concepts is more important than memorizing template keys/properties</li>
+					<li>Use Errors/Failures during Template Build Time to increase developer iteration speed</li>
+				</ol>
+				<h1 id="list-of-sharable-components">List of Sharable Components</h1>
 				<ul>
-					<li>Class Constructor</li>
-					<li>Many Helper funcitons to create various parameters using defaults and guarenteeing enough info to properly create a template</li>
-				</ul>
-				<h2 id="conventions">Conventions</h2>
-				<h3 id="conventions">Conventions</h3>
-				<ul>
-					<li><p>every class method needs a sane default</p>
-					</li>
-					<li><p>any property named <code>&lt;X&gt; list</code> <strong>always</strong> intelligently handle inputs of an &#39;item&#39; or a &#39;list&#39;</p>
+					<li><p>Template.js</p>
 						<ul>
-							<li>what if it was &quot;ends in <code>s</code>&quot; for brevity -vs- &#39;ends in <code>list</code>&#39;</li>
+							<li>[] documented, tested, composable properties</li>
 						</ul>
 					</li>
-					<li><p>JSdoc for even private functions - as a future contributor affordance</p>
+					<li><p>[] apiGateway.js</p>
 					</li>
-					<li><p>the JSDoc Example should correspond to the first test in the corresponding <strong>test</strong> file</p>
+					<li><p>[] appSync.js</p>
 					</li>
-					<li><p>interface names all start with <code>I</code> and then followed by a submodule name</p>
+					<li><p>[] awsBatch.js</p>
 					</li>
-					<li><p>interface for outbound types start with <code>I&lt;toUpperCase&gt;</code></p>
+					<li><p>[] awsCloud9.js</p>
 					</li>
-					<li><p>interface for inbound types start with <code>I&lt;toLowerCase&gt;</code></p>
+					<li><p>[] certificateManager.js</p>
 					</li>
-					<li><p>look through the codebase and promote <code>@todo</code>| <code>@idea</code> to &#39;real tracked issues&#39;</p>
+					<li><p>[] cloudFront.js</p>
+					</li>
+					<li><p>[] cloudwatch.js</p>
+					</li>
+					<li><p>[] codeBuild.js</p>
+					</li>
+					<li><p>[] codeCommit.js</p>
+					</li>
+					<li><p>[] codeDeploy.js</p>
+					</li>
+					<li><p>[] codePipeline.js</p>
+					</li>
+					<li><p>[] cognito.js</p>
+					</li>
+					<li><p>[] comprehend.js</p>
+					</li>
+					<li><p>[] dynamoDB.js</p>
+					</li>
+					<li><p>[] ec2.js</p>
+					</li>
+					<li><p>[] ecs.js</p>
+					</li>
+					<li><p>[] eks.js</p>
+					</li>
+					<li><p>[] elastiCache.js</p>
+					</li>
+					<li><p>[] kinesis.js</p>
+					</li>
+					<li><p>[] lambda.js</p>
+					</li>
+					<li><p>[] lex.js</p>
+					</li>
+					<li><p>[] macie.js</p>
+					</li>
+					<li><p>[] polly.js</p>
+					</li>
+					<li><p>[] readme.md</p>
+					</li>
+					<li><p>[] rekognition.js</p>
+					</li>
+					<li><p>[] route53.js</p>
+					</li>
+					<li><p>[-] s3.js</p>
+						<ul>
+							<li>[-] documented &amp; tested class constructor</li>
+							<li>[-] documented &amp; tested class methods</li>
+							<li><input disabled="" type="checkbox"> documented &amp; tested composable properties</li>
+						</ul>
+					</li>
+					<li><p>[] secretsManager.js</p>
+					</li>
+					<li><p>[] ses.js</p>
+					</li>
+					<li><p>[] sns.js</p>
+					</li>
+					<li><p>[] sqs.js</p>
+					</li>
+					<li><p>[] transcribe.js</p>
+					</li>
+					<li><p>[] translate.js</p>
 					</li>
 				</ul>
-				<h2 id="checklist">Checklist</h2>
-				<ul>
-					<li>interfaces starts with <code>I</code>&lt; logical name &gt;</li>
-					<li>tests</li>
-					<li>jsdoc w/ @description @example&lt; short &amp;&amp; simple &gt;</li>
-				</ul>
-				<h2 id="docs">Docs</h2>
-				<p><a href="https://raw.githack.com/federalies/squals/master/docs/index.html">WIP</a></p>
 			</div>
 		</div>
 		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
@@ -109,10 +159,31 @@
 					<li class="globals  ">
 						<a href="globals.html"><em>Globals</em></a>
 					</li>
+					<li class=" tsd-kind-module">
+						<a href="modules/s3.html">S3</a>
+					</li>
 				</ul>
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-enum">
+						<a href="enums/_cdnpolicies.html" class="tsd-kind-icon">_CDNPolicies</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/validcdnevents.html" class="tsd-kind-icon">valid<wbr>Cdn<wbr>Events</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/validmethodsets.html" class="tsd-kind-icon">valid<wbr>Method<wbr>Sets</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/validmintlsproto.html" class="tsd-kind-icon">valid<wbr>MinTLSProto</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/validpriceclass.html" class="tsd-kind-icon">valid<wbr>Price<wbr>Class</a>
+					</li>
+					<li class=" tsd-kind-enum">
+						<a href="enums/validsslmethods.html" class="tsd-kind-icon">validSSLMethods</a>
+					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/accesspolicy.html" class="tsd-kind-icon">Access<wbr>Policy</a>
 					</li>
@@ -120,12 +191,66 @@
 						<a href="classes/accesspolicystatement.html" class="tsd-kind-icon">Access<wbr>Policy<wbr>Statement</a>
 					</li>
 					<li class=" tsd-kind-class">
-						<a href="classes/s3bucket.html" class="tsd-kind-icon">S3<wbr>Bucket</a>
+						<a href="classes/cloudfrontcdn.html" class="tsd-kind-icon">Cloud<wbr>FrontCDN</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/originaccessid.html" class="tsd-kind-icon">Origin<wbr>AccessID</a>
 					</li>
 					<li class=" tsd-kind-class">
 						<a href="classes/s3bucketpolicy.html" class="tsd-kind-icon">S3<wbr>Bucket<wbr>Policy</a>
 					</li>
+					<li class=" tsd-kind-class">
+						<a href="classes/template.html" class="tsd-kind-icon">Template</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdncachebehavior.html" class="tsd-kind-icon">ICDNCache<wbr>Behavior</a>
+					</li>
 					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/icdncustomheader.html" class="tsd-kind-icon">ICDNCustom<wbr>Header</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/icdnlambdafunctionassociations.html" class="tsd-kind-icon">ICDNLambda<wbr>Function<wbr>Associations</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnoriginscustomheader.html" class="tsd-kind-icon">ICDNOrigins<wbr>Custom<wbr>Header</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/icdnorigins_http.html" class="tsd-kind-icon">ICDNOrigins_<wbr>HTTP</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/icdnorigins_s3.html" class="tsd-kind-icon">ICDNOrigins_<wbr><wbr>S3</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdncahebehavior.html" class="tsd-kind-icon">ICdn<wbr>Cahe<wbr>Behavior</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdncookies.html" class="tsd-kind-icon">ICdn<wbr>Cookies</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdncustomerrorresp.html" class="tsd-kind-icon">ICdn<wbr>Custom<wbr>Error<wbr>Resp</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnlambdafunctionassociation.html" class="tsd-kind-icon">ICdn<wbr>Lambda<wbr>Function<wbr>Association</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnlogging.html" class="tsd-kind-icon">ICdn<wbr>Logging</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnrestrictions_allcountries.html" class="tsd-kind-icon">ICdn<wbr>Restrictions_<wbr>all<wbr>Countries</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnrestrictions_restricted.html" class="tsd-kind-icon">ICdn<wbr>Restrictions_<wbr>restricted</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnviewercert_acm.html" class="tsd-kind-icon">ICdn<wbr>Viewer<wbr>Cert_<wbr>ACM</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnviewercert_cf.html" class="tsd-kind-icon">ICdn<wbr>Viewer<wbr>Cert_<wbr>CF</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnviewercert_iam.html" class="tsd-kind-icon">ICdn<wbr>Viewer<wbr>Cert_<wbr>IAM</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/igetatt.html" class="tsd-kind-icon">IGet<wbr>Att</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -158,9 +283,6 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/iinruletransitionsdurationed.html" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transitions<wbr>Durationed</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-not-exported">
-						<a href="interfaces/iins3bucket.html" class="tsd-kind-icon">IIn<wbr>S3Bucket</a>
-					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ilifecycleconfig.html" class="tsd-kind-icon">ILifecycle<wbr>Config</a>
 					</li>
@@ -191,7 +313,7 @@
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ilifecycletransitions.html" class="tsd-kind-icon">ILifecycle<wbr>Transitions</a>
 					</li>
-					<li class=" tsd-kind-interface tsd-is-not-exported">
+					<li class=" tsd-kind-interface">
 						<a href="interfaces/iref.html" class="tsd-kind-icon">IRef</a>
 					</li>
 					<li class=" tsd-kind-interface">
@@ -199,6 +321,36 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/itagfilters.html" class="tsd-kind-icon">ITag<wbr>Filters</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icachebehavior.html" class="tsd-kind-icon">Icache<wbr>Behavior</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icachecustomerrorresp.html" class="tsd-kind-icon">Icache<wbr>Custom<wbr>Error<wbr>Resp</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icachelogging.html" class="tsd-kind-icon">Icache<wbr>Logging</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icachepath2err.html" class="tsd-kind-icon">Icache<wbr>Path2<wbr>Err</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icacherestrictions_nolist.html" class="tsd-kind-icon">Icache<wbr>Restrictions_<wbr>no<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icacherestrictions_yeslist.html" class="tsd-kind-icon">Icache<wbr>Restrictions_<wbr>yes<wbr>List</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdncookies_list.html" class="tsd-kind-icon">Icdn<wbr>Cookies_<wbr>list</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdncookies_universal.html" class="tsd-kind-icon">Icdn<wbr>Cookies_<wbr>universal</a>
+					</li>
+					<li class=" tsd-kind-interface tsd-is-not-exported">
+						<a href="interfaces/icdnorigins.html" class="tsd-kind-icon">Icdn<wbr>Origins</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="interfaces/icdnviewercert.html" class="tsd-kind-icon">Icdn<wbr>Viewer<wbr>Cert</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/ilifecyclerule.html" class="tsd-kind-icon">Ilifecycle<wbr>Rule</a>
@@ -256,9 +408,6 @@
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/intags.html" class="tsd-kind-icon">In<wbr>Tags</a>
-					</li>
-					<li class=" tsd-kind-interface tsd-is-not-exported">
-						<a href="interfaces/indexsignature.html" class="tsd-kind-icon">Index<wbr>Signature</a>
 					</li>
 					<li class=" tsd-kind-interface">
 						<a href="interfaces/outaccelerateconfig.html" class="tsd-kind-icon">Out<wbr>Accelerate<wbr>Config</a>
@@ -372,13 +521,28 @@
 						<a href="globals.html#iaccesss3permission" class="tsd-kind-icon">IAccess<wbr>S3Permission</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#icdnorigins" class="tsd-kind-icon">ICDNOrigins</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#icdnrestrictions" class="tsd-kind-icon">ICdn<wbr>Restrictions</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#icdnviewercert" class="tsd-kind-icon">ICdn<wbr>Viewer<wbr>Cert</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#iinruletransitions" class="tsd-kind-icon">IIn<wbr>Rule<wbr>Transitions</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#ilifecyclevalid" class="tsd-kind-icon">ILifecycle<wbr>Valid</a>
 					</li>
 					<li class=" tsd-kind-type-alias tsd-is-not-exported">
-						<a href="globals.html#ivalidpublicaccesscontrols" class="tsd-kind-icon">IValid<wbr>Public<wbr>Access<wbr>Controls</a>
+						<a href="globals.html#icachecustresp" class="tsd-kind-icon">Icache<wbr>Cust<wbr>Resp</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#icacherestrictions" class="tsd-kind-icon">Icache<wbr>Restrictions</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="globals.html#icdncookies" class="tsd-kind-icon">Icdn<wbr>Cookies</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="globals.html#ilifecyclevalidrules" class="tsd-kind-icon">Ilifecycle<wbr>Valid<wbr>Rules</a>
@@ -396,6 +560,12 @@
 						<a href="globals.html#tags" class="tsd-kind-icon">Tags</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#_minproto" class="tsd-kind-icon">_min<wbr>Proto</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#_ssltype" class="tsd-kind-icon">_ssl<wbr>Type</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#accelerate" class="tsd-kind-icon">accelerate</a>
 					</li>
 					<li class=" tsd-kind-function">
@@ -403,6 +573,12 @@
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#analyticsitem" class="tsd-kind-icon">analytics<wbr>Item</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cachebehavior" class="tsd-kind-icon">cache<wbr>Behavior</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cachebehaviorconfig" class="tsd-kind-icon">cache<wbr>Behavior<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#conditionabortincompletemultipartupload" class="tsd-kind-icon">condition<wbr>Abort<wbr>Incomplete<wbr>Multipart<wbr>Upload</a>
@@ -423,10 +599,16 @@
 						<a href="globals.html#conditiontransitions" class="tsd-kind-icon">condition<wbr>Transitions</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#cookiesconfig" class="tsd-kind-icon">cookies<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#corsconfig" class="tsd-kind-icon">cors<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#corsrule" class="tsd-kind-icon">cors<wbr>Rule</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#cutomerrorresp" class="tsd-kind-icon">cutom<wbr>Error<wbr>Resp</a>
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#destination" class="tsd-kind-icon">destination</a>
@@ -456,6 +638,9 @@
 						<a href="globals.html#loggingconfg" class="tsd-kind-icon">logging<wbr>Confg</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#loggingconfig" class="tsd-kind-icon">logging<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#metricsconfig" class="tsd-kind-icon">metrics<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function">
@@ -463,6 +648,9 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#notifconfig" class="tsd-kind-icon">notif<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#originsconfig" class="tsd-kind-icon">origins<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#parsefilter" class="tsd-kind-icon">parse<wbr>Filter</a>
@@ -483,6 +671,9 @@
 						<a href="globals.html#replicationrule" class="tsd-kind-icon">replication<wbr>Rule</a>
 					</li>
 					<li class=" tsd-kind-function">
+						<a href="globals.html#restrictionsconfig" class="tsd-kind-icon">restrictions<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
 						<a href="globals.html#serversideencryptionrule" class="tsd-kind-icon">server<wbr>Side<wbr>Encryption<wbr>Rule</a>
 					</li>
 					<li class=" tsd-kind-function">
@@ -499,6 +690,9 @@
 					</li>
 					<li class=" tsd-kind-function">
 						<a href="globals.html#versioningconfig" class="tsd-kind-icon">versioning<wbr>Config</a>
+					</li>
+					<li class=" tsd-kind-function">
+						<a href="globals.html#viewercertconfig" class="tsd-kind-icon">viewer<wbr>Cert<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-function tsd-is-not-exported">
 						<a href="globals.html#websiteconfig" class="tsd-kind-icon">website<wbr>Config</a>
