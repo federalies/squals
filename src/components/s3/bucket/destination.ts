@@ -1,5 +1,3 @@
-/** @module S3Bucket */
-
 /**
  * AWS::S3: Make a destination.
  *
@@ -9,10 +7,12 @@
  * @example
  *  var dest = destination()
  */
-export const destination = (config: InDestination): { Destination: OutDestinationItem } => {
+export const destination = (
+  config: IbucketDestination
+): { Destination: IBucketDestinationItem } => {
   const { arn, format, acctId, prefix } = { format: 'CSV', ...config }
 
-  let ret: { Destination: OutDestinationItem }
+  let ret: { Destination: IBucketDestinationItem }
 
   if (arn) {
     if (format && ['CSV', 'ORC', 'Parquet'].includes(format)) {
@@ -36,14 +36,14 @@ export const destination = (config: InDestination): { Destination: OutDestinatio
   return ret
 }
 
-export interface InDestination {
+export interface IbucketDestination {
   arn: string
   prefix?: string
   acctId?: string
   format?: string
 }
 
-export interface OutDestinationItem {
+export interface IBucketDestinationItem {
   BucketArn: string
   Format: string
   Prefix?: string

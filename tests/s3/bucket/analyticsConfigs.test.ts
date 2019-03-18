@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { analyticsConfig, OutAnalyticsConfig } from '../../../src/components/s3/bucket'
+import { analyticsConfig, IBucketAnalyticsConfig } from '../../../src/components/s3/bucket'
 
 describe('defaults', () => {
   test('analyze docs/ w- tagList Array', () => {
@@ -10,7 +10,7 @@ describe('defaults', () => {
       prefix: 'doc/',
       tagList: [{ keyy1: 'values' }, { keyy: 'value' }]
     })
-    const expected: OutAnalyticsConfig = {
+    const expected: IBucketAnalyticsConfig = {
       AnalyticsConfigurations: [
         {
           Id: 'testA',
@@ -25,7 +25,7 @@ describe('defaults', () => {
   test('analyze docs/ w- tagList item', () => {
     // OutAnalyticsItem
     const actual = analyticsConfig({ id: 'testA', prefix: 'doc/', tagList: { keyy: 'value' } })
-    const expected: OutAnalyticsConfig = {
+    const expected: IBucketAnalyticsConfig = {
       AnalyticsConfigurations: [
         {
           Id: 'testA',
@@ -45,7 +45,7 @@ describe('defaults', () => {
       { id: 'testB', prefix: 'archive/', tagList: { Legacy: 'singular' } },
       { id: 'testC', prefix: 'archives/', tagList: [{ Legacy: 'plural' }] }
     ])
-    const expected: OutAnalyticsConfig = {
+    const expected: IBucketAnalyticsConfig = {
       AnalyticsConfigurations: [
         {
           Id: 'test0',

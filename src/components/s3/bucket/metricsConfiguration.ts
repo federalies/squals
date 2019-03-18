@@ -1,24 +1,25 @@
-import { InTags, OutTags, TagFilters } from './tags'
+import { Itags, ITags } from '../../Template'
+import { TagFilters } from './tags'
 
-/** @module S3Bucket */
-
-export const metricsConfig = (meterThese: InMetricsRule | InMetricsRule[]) => {
+export const metricsConfig = (
+  meterThese: IbucketMetricsRule | IbucketMetricsRule[]
+): IBucketMetricsConfig => {
   meterThese = Array.isArray(meterThese) ? meterThese : new Array(meterThese)
   return {
     MetricsConfigurations: meterThese.map(v => metricsItem(v))
   }
 }
 
-// function isOutReady(rule: InMetricsRule | OutMetricsRule): rule is OutMetricsRule {
-//   return (<OutMetricsRule>rule).Id !== undefined
+// function isOutReady(rule: ibucketMetricsRule | IBucketMetricsRule): rule is IBucketMetricsRule {
+//   return (<IBucketMetricsRule>rule).Id !== undefined
 // }
 
-export const metricsItem = (params: InMetricsRule): OutMetricsRule => {
+export const metricsItem = (params: IbucketMetricsRule): IBucketMetricsRule => {
   // if (isOutReady(params)) {
   //   return params
   // }
   const { id, prefix, tagList } = { prefix: null, tagList: null, ...params }
-  const ret: OutMetricsRule = tagList
+  const ret: IBucketMetricsRule = tagList
     ? {
       Id: id.toString(),
       ...TagFilters(tagList)
@@ -31,16 +32,16 @@ export const metricsItem = (params: InMetricsRule): OutMetricsRule => {
   return ret
 }
 
-export interface InMetricsRule {
+export interface IbucketMetricsRule {
   id: string
   prefix?: string
-  tagList?: InTags | InTags[]
+  tagList?: Itags | Itags[]
 }
-export interface OutMetricsRule {
+export interface IBucketMetricsRule {
   Id: string
   Prefix?: string
-  TagFilters?: OutTags[]
+  TagFilters?: ITags[]
 }
-export interface OutMetricsConfig {
-  MetricsConfigurations: OutMetricsRule[]
+export interface IBucketMetricsConfig {
+  MetricsConfigurations: IBucketMetricsRule[]
 }

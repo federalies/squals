@@ -1,7 +1,5 @@
 import { parse } from '@sandfox/arn'
 
-/** @module S3Bucket */
-
 /**
  * Parse S3 Key/Notification Filter.
  *
@@ -12,7 +10,7 @@ import { parse } from '@sandfox/arn'
  *  var {Name, Value} = parseFilter('*.jpg')
  *  console.log({Name, Value}) // {Name:'suffix', Value:'.jpg'}
  */
-const parseFilter = (filter: string): OutNotifFilterRule => {
+const parseFilter = (filter: string): IBucketNotifFilterRule => {
   let Name = ''
   let Value = ''
 
@@ -48,21 +46,21 @@ const parseFilter = (filter: string): OutNotifFilterRule => {
  *                             filters:['YellowSto*', '*.jpg', '*.png']}
  *                          ])
  */
-export const notifConfig = (notifList: InNotifs | InNotifs[]) => {
+export const notifConfig = (notifList: IbucketNotifs | IbucketNotifs[]) => {
   notifList = Array.isArray(notifList) ? notifList : new Array(notifList)
 
-  const data: SeparatedReducer = notifList.reduce(
-    (prior: SeparatedReducer, notif: InNotifs) => {
+  const data: IbucketSeparatedReducer = notifList.reduce(
+    (prior: IbucketSeparatedReducer, notif: IbucketNotifs) => {
       const svc = parse(notif.arn).service
       switch (svc) {
         case 'lambda':
-          prior.l.push(toAWSfmt('lambda', notif) as OutLambdaConfig)
+          prior.l.push(toAWSfmt('lambda', notif) as IBucketLambdaConfig)
           break
         case 'sqs':
-          prior.q.push(toAWSfmt('sqs', notif) as OutQueueConfig)
+          prior.q.push(toAWSfmt('sqs', notif) as IBucketQueueConfig)
           break
         case 'sns':
-          prior.t.push(toAWSfmt('sns', notif) as OutTopicConfig)
+          prior.t.push(toAWSfmt('sns', notif) as IBucketTopicConfig)
           break
         default:
           throw new Error(
@@ -74,7 +72,7 @@ export const notifConfig = (notifList: InNotifs | InNotifs[]) => {
     { l: [], t: [], q: [] }
   )
 
-  let ret: OutNotificationConfiguration = { NotificationConfiguration: {} }
+  let ret: IBucketNotificationConfiguration = { NotificationConfiguration: {} }
 
   if (data.l.length > 0) {
     ret.NotificationConfiguration['LambdaConfigurations'] = data.l
@@ -103,8 +101,8 @@ export const notifConfig = (notifList: InNotifs | InNotifs[]) => {
  */
 const toAWSfmt = (
   svc: 'lambda' | 'sns' | 'sqs',
-  item: InNotifs
-): OutLambdaConfig | OutQueueConfig | OutTopicConfig => {
+  item: IbucketNotifs
+): IBucketLambdaConfig | IBucketQueueConfig | IBucketTopicConfig => {
   //
   const validValues = [
     's3:ObjectCreated:*',
@@ -166,53 +164,67 @@ const toAWSfmt = (
   }
 }
 
-export interface InNotifs {
+export interface IbucketNotifs {
   arn: string
-  event: string
+  event: validS3notificationEvents
   filterList: string | string[]
 }
 
-interface SeparatedReducer {
-  l: OutLambdaConfig[]
-  q: OutQueueConfig[]
-  t: OutTopicConfig[]
+interface IbucketSeparatedReducer {
+  l: IBucketLambdaConfig[]
+  q: IBucketQueueConfig[]
+  t: IBucketTopicConfig[]
 }
 
-export interface OutSeparatedNotificationSets {
-  LambdaConfigurations?: OutLambdaConfig[]
-  QueueConfigurations?: OutQueueConfig[]
-  TopicConfigurations?: OutTopicConfig[]
+export interface IBucketSeparatedNotificationSets {
+  LambdaConfigurations?: IBucketLambdaConfig[]
+  QueueConfigurations?: IBucketQueueConfig[]
+  TopicConfigurations?: IBucketTopicConfig[]
 }
 
-export interface OutLambdaConfig {
+export interface IBucketLambdaConfig {
   Event: string
   Function: string
-  Filter?: OutNotificationFilters
+  Filter?: IBucketNotificationFilters
 }
 
-export interface OutQueueConfig {
+export interface IBucketQueueConfig {
   Event: string
   Queue: string
-  Filter?: OutNotificationFilters
+  Filter?: IBucketNotificationFilters
 }
 
-export interface OutTopicConfig {
+export interface IBucketTopicConfig {
   Event: string
   Topic: string
-  Filter?: OutNotificationFilters
+  Filter?: IBucketNotificationFilters
 }
 
-export interface OutNotificationFilters {
+export interface IBucketNotificationFilters {
   S3Key: {
-    Rules: OutNotifFilterRule[]
+    Rules: IBucketNotifFilterRule[]
   }
 }
 
-export interface OutNotifFilterRule {
+export interface IBucketNotifFilterRule {
   Name: string
   Value: string
 }
 
-export interface OutNotificationConfiguration {
-  NotificationConfiguration: OutSeparatedNotificationSets
+export interface IBucketNotificationConfiguration {
+  NotificationConfiguration: IBucketSeparatedNotificationSets
+}
+
+export enum validS3notificationEvents {
+  's3:ObjectCreated:*' = 's3:ObjectCreated:*',
+  's3:ObjectCreated:Put' = 's3:ObjectCreated:Put',
+  's3:ObjectCreated:Post' = 's3:ObjectCreated:Post',
+  's3:ObjectCreated:Copy' = 's3:ObjectCreated:Copy',
+  's3:ObjectCreated:CompleteMultipartUpload' = 's3:ObjectCreated:CompleteMultipartUpload',
+  's3:ObjectRemoved:*' = 's3:ObjectRemoved:*',
+  's3:ObjectRemoved:Delete' = 's3:ObjectRemoved:Delete',
+  's3:ObjectRemoved:DeleteMarkerCreated' = 's3:ObjectRemoved:DeleteMarkerCreated',
+  's3:ObjectRestore:Post' = 's3:ObjectRestore:Post',
+  's3:ObjectRestore:Completed' = 's3:ObjectRestore:Completed',
+  's3:ReducedRedundancyLostObject' = 's3:ReducedRedundancyLostObject'
 }

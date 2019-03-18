@@ -10,7 +10,9 @@
  *  var rcfg = replicationConfig({ iamARN:getActingIAMWhileReplcating(),
  *                                 rules: getTheRuleListWeNeedToConfigureTheTempalte() })
  */
-export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig | undefined => {
+export const replicationConfig = (
+  params: IbucketReplicaConfig
+): IBucketReplicaConfig | undefined => {
   const { iamARN, destBucket } = params
 
   if (!iamARN || !(destBucket || 'rules' in params)) {
@@ -22,7 +24,7 @@ export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig | u
     // replciate "everything" to some other bucket
     // where "eveything" still includes SSE objects
     const complierEnsuredBucket = destBucket as string
-    const defaultRule: InReplicaRule = {
+    const defaultRule: IbucketReplicaRule = {
       id: 'Squals_DefaultRule_ReplicateAll',
       prefix: '',
       status: true,
@@ -32,7 +34,7 @@ export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig | u
     let { rules } = { rules: defaultRule, ...params }
 
     rules = Array.isArray(rules) ? rules : new Array(rules)
-    const complierEnsuredRules = rules as InReplicaRule[]
+    const complierEnsuredRules = rules as IbucketReplicaRule[]
 
     return {
       ReplicationConfiguration: {
@@ -57,14 +59,14 @@ export const replicationConfig = (params: InReplicaConfig): OutReplicaConfig | u
  *  var r = replicationRule()
  */
 export const replicationRule = (
-  params: InReplicaRule = {
+  params: IbucketReplicaRule = {
     dest: { bucket: '' },
     prefix: '',
     id: undefined,
     replicateEncData: false,
     status: true
   }
-): OutReplicationRule => {
+): IBucketReplicationRule => {
   const {
     dest: { bucket },
     id,
@@ -83,7 +85,7 @@ export const replicationRule = (
     throw new Error(`ƒ.replicationRule requries a 'dest.bucket' input`)
   }
 
-  const ret: OutReplicationRule = {
+  const ret: IBucketReplicationRule = {
     Destination: replicationDest(params.dest),
     Prefix: prefix,
     Status: status ? 'Enabled' : 'Disabled'
@@ -114,7 +116,7 @@ export const replicationRule = (
  * @example
  *  var d = replicationDest({bucket: 'myBucket'})
  */
-export const replicationDest = (params: InReplicaDest): OutReplicaDestination => {
+export const replicationDest = (params: IbucketReplicaDest): IBucketReplicaDestination => {
   const { bucket, account, kmsId, storageClass } = {
     account: null,
     kmsId: null,
@@ -132,7 +134,7 @@ export const replicationDest = (params: InReplicaDest): OutReplicaDestination =>
     )
   }
 
-  const ret: OutReplicaDestination = {
+  const ret: IBucketReplicaDestination = {
     Bucket: bucket
   }
 
@@ -146,39 +148,37 @@ export const replicationDest = (params: InReplicaDest): OutReplicaDestination =>
   return ret
 }
 
-// type InReplicaConfig = InReplicaConfig_destBucket | InReplicaConfig_rulesList
-
-export interface InReplicaConfig {
+export interface IbucketReplicaConfig {
   iamARN: string
   destBucket?: string
-  rules?: InReplicaRule | InReplicaRule[]
+  rules?: IbucketReplicaRule | IbucketReplicaRule[]
 }
 
-export interface InReplicaConfig_destBucket {
+export interface IbucketReplicaConfig_destBucket {
   iamARN: string
   destBucket: string
 }
-export interface InReplicaConfig_rulesList {
+export interface IbucketReplicaConfig_rulesList {
   iamARN: string
-  rules: InReplicaRule | InReplicaRule[]
+  rules: IbucketReplicaRule | IbucketReplicaRule[]
 }
 
-export interface InReplicaRule {
+export interface IbucketReplicaRule {
   id?: string
   prefix?: string // output allows empty string - represents ALL - chosen as default
   status?: boolean
-  dest: InReplicaDest
+  dest: IbucketReplicaDest
   replicateEncData?: boolean
 }
 
-export interface InReplicaDest {
+export interface IbucketReplicaDest {
   bucket: string
   account?: string
   storageClass?: string
   kmsId?: string
 }
 
-export interface OutReplicaDestination {
+export interface IBucketReplicaDestination {
   Bucket: string
   StorageClass?: string
   Account?: string
@@ -190,8 +190,8 @@ export interface OutReplicaDestination {
   }
 }
 
-export interface OutReplicationRule {
-  Destination: OutReplicaDestination
+export interface IBucketReplicationRule {
+  Destination: IBucketReplicaDestination
   Prefix: string
   Id?: string
   Status: 'Enabled' | 'Disabled'
@@ -202,9 +202,9 @@ export interface OutReplicationRule {
   }
 }
 
-export interface OutReplicaConfig {
+export interface IBucketReplicaConfig {
   ReplicationConfiguration: {
     Role: string
-    Rules: OutReplicationRule[]
+    Rules: IBucketReplicationRule[]
   }
 }

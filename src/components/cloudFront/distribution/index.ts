@@ -1,5 +1,5 @@
 // export * from './distribution'
-export * from './cacheBehavior'
+export * from './behaviors'
 export * from './customErrorResp'
 export * from './origins'
 export * from './restrictions'

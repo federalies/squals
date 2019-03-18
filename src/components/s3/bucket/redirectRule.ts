@@ -1,7 +1,5 @@
 import * as url from 'url'
 
-/** @module S3Bucket */
-
 /**
  * RedirRule makes a valid cloudformation obj.
  *
@@ -17,7 +15,7 @@ import * as url from 'url'
  *  var output2 = redirRule({ to:'https://federali.es', when: 404 })
  *  var output3 = redirRule({ to:'https://federali.es/', when: '/doc', replacer: '/docs', doFullReplace: true })
  */
-export const redirRule = (param: InRedirRule): OutRouteRule => {
+export const redirRule = (param: IbucketRedirRule): IBucketRouteRule => {
   const { to, when, replacer, doFullReplace, ext } = {
     to: '',
     when: '',
@@ -29,7 +27,7 @@ export const redirRule = (param: InRedirRule): OutRouteRule => {
 
   if (to && when) {
     const uri = new url.URL(to)
-    let ret: OutRouteRule = {
+    let ret: IBucketRouteRule = {
       RoutingRuleCondition:
         typeof when === 'number'
           ? { HttpErrorCodeReturnedEquals: when.toString() }
@@ -55,7 +53,7 @@ export const redirRule = (param: InRedirRule): OutRouteRule => {
   }
 }
 
-export interface InRedirRule {
+export interface IbucketRedirRule {
   to: string
   when: string | number
   replacer?: string
@@ -64,7 +62,7 @@ export interface InRedirRule {
   // HttpRedirectCode?: string throw in ext
 }
 
-export interface OutRule_wPrefixReplace {
+export interface IBucketRule_wPrefixReplace {
   HostName?: string
   HttpRedirectCode?: string
   Protocol?: string
@@ -72,7 +70,7 @@ export interface OutRule_wPrefixReplace {
   ReplaceKeyWith?: never
 }
 
-export interface OutRule_wFullReplace {
+export interface IBucketRule_wFullReplace {
   HostName?: string
   HttpRedirectCode?: string
   Protocol?: string
@@ -80,8 +78,8 @@ export interface OutRule_wFullReplace {
   ReplaceKeyWith?: string
 }
 
-export interface OutRouteRule {
-  RedirectRule: OutRule_wFullReplace | OutRule_wPrefixReplace
+export interface IBucketRouteRule {
+  RedirectRule: IBucketRule_wFullReplace | IBucketRule_wPrefixReplace
   RoutingRuleCondition: {
     HttpErrorCodeReturnedEquals?: string
     KeyPrefixEquals?: string

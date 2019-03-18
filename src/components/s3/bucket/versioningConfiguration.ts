@@ -1,5 +1,3 @@
-/** @module S3Bucket */
-
 /**
  * AWS:S3:: Setup Versioning Config.
  *
@@ -8,12 +6,12 @@
  * @example
  *  var version = versioning(true)
  */
-export const versioningConfig = (isEnabled: boolean): OutVersioning => {
+export const versioningConfig = (isEnabled: boolean): IBucketVersioning => {
   return isEnabled
     ? { VersioningConfiguration: { Status: 'Enabled' } }
     : { VersioningConfiguration: { Status: 'Suspended' } }
 }
 
-export interface OutVersioning {
+export interface IBucketVersioning {
   VersioningConfiguration: { Status: 'Suspended' | 'Enabled' }
 }

@@ -1,4 +1,4 @@
-import { InDestination, destination, OutDestinationItem } from './destination'
+import { destination, IbucketDestination, IBucketDestinationItem } from './destination'
 
 const difference = (setA: any[], setB: any[]) => {
   return Array.from(
@@ -24,8 +24,8 @@ const difference = (setA: any[], setB: any[]) => {
  *   ])
  */
 export const inventoryConfig = (
-  configs: InInventoryRule | InInventoryRule[]
-): OutInventoryConfig => {
+  configs: IbucketInventoryRule | IbucketInventoryRule[]
+): IBucketInventoryConfig => {
   return Array.isArray(configs)
     ? { InventoryConfigurations: configs.map(item => inventoryRule(item)) }
     : { InventoryConfigurations: [inventoryRule(configs)] }
@@ -42,7 +42,7 @@ export const inventoryConfig = (
  *  var a = inventoryRule({ id: 'myID', dest: { arn: 'arn:aws:s3:bucket0' } })
  *  var b = inventoryRule([{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket1' }},{ id: 'myID', dest: { arn: 'arn:aws:s3:bucket2' }} ] )
  */
-export const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
+export const inventoryRule = (params: IbucketInventoryRule): IBucketInventoryRule => {
   // @ts-ignore
   const { id, versions, frequency, dest, enabled, optionals, prefix } = {
     id: null,
@@ -93,7 +93,7 @@ export const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
   }
 
   // construct return obj
-  const ret: OutInventoryRule = {
+  const ret: IBucketInventoryRule = {
     ...destination(dest),
     Id: id,
     Enabled: enabled,
@@ -106,9 +106,9 @@ export const inventoryRule = (params: InInventoryRule): OutInventoryRule => {
   return ret
 }
 
-export interface InInventoryRule {
+export interface IbucketInventoryRule {
   id: string
-  dest: InDestination
+  dest: IbucketDestination
   enabled?: boolean
   prefix?: string
   versions?: string
@@ -116,16 +116,16 @@ export interface InInventoryRule {
   optionals?: string[]
 }
 
-export interface OutInventoryRule {
+export interface IBucketInventoryRule {
   Id: string
   Enabled: boolean
-  Destination: OutDestinationItem
+  Destination: IBucketDestinationItem
   ScheduleFrequency: string
   IncludedObjectVersions: string
   Prefix?: string
   OptionalFields?: string[]
 }
 
-export interface OutInventoryConfig {
-  InventoryConfigurations: OutInventoryRule[]
+export interface IBucketInventoryConfig {
+  InventoryConfigurations: IBucketInventoryRule[]
 }

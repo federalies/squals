@@ -9,7 +9,7 @@ export class CloudFrontCDN {
   Properties: {
     DistributionConfig: {
       Enabled: Boolean
-      Origins: ICDNOrigins[]
+      Origins: ICdnOrigins[]
       DefaultCacheBehavior: {
         TargetOriginId: string
         ViewerProtocolPolicy: string
@@ -60,7 +60,7 @@ export class CloudFrontCDN {
     this.Properties = defaults
   }
 
-  addOrigins (origins: ICDNOrigins[]) {
+  addOrigins (origins: ICdnOrigins[]) {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -89,7 +89,7 @@ export enum validPriceClass {
   'two' = 'PriceClass_200',
   'all' = 'PriceClass_All'
 }
-export interface ICDNCacheBehavior {
+export interface ICdnCacheBehavior {
   AllowedMethods: string[]
   CachedMethods: string[]
   Compress: Boolean
@@ -104,7 +104,7 @@ export interface ICDNCacheBehavior {
     Querystring: boolean
     QuerystringCacheKeys: string[]
   }
-  LambdaFunctionAssociations: ICDNLambdaFunctionAssociations[]
+  LambdaFunctionAssociations: ICdnLambdaFunctionAssociations[]
   MaxTTL: Number
   MinTTL: Number
   PathPattern: string
@@ -114,7 +114,7 @@ export interface ICDNCacheBehavior {
   ViewerProtocolPolicy: string
 }
 
-export interface ICDNOrigins {
+export interface ICdnOrigins {
   Id: string
   DomainName: string
   CustomOriginConfig?: {
@@ -125,19 +125,19 @@ export interface ICDNOrigins {
     OriginReadTimeout?: number
     OriginSSLProtocols?: string[]
   }
-  OriginCustomHeaders?: ICDNCustomHeader[]
+  OriginCustomHeaders?: ICdnCustomHeader[]
   OriginPath?: string
   S3OriginConfig?: {
     OriginAccessIdentity: string
   }
 }
 
-interface ICDNCustomHeader {
+interface ICdnCustomHeader {
   HeaderName: string
   HeaderValue: string
 }
 
-interface ICDNLambdaFunctionAssociations {
+interface ICdnLambdaFunctionAssociations {
   EventType: string
   LambdaFunctionARN: string
 }

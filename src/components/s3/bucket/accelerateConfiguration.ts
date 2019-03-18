@@ -1,4 +1,4 @@
-export const accelerate = (shouldAccelate: boolean = true): OutAccelerateConfig => {
+export const accelerate = (shouldAccelate: boolean = true): IBucketAccelerateConfig => {
   return {
     AccelerateConfiguration: {
       AccelerationStatus: shouldAccelate ? 'Enabled' : 'Suspended'
@@ -6,6 +6,6 @@ export const accelerate = (shouldAccelate: boolean = true): OutAccelerateConfig 
   }
 }
 
-export interface OutAccelerateConfig {
+export interface IBucketAccelerateConfig {
   AccelerateConfiguration: { AccelerationStatus: 'Enabled' | 'Suspended' }
 }

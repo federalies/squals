@@ -1,5 +1,3 @@
-/** @module S3Bucket */
-
 /**
  * Public Access Condfig.
  *
@@ -15,9 +13,9 @@
  * @example
  *  var a = publicAccesConfig({publicAclBlock: true,  pulicAclIgnore:true, publicPolciy:true, publicBuckets:true})
  */
-export const publicAccesConfig = (params: InPublicAccessConfig) => {
+export const publicAccesConfig = (params: IbucketPublicAccessConfig) => {
   const { publicAclBlock, publicPolciy, pulicAclIgnore, publicBuckets } = params
-  let config: OutPublicAccessConfig = {}
+  let config: IBucketPublicAccessConfig = {}
   if ('publicAclBlock' in params) config['BlockPublicAcls'] = publicAclBlock as boolean
   if ('publicPolciy' in params) config['BlockPublicPolicy'] = publicPolciy as boolean
   if ('pulicAclIgnore' in params) config['IgnorePublicAcls'] = pulicAclIgnore as boolean
@@ -26,14 +24,14 @@ export const publicAccesConfig = (params: InPublicAccessConfig) => {
   return { PublicAccessBlockConfiguration: config }
 }
 
-export interface InPublicAccessConfig {
+export interface IbucketPublicAccessConfig {
   publicAclBlock?: boolean
   pulicAclIgnore?: boolean
   publicPolciy?: boolean
   publicBuckets?: boolean
 }
 
-export interface OutPublicAccessConfig {
+export interface IBucketPublicAccessConfig {
   BlockPublicAcls?: boolean
   BlockPublicPolicy?: boolean
   IgnorePublicAcls?: boolean

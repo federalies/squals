@@ -1,6 +1,5 @@
 import * as Url from 'url'
-import { redirRule, OutRouteRule, InRedirRule } from './redirectRule'
-// import { isEmpty } from 'lodash-es'
+import { redirRule, IbucketRedirRule, IBucketRouteRule } from './redirectRule'
 
 /**
  * removing lodash since that is causing headaches with JEST that I dont yet know how to resolve.
@@ -25,7 +24,7 @@ import { redirRule, OutRouteRule, InRedirRule } from './redirectRule'
  *  var webcfgPlain = websiteConfig()
  *  var webcfgWRedirRules = websiteConfig({redir:[{when:'docs/', to:'squals.readthedocs.io/', replacer:'', doFullReplace:true}]})
  */
-const websiteConfig = (param?: inWebsiteConfig): OutWebsiteConfig => {
+export const websiteConfig = (param?: IbucketWebsiteConfig): IBucketWebsiteConfig => {
   const { redir, indexpage, errorpage } = {
     redir: '',
     indexpage: 'index.html',
@@ -80,29 +79,27 @@ const websiteConfig = (param?: inWebsiteConfig): OutWebsiteConfig => {
   }
 }
 
-export interface inWebsiteConfig {
+export interface IbucketWebsiteConfig {
   indexPage?: string
   errorPage?: string
-  redir?: string | InRedirRule[]
+  redir?: string | IbucketRedirRule[]
 }
 
-export interface OutWebsiteEnabled {
+export interface IBucketWebsiteEnabled {
   IndexDocument: string
   ErrorDocument: string
 }
-export interface OutWebsiteConfigRedirAll extends OutWebsiteEnabled {
+export interface IBucketWebsiteConfigRedirAll extends IBucketWebsiteEnabled {
   RedirectAllRequestsTo: { HostName: string; Protocol: string }
 }
-export interface OutWebsiteConfigRedirRules extends OutWebsiteEnabled {
-  RoutingRules: OutRouteRule[]
+export interface IBucketWebsiteConfigRedirRules extends IBucketWebsiteEnabled {
+  RoutingRules: IBucketRouteRule[]
 }
-export type OutWebsiteConfigElem =
-  | OutWebsiteEnabled
-  | OutWebsiteConfigRedirRules
-  | OutWebsiteConfigRedirAll
+export type IBucketWebsiteConfigElem =
+  | IBucketWebsiteEnabled
+  | IBucketWebsiteConfigRedirRules
+  | IBucketWebsiteConfigRedirAll
 
-export interface OutWebsiteConfig {
-  WebsiteConfiguration: OutWebsiteConfigElem
+export interface IBucketWebsiteConfig {
+  WebsiteConfiguration: IBucketWebsiteConfigElem
 }
-
-export { websiteConfig }

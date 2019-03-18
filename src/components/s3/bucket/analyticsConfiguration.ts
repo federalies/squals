@@ -1,5 +1,6 @@
-import { destination, InDestination, OutDestinationItem } from './destination'
-import { OutTags, InTags, TagFilters } from './tags'
+import { TagFilters } from './tags'
+import { destination, IBucketDestinationItem, IbucketDestination } from './destination'
+import { Itags, ITags } from '../../Template';
 
 /**
  * AWS:S3:: Analytics Configuration.
@@ -24,8 +25,8 @@ import { OutTags, InTags, TagFilters } from './tags'
  *  ])
  */
 export const analyticsConfig = (
-  config: InAnalyticsConfigItem | InAnalyticsConfigItem[]
-): OutAnalyticsConfig => {
+  config: IbucketAnalyticsConfigItem | IbucketAnalyticsConfigItem[]
+): IBucketAnalyticsConfig => {
   return Array.isArray(config)
     ? { AnalyticsConfigurations: config.map(item => analyticsItem(item)) }
     : { AnalyticsConfigurations: [analyticsItem(config)] }
@@ -40,7 +41,7 @@ export const analyticsConfig = (
  * @example
  *   var v = analyticsItem({ id:'heyThere', prefix:'myPrefix', tagList:[{key1:'val1'},{key1:'val2'}] })
  */
-const analyticsItem = (config: InAnalyticsConfigItem): OutAnalyticsItem => {
+const analyticsItem = (config: IbucketAnalyticsConfigItem): IBucketAnalyticsItem => {
   const { id, prefix, dest, tagList } = {
     // id*
     dest: null,
@@ -77,25 +78,25 @@ const analyticsItem = (config: InAnalyticsConfigItem): OutAnalyticsItem => {
 /**
  * @todo make ID not required
  */
-export interface InAnalyticsConfigItem {
+export interface IbucketAnalyticsConfigItem {
   id: string
-  dest?: InDestination
+  dest?: IbucketDestination
   prefix?: string
-  tagList?: InTags | InTags[]
+  tagList?: Itags | Itags[]
 }
 
-export interface OutAnalyticsItem {
+export interface IBucketAnalyticsItem {
   Id: string
   Prefix?: string
-  TagFilters?: Array<OutTags>
+  TagFilters?: ITags[]
   StorageClassAnalysis: {
     DataExport?: {
       OutputSchemaVersion: string
-      Destination: OutDestinationItem
+      Destination: IBucketDestinationItem
     }
   }
 }
 
-export interface OutAnalyticsConfig {
-  AnalyticsConfigurations: Array<OutAnalyticsItem>
+export interface IBucketAnalyticsConfig {
+  AnalyticsConfigurations: IBucketAnalyticsItem[]
 }

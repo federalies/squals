@@ -1,5 +1,3 @@
-/** @module S3Bucket */
-
 /**
  * This is a Title.
  *
@@ -10,9 +8,9 @@
  * @example
  *  var lc = loggingConfg({saveLogsToBucket:'otherbucket', logPrefix:'logs/'})
  */
-export const loggingConfg = (params: InLoggingConfig = {}) => {
+export const loggingConfg = (params: IbucketLoggingConfig = {}) => {
   const { saveLogsToBucket, logPrefix } = params
-  const data: OutLogging = {}
+  const data: IBucketLogging = {}
   if (logPrefix) data['LogFilePrefix'] = logPrefix
   if (saveLogsToBucket) data['DestinationBucketName'] = saveLogsToBucket
   return {
@@ -20,15 +18,15 @@ export const loggingConfg = (params: InLoggingConfig = {}) => {
   }
 }
 
-export interface InLoggingConfig {
+export interface IbucketLoggingConfig {
   saveLogsToBucket?: string
   logPrefix?: string
 }
-export interface OutLogging {
+export interface IBucketLogging {
   DestinationBucketName?: string // defaults to same bucket
   LogFilePrefix?: string // default to empty string
 }
 
-export interface OutLoggingConfig {
-  LoggingConfiguration: OutLogging
+export interface IBucketLoggingConfig {
+  LoggingConfiguration: IBucketLogging
 }

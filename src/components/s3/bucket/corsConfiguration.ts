@@ -37,8 +37,8 @@ const difference = (setA: any[], setB: any[]) => {
  *   var cfmCorsConfig = corsConfig([{methods:[],origins:[]}])
  */
 export const corsConfig = (
-  rules: InCorsRule | InCorsRule[]
-): { CorsConfiguration: { CorsRules: OutCorsRule[] } } => {
+  rules: IbucketCorsRule | IbucketCorsRule[]
+): { CorsConfiguration: { CorsRules: IBucketCorsRule[] } } => {
   return Array.isArray(rules)
     ? {
       CorsConfiguration: {
@@ -65,7 +65,7 @@ export const corsConfig = (
  *  var cors3 = corsRule({id:"Local Development Rule3", maxAge:3600*6,  GET:'localhost'})
  *  var cors4 = corsRule({id:"Local Development Rule4", maxAge:3600*6, 'GET|POST':['mydomain.com','localhost']})
  */
-export const corsRule = (params: InCorsRule): OutCorsRule => {
+export const corsRule = (params: IbucketCorsRule): IBucketCorsRule => {
   let {
     methods,
     origins,
@@ -106,7 +106,7 @@ export const corsRule = (params: InCorsRule): OutCorsRule => {
   const AllowedMethods = Array.isArray(methods) ? methods : new Array(methods)
   const AllowedOrigins = Array.isArray(origins) ? origins : new Array(origins)
 
-  const rule: OutCorsRule = {
+  const rule: IBucketCorsRule = {
     AllowedMethods: [...AllowedMethods, ...Verbs],
     AllowedOrigins: [...AllowedOrigins, ...Origins]
   }
@@ -135,16 +135,16 @@ export const corsRule = (params: InCorsRule): OutCorsRule => {
   return rule
 }
 
-export type InCorsRule = IInCorsRule_methodsOrigins | IInCorsRule_VerbsOrigins
+export type IbucketCorsRule = IbucketCorsRule_methodsOrigins | IbucketCorsRule_VerbsOrigins
 
 // "at least one" logic is pushed into the type system
-export interface IInCorsRule_methodsOrigins extends IInCorsRule_opts {
+export interface IbucketCorsRule_methodsOrigins extends IbucketCorsRule_opts {
   methods: string | string[]
   origins: string | string[]
   _?: { [key: string]: string | string[] }
 }
 
-export interface IInCorsRule_VerbsOrigins extends IInCorsRule_opts {
+export interface IbucketCorsRule_VerbsOrigins extends IbucketCorsRule_opts {
   methods?: string | string[]
   origins?: string | string[]
   // @todo : determine how this key can be removed so that
@@ -152,14 +152,14 @@ export interface IInCorsRule_VerbsOrigins extends IInCorsRule_opts {
   _: { [key: string]: string | string[] }
 }
 
-export interface IInCorsRule_opts {
+export interface IbucketCorsRule_opts {
   headersExposed?: string[]
   headersAllowed?: string[]
   id?: string
   maxAge?: number
 }
 
-export interface OutCorsRule {
+export interface IBucketCorsRule {
   AllowedMethods: string[]
   AllowedOrigins: string[]
   AllowedHeaders?: string[]

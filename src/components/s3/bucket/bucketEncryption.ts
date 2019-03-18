@@ -1,5 +1,3 @@
-/** @module S3Bucket */
-
 /**
  * Top Level Key Gen for S3 Bucket.
  *
@@ -11,7 +9,9 @@
  *   var b = bucketEncryption({algo:'AES256'})
  *   var c = bucketEncryption([{algo:'AES256'}, {algo:'aws:kms',keyID:'1sf1f3fqws'}])
  */
-export const encryptionConfig = (encRules: InParamSSRule | InParamSSRule[] = {}): OutBucketEnc => {
+export const encryptionConfig = (
+  encRules: IbucketParamSSRule | IbucketParamSSRule[] = {}
+): IBucketBucketEnc => {
   const bucketEnc = Array.isArray(encRules) ? encRules : new Array(encRules)
   return {
     BucketEncryption: {
@@ -31,7 +31,9 @@ export const encryptionConfig = (encRules: InParamSSRule | InParamSSRule[] = {})
  * @example
  *   var a = serverSideEncryptionRule()
  */
-export const serverSideEncryptionRule = (params: InParamSSRule = {}): OutServerSideEncRule => {
+export const serverSideEncryptionRule = (
+  params: IbucketParamSSRule = {}
+): IBucketServerSideEncRule => {
   const { algo, keyID } = { algo: 'aws:kms', keyID: null, ...params }
   if (!['aws:kms', 'AES256'].includes(algo)) {
     throw new Error(
@@ -46,23 +48,23 @@ export const serverSideEncryptionRule = (params: InParamSSRule = {}): OutServerS
     )
   }
 
-  const ret: OutServerSideEncRule = { ServerSideEncryptionByDefault: { SSEAlgorithm: algo } }
+  const ret: IBucketServerSideEncRule = { ServerSideEncryptionByDefault: { SSEAlgorithm: algo } }
   if (keyID) ret.ServerSideEncryptionByDefault['KMSMasterKeyID'] = keyID
   return ret
 }
 
-export interface InParamSSRule {
+export interface IbucketParamSSRule {
   algo?: string
   keyID?: string
 }
 
-export interface OutServerSideEncRule {
+export interface IBucketServerSideEncRule {
   ServerSideEncryptionByDefault: {
     SSEAlgorithm: string
     KMSMasterKeyID?: string
   }
 }
 
-export interface OutBucketEnc {
-  BucketEncryption: { ServerSideEncryptionConfiguration: Array<OutServerSideEncRule> }
+export interface IBucketBucketEnc {
+  BucketEncryption: { ServerSideEncryptionConfiguration: IBucketServerSideEncRule[] }
 }

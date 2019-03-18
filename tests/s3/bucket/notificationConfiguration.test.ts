@@ -1,15 +1,17 @@
 // @ts-nocheck
 
-import { notifConfig } from '../../../src/components/s3/bucket'
+import { notifConfig, validS3notificationEvents } from '../../../src/components/s3/bucket'
 
 describe('defaults', () => {
   // @todo: should correlate to the example in the JSDOc
   test('As Empty As Reasonable: lambda', () => {
-    const a = notifConfig({
+    const _event = validS3notificationEvents['s3:ObjectCreated:*']
+    const rule: any = {
       arn: 'arn:aws:lambda::123456789012:resourceA/division_abc',
-      event: 's3:ObjectCreated:*',
+      event: _event,
       filterList: ['Yosem*', '*.jpg']
-    })
+    }
+    const a = notifConfig(rule)
     const e = {
       NotificationConfiguration: {
         LambdaConfigurations: [
@@ -38,20 +40,21 @@ describe('defaults', () => {
   })
 
   test('A comprehensive list tends to be pretty long', () => {
+    const _event = validS3notificationEvents['s3:ObjectCreated:*']
     const a = notifConfig([
       {
         arn: 'arn:aws:lambda::123456789012:resourceA/division_abc',
-        event: 's3:ObjectCreated:*',
+        event: validS3notificationEvents['s3:ObjectCreated:*'],
         filterList: '*.jpg'
       },
       {
         arn: 'arn:aws:sqs::123456789012:resourceA/division_abc',
-        event: 's3:ObjectRemoved:Delete',
+        event: validS3notificationEvents['s3:ObjectRemoved:Delete'],
         filterList: 'Yosem*'
       },
       {
         arn: 'arn:aws:sns::123456789012:resourceA/division_abc',
-        event: 's3:ObjectCreated:Post',
+        event: validS3notificationEvents['s3:ObjectCreated:Post'],
         filterList: ['Yosem*', '*.jpg']
       }
     ])
@@ -117,7 +120,7 @@ describe('defaults', () => {
   test('Simple SNS Example', () => {
     const a = notifConfig({
       arn: 'arn:aws:sns::123456789012:resourceA/division_abc/subdivision_xyz/ProdServerCert',
-      event: 's3:ObjectCreated:*',
+      event: validS3notificationEvents['s3:ObjectCreated:*'],
       filterList: ['Yosem*', '*.jpg']
     })
     const e = {
@@ -151,7 +154,7 @@ describe('defaults', () => {
   test('simple SQS example', () => {
     const a = notifConfig({
       arn: 'arn:aws:sqs::123456789012:resourceA/division_abc/subdivision_xyz/ProdServerCert',
-      event: 's3:ObjectCreated:*',
+      event: validS3notificationEvents['s3:ObjectCreated:*'],
       filterList: ['Yosem*', '*.jpg']
     })
     const e = {
@@ -186,7 +189,7 @@ describe('defaults', () => {
     const a = () =>
       notifConfig({
         arn: 'arn:aws:lambda::123456789012:resourceA/division_abc/subdivision_xyz/ProdServerCert',
-        event: 's3:ObjectCreated:*',
+        event: validS3notificationEvents['s3:ObjectCreated:*'],
         filterList: 'Yosem'
       })
     expect(a).toThrow()
@@ -196,7 +199,7 @@ describe('defaults', () => {
     const a = () =>
       notifConfig({
         arn: 'arn:aws:ec2::123456789012:resourceA/division_abc/subdivision_xyz/ProdServerCert',
-        event: 's3:ObjectCreated:*',
+        event: validS3notificationEvents['s3:ObjectCreated:*'],
         filterList: 'Yosem*'
       })
     // should throw an "invalid notification event type"
@@ -204,12 +207,13 @@ describe('defaults', () => {
   })
 
   test('Invalid S3 event types throw errors', () => {
-    const a = () =>
-      notifConfig({
-        arn: 'arn:aws:sqs::123456789012:resourceA/division_abc/subdivision_xyz/ProdServerCert',
-        event: 's3---SomeOtherEvent',
-        filterList: 'Yosem*'
-      })
+    const _event = validS3notificationEvents['s3:ObjectCreated:*']
+    const rule: any = {
+      arn: 'arn:aws:sqs::123456789012:resourceA/division_abc/subdivision_xyz/ProdServerCert',
+      event: 's3---SomeOtherEvent',
+      filterList: 'Yosem*'
+    }
+    const a = () => notifConfig(rule)
     expect(a).toThrow()
   })
 

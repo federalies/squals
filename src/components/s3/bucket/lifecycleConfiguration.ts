@@ -1,4 +1,5 @@
-import { TagFilters, OutTags, InTags } from './tags'
+import { TagFilters } from './tags'
+import { Itags, ITags } from '../../Template'
 
 /**
  * Config the Lifecycle Rules.
@@ -11,8 +12,8 @@ import { TagFilters, OutTags, InTags } from './tags'
  *  var lifeCycle2 = lifecycleConfig([{},{}])
  */
 export const lifecycleConfig = (
-  rules: IlifecycleValidRules | IlifecycleValidRules[]
-): ILifecycleConfig => {
+  rules: IbucketlifecycleValidRules | IbucketlifecycleValidRules[]
+): IBucketLifecycleConfig => {
   rules = Array.isArray(rules) ? rules : new Array(rules)
   return {
     LifecycleConfiguration: {
@@ -36,7 +37,7 @@ export const lifecycleConfig = (
  *  var rulesA = lifecyleRule({opt:1})
  *  var rulesB = lifecyleRule([{opt:1},{opt:1}])
  */
-export const lifecyleRule = (rule: IlifecycleRule): ILifecycleValid => {
+export const lifecyleRule = (rule: IbucketlifecycleRule): IBucketLifecycleValid => {
   const { status, id, prefix, tagList, ...inRuleConfig } = {
     status: true,
     id: null,
@@ -68,8 +69,8 @@ export const lifecyleRule = (rule: IlifecycleRule): ILifecycleValid => {
    * 3. Don't use 'transition' if you are using - 'expiryDays'|'keepOldVersionForDays'
    */
 
-  const ruleConfig = inRuleConfig as IlifecycleValidRules
-  const ret: ILifecycleValid = tagList
+  const ruleConfig = inRuleConfig as IbucketlifecycleValidRules
+  const ret: IBucketLifecycleValid = tagList
     ? {
       Status: status ? 'Enabled' : 'Disabled',
       ...transformtoAWSfmt(ruleConfig),
@@ -94,7 +95,7 @@ export const lifecyleRule = (rule: IlifecycleRule): ILifecycleValid => {
  * @example
  * var v = conditionAbortIncompleteMultipartUpload()
  */
-const conditionAbortIncompleteMultipartUpload = (params: IInRuleMultipartAbort) => {
+const conditionAbortIncompleteMultipartUpload = (params: IbucketRuleMultipartAbort) => {
   const { quitMultipartsAfterDays } = params
   return {
     AbortIncompleteMultipartUpload: {
@@ -112,7 +113,7 @@ const conditionAbortIncompleteMultipartUpload = (params: IInRuleMultipartAbort) 
  * @example
  * var v = conditionExpirationDate()
  */
-const conditionExpirationDate = (params: IInRuleExpiryDate) => {
+const conditionExpirationDate = (params: IbucketRuleExpiryDate) => {
   const { expiryDate } = params
   return { ExpirationDate: expiryDate }
 }
@@ -126,7 +127,7 @@ const conditionExpirationDate = (params: IInRuleExpiryDate) => {
  * @example
  * var v = conditionExpirationInDays()
  */
-const conditionExpirationInDays = (params: IInRuleExpirationDays) => {
+const conditionExpirationInDays = (params: IbucketRuleExpirationDays) => {
   const { expiryDays } = params
   return { ExpirationInDays: expiryDays }
 }
@@ -140,7 +141,9 @@ const conditionExpirationInDays = (params: IInRuleExpirationDays) => {
  * @example
  * var v = conditionNoncurrentVersionExpirationInDays()
  */
-const conditionNoncurrentVersionExpirationInDays = (params: IInRuleMoveOldVersionsAfterDays) => {
+const conditionNoncurrentVersionExpirationInDays = (
+  params: IbucketRuleMoveOldVersionsAfterDays
+) => {
   const { keepOldVersionForDays } = params
   return { NoncurrentVersionExpirationInDays: keepOldVersionForDays }
 }
@@ -153,16 +156,18 @@ const conditionNoncurrentVersionExpirationInDays = (params: IInRuleMoveOldVersio
  * @example
  * var v = conditionNoncurrentVersionTransitions()
  */
-const conditionNoncurrentVersionTransitions = (trans: IInRuleMoveOldVersions) => {
+const conditionNoncurrentVersionTransitions = (trans: IbucketRuleMoveOldVersions) => {
   const transitionList = Array.isArray(trans.moveOldVersionRules)
     ? trans.moveOldVersionRules
     : new Array(trans.moveOldVersionRules)
 
   return {
-    NoncurrentVersionTransitions: transitionList.map((v: IlifecycleRuleMoveOldVersionsItem) => ({
-      StorageClass: v.storage,
-      TransitionInDays: v.daysTillSlowDown
-    }))
+    NoncurrentVersionTransitions: transitionList.map(
+      (v: IbucketlifecycleRuleMoveOldVersionsItem) => ({
+        StorageClass: v.storage,
+        TransitionInDays: v.daysTillSlowDown
+      })
+    )
   }
 }
 
@@ -174,23 +179,23 @@ const conditionNoncurrentVersionTransitions = (trans: IInRuleMoveOldVersions) =>
  * @example
  * var v = conditionTransitions()
  */
-const conditionTransitions = (input: IInRuleTransitions) => {
+const conditionTransitions = (input: IbucketRuleTransitions) => {
   const transitionList = Array.isArray(input.transitions)
     ? input.transitions
     : new Array(input.transitions)
 
-  let ret: ILifecycleTransitionItem
+  let ret: IBucketLifecycleTransitionItem
   return {
     Transitions: transitionList.map(
-      (v: IlifecycleRuleTransitionItem_wDate | IlifecycleRuleTransitionItem_wDays) => {
+      (v: IbucketlifecycleRuleTransitionItem_wDate | IbucketlifecycleRuleTransitionItem_wDays) => {
         if (v.atDate) {
-          const complierHelp = v as IlifecycleRuleTransitionItem_wDate
+          const complierHelp = v as IbucketlifecycleRuleTransitionItem_wDate
           ret = {
             StorageClass: complierHelp.storage,
             TransitionDate: complierHelp.atDate
           }
         } else {
-          const complierHelp = v as IlifecycleRuleTransitionItem_wDays
+          const complierHelp = v as IbucketlifecycleRuleTransitionItem_wDays
           ret = {
             StorageClass: complierHelp.storage,
             TransitionInDays: complierHelp.daysTillSlowDown
@@ -210,7 +215,7 @@ const conditionTransitions = (input: IInRuleTransitions) => {
  * @example
  * var awsFormated = transformtoAWSfmt({ ruleName:"ExpirationInDays", expiryDays: 42 })
  */
-const transformtoAWSfmt = (input: IlifecycleValidRules): any => {
+const transformtoAWSfmt = (input: IbucketlifecycleValidRules): any => {
   /**
    * Condtion Options:
    * 1. { quitMultipartsAfterDays: Number }
@@ -243,69 +248,71 @@ const transformtoAWSfmt = (input: IlifecycleValidRules): any => {
 // as much as is reasonable - types should represent shapes - not meta-meta-logic
 // this one makes it hard
 
-export interface IlifecycleRule {
+export interface IbucketlifecycleRule {
   id?: string
   prefix?: string
   status?: boolean
-  tagList?: InTags | InTags[]
+  tagList?: Itags | Itags[]
 }
 
-export interface IlifecycleRuleMoveOldVersionsItem {
+export interface IbucketlifecycleRuleMoveOldVersionsItem {
   // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule-noncurrentversiontransition.html
   storage: string
   daysTillSlowDown: number
 }
 
-export interface IlifecycleRuleTransitionItem_wDays {
+export interface IbucketlifecycleRuleTransitionItem_wDays {
   storage: string
   daysTillSlowDown: number
   atDate?: never
 }
 
-export type IInRuleTransitions = IInRuleTransitionsDated | IInRuleTransitionsDurationed
+export type IbucketRuleTransitions = IbucketRuleTransitionsDated | IbucketRuleTransitionsDurationed
 
-export interface IlifecycleRuleTransitionItem_wDate {
+export interface IbucketlifecycleRuleTransitionItem_wDate {
   storage: string
   atDate: string
   daysTillSlowDown?: never
 }
 
-export interface IInRuleMultipartAbort extends IlifecycleRule {
+export interface IbucketRuleMultipartAbort extends IbucketlifecycleRule {
   quitMultipartsAfterDays: number
 }
 
-export interface IInRuleExpiryDate extends IlifecycleRule {
+export interface IbucketRuleExpiryDate extends IbucketlifecycleRule {
   expiryDate?: string
 }
 
-export interface IInRuleExpirationDays extends IlifecycleRule {
+export interface IbucketRuleExpirationDays extends IbucketlifecycleRule {
   expiryDays: number
 }
 
-export interface IInRuleMoveOldVersionsAfterDays extends IlifecycleRule {
+export interface IbucketRuleMoveOldVersionsAfterDays extends IbucketlifecycleRule {
   keepOldVersionForDays?: number
 }
 
-export interface IInRuleMoveOldVersions extends IlifecycleRule {
-  moveOldVersionRules: IlifecycleRuleMoveOldVersionsItem | IlifecycleRuleMoveOldVersionsItem[]
+export interface IbucketRuleMoveOldVersions extends IbucketlifecycleRule {
+  moveOldVersionRules:
+    | IbucketlifecycleRuleMoveOldVersionsItem
+    | IbucketlifecycleRuleMoveOldVersionsItem[]
 }
 
-export interface IInRuleTransitionsDurationed extends IlifecycleRule {
-  transitions: IlifecycleRuleTransitionItem_wDays | IlifecycleRuleTransitionItem_wDays[]
+export interface IbucketRuleTransitionsDurationed extends IbucketlifecycleRule {
+  transitions: IbucketlifecycleRuleTransitionItem_wDays | IbucketlifecycleRuleTransitionItem_wDays[]
 }
 
-export interface IInRuleTransitionsDated extends IlifecycleRule {
-  transitions: IlifecycleRuleTransitionItem_wDate | IlifecycleRuleTransitionItem_wDate[]
+export interface IbucketRuleTransitionsDated extends IbucketlifecycleRule {
+  transitions: IbucketlifecycleRuleTransitionItem_wDate | IbucketlifecycleRuleTransitionItem_wDate[]
 }
 
 // https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-s3-bucket-lifecycleconfig-rule.html
-export type IlifecycleValidRules =
-  | IInRuleMultipartAbort
-  | IInRuleExpirationDays
-  | IInRuleMoveOldVersions
-  | IInRuleExpiryDate
-  | IInRuleTransitions
-  | IInRuleMoveOldVersionsAfterDays
+export type IbucketlifecycleValidRules =
+  | IbucketRuleMultipartAbort
+  | IbucketRuleExpirationDays
+  | IbucketRuleMoveOldVersions
+  | IbucketRuleExpiryDate
+  | IbucketRuleTransitions
+  | IbucketRuleMoveOldVersionsAfterDays
 
 /*******
  * inbound Interfaces ⬆︎
@@ -313,52 +320,52 @@ export type IlifecycleValidRules =
  * Outbound Interfaces ⬇
  ********/
 
-export type ILifecycleValid =
-  | ILifecycleMultiPartCancel
-  | ILifecycleExpirationDate
-  | ILifecycleExpirationInDays
-  | ILifecycleNoncurrentVer
-  | ILifecycleNonCurrentTrans
-  | ILifecycleTransitions
+export type IBucketLifecycleValid =
+  | IBucketLifecycleMultiPartCancel
+  | IBucketLifecycleExpirationDate
+  | IBucketLifecycleExpirationInDays
+  | IBucketLifecycleNoncurrentVer
+  | IBucketLifecycleNonCurrentTrans
+  | IBucketLifecycleTransitions
 
-export interface ILifecycleMoveOldVersionsItem {
+export interface IBucketLifecycleMoveOldVersionsItem {
   StorageClass: string
   TransitionInDays: number
 }
 
-export interface ILifecycleTransitionItem {
+export interface IBucketLifecycleTransitionItem {
   StorageClass: string
   TransitionDate?: string
   TransitionInDays?: number
 }
 
-export interface ILifecycleMultiPartCancel extends ILifecycleItem {
+export interface IBucketLifecycleMultiPartCancel extends IBucketLifecycleItem {
   AbortIncompleteMultipartUpload: {
     DaysAfterInitiation: number
   }
 }
-export interface ILifecycleExpirationDate extends ILifecycleItem {
+export interface IBucketLifecycleExpirationDate extends IBucketLifecycleItem {
   ExpirationDate: string
 }
-export interface ILifecycleExpirationInDays extends ILifecycleItem {
+export interface IBucketLifecycleExpirationInDays extends IBucketLifecycleItem {
   ExpirationInDays: number
 }
-export interface ILifecycleNoncurrentVer extends ILifecycleItem {
+export interface IBucketLifecycleNoncurrentVer extends IBucketLifecycleItem {
   NoncurrentVersionExpirationInDays?: number
 }
-export interface ILifecycleNonCurrentTrans extends ILifecycleItem {
-  NoncurrentVersionTransitions: ILifecycleMoveOldVersionsItem[]
+export interface IBucketLifecycleNonCurrentTrans extends IBucketLifecycleItem {
+  NoncurrentVersionTransitions: IBucketLifecycleMoveOldVersionsItem[]
 }
-export interface ILifecycleTransitions extends ILifecycleItem {
-  Transitions: ILifecycleTransitionItem[]
+export interface IBucketLifecycleTransitions extends IBucketLifecycleItem {
+  Transitions: IBucketLifecycleTransitionItem[]
 }
-export interface ILifecycleItem {
+export interface IBucketLifecycleItem {
   Status: 'Enabled' | 'Disabled'
   Id?: string
   Prefix?: string
-  TagFilters?: OutTags
+  TagFilters?: ITags
 }
 
-export interface ILifecycleConfig {
-  LifecycleConfiguration: { Rules: ILifecycleItem[] }
+export interface IBucketLifecycleConfig {
+  LifecycleConfiguration: { Rules: IBucketLifecycleItem[] }
 }

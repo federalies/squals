@@ -6,8 +6,9 @@
  * @param _input
  * @see <https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-cloudfront-distribution-cookies.html>
  * @example
- *  var c = cookiesConfig()
- *
+ * var c1 = cookiesConfig({cookies:['chocolate', 'sugar']}
+ * var c2 = cookiesConfig({forward:'none'}
+ * var c3 = cookiesConfig({forward:'all'}
  */
 export const cookiesConfig = (_input: IcdnCookies): ICdnCookies => {
   if ('cookies' in _input) {

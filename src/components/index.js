@@ -3,7 +3,7 @@
 // $1$2,
 
 export { Template } from './Template'
-export { S3Bucket } from './s3' // removed S3BucketPolicy @todo add back
+export { S3 } from './s3' // removed S3BucketPolicy @todo add back
 export { SqsQueue, SqsQueuePolicy } from './sqs'
 // export { SnsSubscription, SnsTopic, SnsTopicPolicy } from './sns.js'
 // export { CodeCommitRepo } from './codeCommit.js'
@@ -11,7 +11,7 @@ export { SqsQueue, SqsQueuePolicy } from './sqs'
 // export { EcsCluster, EcsService, EcsTaskDefinition } from './ecs'
 // export { EksCluster } from './eks'
 
-export { CloudFrontCDN, CloudFrontID, CloudFrontStreaming } from './cloudFront'
+export * from './cloudFront'
 
 export {
   // https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html#welcome-pricing
@@ -49,11 +49,7 @@ export {
   CognitoUserPoolUserToGroupAttachment
 } from './cognito'
 
-export {
-  BatchComputeEnvironment,
-  BatchJobDefinition,
-  BatchJobQueue
-} from './awsBatch'
+export { BatchComputeEnvironment, BatchJobDefinition, BatchJobQueue } from './awsBatch'
 
 // export { Cloud9EnvironmentEC2 } from './awsCloud9.js'
 

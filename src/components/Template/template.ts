@@ -51,3 +51,19 @@ export interface IRef {
 export interface IGetAtt {
   'Fn::GetAtt': [string, string]
 }
+
+export interface Itags {
+  [key: string]: string
+}
+
+export interface ITags {
+  Key: string
+  Value: string
+}
+export interface IResourceTags {
+  Tags: ITags[]
+}
+
+export interface ITagFilters {
+  TagFilters: ITags[]
+}

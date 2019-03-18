@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { S3, websiteConfig } from '../../../src/components/s3/bucket'
+import { websiteConfig } from '../../../src/components/s3/bucket'
 
 // describe('website', () => {
 //   const noop = (input: any) => {
