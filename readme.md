@@ -16,7 +16,8 @@ The project goals are to make systems more composeable, contextual, shareable, a
 
 ## Goals:
 
-- Layer Up a Declarative Interface via resuable composable functions rather than inert markup.
+- Allow a slow building up interfaces via function values - but also allowing an imperative approach.
+- Layer Up a Declarative Interfaces via resuable composable functions rather than inert markup.
 - Round off the sharp edges of dealing with `AWS::cloudformation` templates
 - Sharable Components & HOCs
 - Decompose Recompose Princples
