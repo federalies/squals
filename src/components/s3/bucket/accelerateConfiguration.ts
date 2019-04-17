@@ -1,3 +1,13 @@
+/**
+ * Title.
+ *
+ * @describe description
+ * @param shouldAccelate
+ * @example
+ *  var a = accelerate(true)
+ *  console.log(a) // { AccelerateConfiguration: { AccelerationStatus: 'Enabled' }}
+ *
+ */
 export const accelerate = (shouldAccelate: boolean = true): IBucketAccelerateConfig => {
   return {
     AccelerateConfiguration: {

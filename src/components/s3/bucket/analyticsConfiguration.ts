@@ -1,6 +1,6 @@
 import { TagFilters } from './tags'
 import { destination, IBucketDestinationItem, IbucketDestination } from './destination'
-import { Itags, ITags } from '../../Template';
+import { Itags, ITags } from '../../Template'
 
 /**
  * AWS:S3:: Analytics Configuration.

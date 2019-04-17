@@ -14,7 +14,7 @@ import { IRef } from '../../Template'
  *  var ACM = viewerCertConfig({ acmCert })
  *  console.log(ACM) // { AcmCertificateArn: 'arn:aws:acm::somegreatSttingvalue',MinimumProtocolVersion: 'TLSv1.2_2018',SslSupportMethod: 'sni-only' }
  */
-export const viewerCertConfig = (_input: IcdnViewerCert = {}): any => {
+export const viewerCertConfig = (_input: IcdnViewerCert = {}): ICdnViewerCert => {
   if (_input.acm) {
     return {
       AcmCertificateArn: _input.acm,
@@ -39,7 +39,7 @@ export const viewerCertConfig = (_input: IcdnViewerCert = {}): any => {
 }
 
 // exported for unit tests
-export const _sslType = (
+const _sslType = (
   _input: { sslType?: validSSLMethods },
   _default: validSSLMethods = validSSLMethods.sni
 ) => {
@@ -51,7 +51,7 @@ export const _sslType = (
 }
 
 // exported for unit tests
-export const _minProto = (
+const _minProto = (
   _input: { minProto?: validMinTLSProto },
   _default: validMinTLSProto = validMinTLSProto['TLSv1.2_2018']
 ) => {

@@ -1,72 +1,73 @@
-export const restrictionsConfig = (_input: IcacheRestrictions = {}): ICdnRestrictions => {
-  // default = none
-  // whitelist:[]
-  // blacklist:[]
-
-  let { whitelist, blacklist } = _input
-
-  if ('blacklist' in _input) {
-    blacklist = Array.isArray(blacklist) ? blacklist : (new Array(blacklist) as string[])
-
-    return {
-      Restrictions: {
-        GeoRestriction: {
-          RestrictionType: 'blacklist',
-          Locations: blacklist
-        }
-      }
-    }
-  } else if ('whitelist' in _input) {
-    whitelist = Array.isArray(whitelist) ? whitelist : (new Array(blacklist) as string[])
-
-    return {
-      Restrictions: {
-        GeoRestriction: {
-          RestrictionType: 'whitelist',
-          Locations: whitelist
-        }
-      }
-    }
+/**
+ * Setup Location Restrictions.
+ *
+ * @param _input
+ * @description Setup GeoRestrictions on the CDN so that it is not available in various regions
+ * @example
+ * var noRestrictions = restrictionsConfig() // same as if no restrictions are setup
+ * var restrictAllEUcuzGDPR = restrictionsConfig({blacklist:EUMembers()})
+ * var allowAFewSpanishSpeakingCountries = restrictionsConfig({whitelist:['MX','ES','CO','AR','CL','EC', 'VE', 'PE']})
+ */
+export const restrictionsConfig = (_input: IcacheRestrictions = {}): ICdnGeoRestrictions => {
+  if ('blacklist' in _input && 'whitelist' in _input) {
+    throw new Error('For Geo Restictions on CDNs use only a blacklist or a whitelist ')
+  } else if (_input.whitelist) {
+    return restrict(_input.whitelist)
+  } else if (_input.blacklist) {
+    return restrict(_input.blacklist, 'blacklist')
+  } else if (_input && Object.keys({ ..._input }).length === 0) {
+    return allCountries()
   } else {
-    // default catch all
-    return {
-      Restrictions: {
-        GeoRestriction: {
-          RestrictionType: 'none'
-        }
+    console.warn(
+      `You passed someting into the CDN restrictionsConfig but it was not what the funciton was expecting - you gave:${_input}` +
+        `was expecting: an empty object, object with a { [key: "whitelist" | "blacklist"] : string | string[] } ` +
+        `giving you the benefir of the doubt - just going to nudge the output to valid "no restictions"`
+    )
+    return allCountries()
+  }
+}
+
+const allCountries = (): ICdnGeoRestrictions => {
+  return {
+    Restrictions: {
+      GeoRestriction: {
+        RestrictionType: 'none'
+      }
+    }
+  }
+}
+const restrict = (
+  countryList: string | string[],
+  isaYesList: 'whitelist' | 'blacklist' = 'whitelist'
+): ICdnGeoRestrictions => {
+  return {
+    Restrictions: {
+      GeoRestriction: {
+        RestrictionType: isaYesList === 'whitelist' ? 'whitelist' : 'blacklist',
+        Locations: Array.isArray(countryList) ? countryList : new Array(countryList)
       }
     }
   }
 }
 
-export type IcacheRestrictions = IcacheRestrictions_yesList | IcacheRestrictions_noList
-
-export interface IcacheRestrictions_yesList {
+export interface IcacheRestrictions {
   whitelist?: string | string[]
-  blacklist?: never
-}
-
-export interface IcacheRestrictions_noList {
   blacklist?: string | string[]
-  whitelist?: never
 }
 
-export type ICdnRestrictions = ICdnRestrictions_allCountries | ICdnRestrictions_restricted
+export type ICdnGeoRestrictionData = ICdnGeoRestrictions_none | ICdnGeoRestriction_listed
 
-export interface ICdnRestrictions_allCountries {
-  Restrictions: {
-    GeoRestriction: {
-      readonly RestrictionType: 'none'
-      Locations?: string[]
-    }
-  }
+export interface ICdnGeoRestrictions_none {
+  RestrictionType: 'none'
 }
 
-export interface ICdnRestrictions_restricted {
+export interface ICdnGeoRestriction_listed {
+  RestrictionType: 'blacklist' | 'whitelist'
+  Locations: string[]
+}
+
+export interface ICdnGeoRestrictions {
   Restrictions: {
-    GeoRestriction: {
-      RestrictionType: 'blacklist' | 'whitelist'
-      Locations: string[]
-    }
+    GeoRestriction: ICdnGeoRestrictionData
   }
 }

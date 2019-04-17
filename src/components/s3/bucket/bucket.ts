@@ -45,7 +45,7 @@ import {
 import randomWord from 'random-word'
 import Randoma from 'randoma'
 
-export class S3Bucket implements IndexSignature {
+export class S3Bucket {
   name: string
   Type: 'AWS::S3::Bucket'
   Properties?: {

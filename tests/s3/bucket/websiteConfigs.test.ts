@@ -84,8 +84,6 @@ describe('Website Default Configuration Options', () => {
               Protocol: 'https',
               HostName: 'federali.es',
               HttpRedirectCode: '302'
-              // ReplaceKeyPrefixWith: String,
-              // ReplaceKeyWith: String
             }
           }
         ]
@@ -95,7 +93,7 @@ describe('Website Default Configuration Options', () => {
 
   test.skip('3. Redirect-All Config', () => {
     const wcRedirAll = websiteConfig({ redir: 'https://federali.es' })
-    // console.log(JSON.stringify(wcRedirAll, null, 2))
+
     expect(wcRedirAll).toEqual({
       WebsiteConfiguration: {
         IndexDocument: 'index.html',

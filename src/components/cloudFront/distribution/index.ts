@@ -1,6 +1,6 @@
-// export * from './distribution'
 export * from './behaviors'
 export * from './customErrorResp'
-export * from './origins'
 export * from './restrictions'
 export * from './viewerCertificate'
+export * from './origins'
+export * from './distribution'

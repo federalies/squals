@@ -32,12 +32,14 @@
   "dependencies": {
     "@sandfox/arn": "^2.1.0",
     "@types/node": "^11.10.4",
+    "joi": "^14.3.1",
     "lodash-es": "^4.17.11",
     "random-word": "^2.0.0",
     "randoma": "^1.2.0"
   },
   "devDependencies": {
     "@types/jest": "^24.0.9",
+    "@types/joi": "^14.3.2",
     "@types/lodash": "^4.14.121",
     "@types/lodash-es": "^4.17.2",
     "ajv": "^6.9.1",
