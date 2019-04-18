@@ -2,25 +2,10 @@
 
 import {
   restrictionsConfig,
-  ICdnGeoRestrictions
+  ICdnGeoRestrictions,
+  ICdnGeoRestriction_listed
 } from '../../../src/components/cloudFront/distribution/restrictions'
-import {
-  NorthAmericas,
-  Americas,
-  SouthAmericas,
-  SouthAsia,
-  CentralAmericas,
-  CanadaPlusUSA,
-  EUMembers,
-  Oceania,
-  SoutheastAsia,
-  EastAsia,
-  CentralAsia,
-  Asia,
-  WesternAsia,
-  dedupe,
-  Europe
-} from '../../../src/components/cloudFront/distribution/restriction_enums'
+import * as region from '../../../src/components/cloudFront/distribution/restriction_enums'
 
 describe('CDN Restrictions', () => {
   test('default', () => {
@@ -36,7 +21,7 @@ describe('CDN Restrictions', () => {
   })
 
   test('whitelist Array', () => {
-    const a = restrictionsConfig({ whitelist: CanadaPlusUSA() })
+    const a = restrictionsConfig({ whitelist: region.CanadaPlusUSA() })
     const e = {
       Restrictions: {
         GeoRestriction: {
@@ -48,7 +33,7 @@ describe('CDN Restrictions', () => {
     expect(a).toEqual(e)
   })
   test('blacklist Array', () => {
-    const a = restrictionsConfig({ blacklist: CanadaPlusUSA() })
+    const a = restrictionsConfig({ blacklist: region.CanadaPlusUSA() })
     const e = {
       Restrictions: {
         GeoRestriction: {
@@ -122,62 +107,74 @@ describe('CDN Restrictions', () => {
 
 describe('spotcheck some enums helper functions', () => {
   test('North America', () => {
-    const a = restrictionsConfig({ whitelist: NorthAmericas() }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({ whitelist: region.NorthAmericas() }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('US')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(39)
+    expect(a.Restrictions.GeoRestriction).toHaveProperty('Locations')
+    expect(b.Locations).toContain('US')
+    expect(b.Locations).toHaveLength(39)
   })
 
   test('South America', () => {
-    const a = restrictionsConfig({ whitelist: SouthAmericas() }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({ whitelist: region.SouthAmericas() }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('BR')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(13)
+    expect(b.Locations).toContain('BR')
+    expect(b.Locations).toHaveLength(13)
   })
 
   test('Central America', () => {
-    const a = restrictionsConfig({ whitelist: CentralAmericas() }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({ whitelist: region.CentralAmericas() }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('BZ')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(7)
+    expect(b.Locations).toContain('BZ')
+    expect(b.Locations).toHaveLength(7)
   })
 
   test('EUMembers', () => {
-    const a = restrictionsConfig({ whitelist: EUMembers() }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({ whitelist: region.EUMembers() }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
+
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('GB')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(29)
+    expect(b.Locations).toContain('GB')
+    expect(b.Locations).toHaveLength(29)
   })
 
   test('Americas', () => {
-    const a = restrictionsConfig({ whitelist: Americas() }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({ whitelist: region.Americas() }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('US')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(51)
+    expect(b.Locations).toContain('US')
+    expect(b.Locations).toHaveLength(51)
   })
 
   test('Europe', () => {
-    const a = restrictionsConfig({ whitelist: Europe() }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({ whitelist: region.Europe() }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('NL')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('IS')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(37)
+    expect(b.Locations).toContain('NL')
+    expect(b.Locations).toContain('IS')
+    expect(b.Locations).toHaveLength(37)
   })
 
   test('Oceania', () => {
-    const a = restrictionsConfig({ whitelist: dedupe([...Oceania()]) }) as ICdnGeoRestrictions
+    const a = restrictionsConfig({
+      whitelist: region.dedupe([...region.Oceania()])
+    }) as ICdnGeoRestrictions
+    const b = a.Restrictions.GeoRestriction as ICdnGeoRestriction_listed
     expect(a.Restrictions.GeoRestriction.RestrictionType).toEqual('whitelist')
-    expect(a.Restrictions.GeoRestriction.Locations).toContain('AU')
-    expect(a.Restrictions.GeoRestriction.Locations).toHaveLength(15)
+    expect(b.Locations).toContain('AU')
+    expect(b.Locations).toHaveLength(15)
   })
 
   test('All The "Not Implemented Yet"s', () => {
-    const a1 = () => restrictionsConfig({ whitelist: Asia() }) as ICdnGeoRestrictions
-    const a2 = () => restrictionsConfig({ whitelist: SouthAsia() }) as ICdnGeoRestrictions
-    const a3 = () => restrictionsConfig({ whitelist: WesternAsia() }) as ICdnGeoRestrictions
-    const a4 = () => restrictionsConfig({ whitelist: CentralAsia() }) as ICdnGeoRestrictions
-    const a5 = () => restrictionsConfig({ whitelist: EastAsia() }) as ICdnGeoRestrictions
-    const a6 = () => restrictionsConfig({ whitelist: SoutheastAsia() }) as ICdnGeoRestrictions
+    const a1 = () => restrictionsConfig({ whitelist: region.Asia() }) as ICdnGeoRestrictions
+    const a2 = () => restrictionsConfig({ whitelist: region.SouthAsia() }) as ICdnGeoRestrictions
+    const a3 = () => restrictionsConfig({ whitelist: region.WesternAsia() }) as ICdnGeoRestrictions
+    const a4 = () => restrictionsConfig({ whitelist: region.CentralAsia() }) as ICdnGeoRestrictions
+    const a5 = () => restrictionsConfig({ whitelist: region.EastAsia() }) as ICdnGeoRestrictions
+    const a6 = () =>
+      restrictionsConfig({ whitelist: region.SoutheastAsia() }) as ICdnGeoRestrictions
 
     expect(a1).toThrow('Not Implemented Yet')
     expect(a2).toThrow('Not Implemented Yet')

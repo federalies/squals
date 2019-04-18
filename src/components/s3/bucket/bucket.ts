@@ -72,26 +72,6 @@ export class S3Bucket {
   }
   [key: string]: any
 
-  // @todo these will be usesful when validating incoming templates?
-  // private properties = [
-  //   'BucketName',
-  //   'AccessControl',
-  //   'AccelerateConfiguration',
-  //   'AnalyticsConfiguration',
-  //   'BucketEncryption',
-  //   'CorsConfiguration',
-  //   'InventoryConfiguration',
-  //   'LifecycleConfiguration',
-  //   'LoggingConfiguration',
-  //   'MetricsConfiguration',
-  //   'NotificationConfiguration',
-  //   'PublicAccessBlockConfiguration',
-  //   'ReplicationConfiguration',
-  //   'Tags',
-  //   'VersioningConfiguration',
-  //   'WebsiteConfiguration'
-  // ]
-
   // private bucketACLS = [
   //   'AuthenticatedRead',
   //   'AwsExecRead',
@@ -354,37 +334,6 @@ export class S3Bucket {
      */
     return { 'Fn::GetAtt': [this.name, 'WebsiteURL'] }
   }
-
-  // outputs (existingOutputs: any) {
-  //   return {
-  //     ...existingOutputs,
-  //     [`${this.name}-websiteURL`]: {
-  //       Description: 'The WebsiteURL of the S3Bucket',
-  //       Value: this.WebsiteURL()
-  //     }
-  //   }
-  // }
-
-  // validate () {
-  //   const testStatusBuilder = (passing = true, msgAccum = {}) => {
-  //     return (pass, addMsg) => {
-  //       msgAccum = pass ? { ...msgAccum } : { ...msgAccum, ...addMsg }
-  //       passing = passing && pass
-  //       return {
-  //         test: pass,
-  //         allTestsPass: passing,
-  //         failMsgs: msgAccum
-  //       }
-  //     }
-  //   }
-  //   const didTestPass = testStatusBuilder()
-
-  //   // @ts-ignore
-  //   const { allTestsPass, failMsgs } = validations(this).reduce((p, t) => {
-  //     return didTestPass(t.test, t.msg)
-  //   })
-  //   return { passes: allTestsPass, failMsgs }
-  // }
 }
 
 interface IRef {

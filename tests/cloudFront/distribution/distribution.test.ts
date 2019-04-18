@@ -2,7 +2,7 @@
 
 import {
   CloudFrontCDN,
-  ICdnGeoRestrictionData
+  ICdnGeoRestriction_listed
 } from '../../../src/components/cloudFront/distribution'
 import { EUMembers } from '../../../src/components/cloudFront/distribution/restriction_enums'
 
@@ -53,7 +53,7 @@ describe('CDN Targets', () => {
     expect(a).toHaveProperty('Properties.DistributionConfig.DefaultRootObject', '/index.html')
   })
 
-  test('fancy setups', () => {
+  test('specify CustomResponseErrors + GeoRestrictions', () => {
     const a = new CloudFrontCDN({
       origins: 'http://federli.es',
       errResp: { 400: { errCacheSecs: 200 } },
@@ -61,26 +61,66 @@ describe('CDN Targets', () => {
     })
 
     // print(a.Properties.DistributionConfig)
+    // print(a.Properties.DistributionConfig.CustomErrorResponses)
+
+    if (
+      a.Properties.DistributionConfig.Restrictions &&
+      'Locations' in a.Properties.DistributionConfig.Restrictions.GeoRestriction
+    ) {
+      let geoRestrictions = a.Properties.DistributionConfig.Restrictions
+        .GeoRestriction as ICdnGeoRestriction_listed
+      expect(geoRestrictions.Locations).toEqual(EUMembers())
+    } else {
+      expect(a.Properties.DistributionConfig.Restrictions).toHaveProperty(
+        'GeoRestriction.RestrictionType'
+      )
+      expect(a.Properties.DistributionConfig.Restrictions).toHaveProperty(
+        'GeoRestriction.Locations'
+      )
+    }
 
     expect(a).toHaveProperty(
-      'Properties.DistributionConfig.Restrictions.GeoRestriction.RestrictionType',
-      'blacklist'
+      'Properties.DistributionConfig.Restrictions.GeoRestriction.RestrictionType'
     )
-
+    expect(a).toHaveProperty('Properties.DistributionConfig.Restrictions.GeoRestriction.Locations')
     expect(a.Properties.DistributionConfig.CustomErrorResponses).toEqual([
       {
         ErrorCode: 400,
         ErrorCachingMinTTL: 200
       }
     ])
-
-    expect(a).toHaveProperty('Properties.DistributionConfig.Restrictions.GeoRestriction.Locations')
   })
 
   test('CDN Add Origin', () => {
     const myCDN = new CloudFrontCDN({ origins: 'http://federali.es' })
-    myCDN.addOrigins(['https://squals.js.org', 'http://federalies.js.org'])
-    expect(myCDN).toEqual({})
+    myCDN.origins(['https://squals.js.org', 'http://federalies.js.org'])
+    const updatedOrigins = [
+      {
+        DomainName: 'federali.es',
+        CustomOriginConfig: {
+          OriginProtocolPolicy: 'http-only'
+        },
+        OriginPath: '/index.html',
+        Id: '0'
+      },
+      {
+        DomainName: 'squals.js.org',
+        CustomOriginConfig: {
+          OriginProtocolPolicy: 'https-only'
+        },
+        OriginPath: '/index.html',
+        Id: '1'
+      },
+      {
+        DomainName: 'federalies.js.org',
+        CustomOriginConfig: {
+          OriginProtocolPolicy: 'http-only'
+        },
+        OriginPath: '/index.html',
+        Id: '2'
+      }
+    ]
+    expect(myCDN.Properties.DistributionConfig.Origins).toEqual(updatedOrigins)
   })
 
   test.skip('', () => {

@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<title>ICdnDefaultCacheBehavior | squals</title>
+	<title>IexpcacheErrResponseRules | squals</title>
 	<meta name="description" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<link rel="stylesheet" href="../assets/css/main.css">
@@ -56,10 +56,10 @@
 					<a href="../globals.html">Globals</a>
 				</li>
 				<li>
-					<a href="icdndefaultcachebehavior.html">ICdnDefaultCacheBehavior</a>
+					<a href="iexpcacheerrresponserules.html">IexpcacheErrResponseRules</a>
 				</li>
 			</ul>
-			<h1>Interface ICdnDefaultCacheBehavior</h1>
+			<h1>Interface IexpcacheErrResponseRules</h1>
 		</div>
 	</div>
 </header>
@@ -70,7 +70,7 @@
 				<h3>Hierarchy</h3>
 				<ul class="tsd-hierarchy">
 					<li>
-						<span class="target">ICdnDefaultCacheBehavior</span>
+						<span class="target">IexpcacheErrResponseRules</span>
 					</li>
 				</ul>
 			</section>
@@ -81,7 +81,9 @@
 						<section class="tsd-index-section ">
 							<h3>Properties</h3>
 							<ul class="tsd-index-list">
-								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="icdndefaultcachebehavior.html#defaultcachebehavior" class="tsd-kind-icon">Default<wbr>Cache<wbr>Behavior</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iexpcacheerrresponserules.html#errcachesecs" class="tsd-kind-icon">err<wbr>Cache<wbr>Secs</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iexpcacheerrresponserules.html#rescode" class="tsd-kind-icon">res<wbr>Code</a></li>
+								<li class="tsd-kind-property tsd-parent-kind-interface"><a href="iexpcacheerrresponserules.html#respath" class="tsd-kind-icon">res<wbr>Path</a></li>
 							</ul>
 						</section>
 					</div>
@@ -90,12 +92,32 @@
 			<section class="tsd-panel-group tsd-member-group ">
 				<h2>Properties</h2>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
-					<a name="defaultcachebehavior" class="tsd-anchor"></a>
-					<h3>Default<wbr>Cache<wbr>Behavior</h3>
-					<div class="tsd-signature tsd-kind-icon">Default<wbr>Cache<wbr>Behavior<span class="tsd-signature-symbol">:</span> <a href="icdncachedefaultbehavior.html" class="tsd-signature-type">ICdnCacheDefaultBehavior</a></div>
+					<a name="errcachesecs" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> err<wbr>Cache<wbr>Secs</h3>
+					<div class="tsd-signature tsd-kind-icon">err<wbr>Cache<wbr>Secs<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">number</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in src/components/cloudFront/distribution/behaviors.ts:68</li>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/a90b117/src/components/cloudFront/distribution/customErrorResp.ts#L79">src/components/cloudFront/distribution/customErrorResp.ts:79</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="rescode" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> res<wbr>Code</h3>
+					<div class="tsd-signature tsd-kind-icon">res<wbr>Code<span class="tsd-signature-symbol">:</span> <a href="../globals.html#rescodes" class="tsd-signature-type">resCodes</a></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/a90b117/src/components/cloudFront/distribution/customErrorResp.ts#L78">src/components/cloudFront/distribution/customErrorResp.ts:78</a></li>
+						</ul>
+					</aside>
+				</section>
+				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-interface">
+					<a name="respath" class="tsd-anchor"></a>
+					<h3><span class="tsd-flag ts-flagOptional">Optional</span> res<wbr>Path</h3>
+					<div class="tsd-signature tsd-kind-icon">res<wbr>Path<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">undefined</span><span class="tsd-signature-symbol"> | </span><span class="tsd-signature-type">string</span></div>
+					<aside class="tsd-sources">
+						<ul>
+							<li>Defined in <a href="https://github.com/federalies/squals/blob/a90b117/src/components/cloudFront/distribution/customErrorResp.ts#L77">src/components/cloudFront/distribution/customErrorResp.ts:77</a></li>
 						</ul>
 					</aside>
 				</section>
@@ -114,10 +136,16 @@
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-interface">
-						<a href="icdndefaultcachebehavior.html" class="tsd-kind-icon">ICdn<wbr>Default<wbr>Cache<wbr>Behavior</a>
+						<a href="iexpcacheerrresponserules.html" class="tsd-kind-icon">Iexpcache<wbr>Err<wbr>Response<wbr>Rules</a>
 						<ul>
 							<li class=" tsd-kind-property tsd-parent-kind-interface">
-								<a href="icdndefaultcachebehavior.html#defaultcachebehavior" class="tsd-kind-icon">Default<wbr>Cache<wbr>Behavior</a>
+								<a href="iexpcacheerrresponserules.html#errcachesecs" class="tsd-kind-icon">err<wbr>Cache<wbr>Secs</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="iexpcacheerrresponserules.html#rescode" class="tsd-kind-icon">res<wbr>Code</a>
+							</li>
+							<li class=" tsd-kind-property tsd-parent-kind-interface">
+								<a href="iexpcacheerrresponserules.html#respath" class="tsd-kind-icon">res<wbr>Path</a>
 							</li>
 						</ul>
 					</li>

@@ -30,6 +30,20 @@ export const originsArrayConfig = (_input: IcdnOriginInput): ICdnOriginItem[] =>
 export type IcdnInputItem = string | IcdnOriginItem
 export type IcdnOriginInput = IcdnInputItem | IcdnInputItem[]
 
+export const originBacktoString = (p: ICdnOriginItem): string => {
+  if ('CustomOriginConfig' in p) {
+    const protocol =
+      p.CustomOriginConfig.OriginProtocolPolicy === 'http-only' ? 'http://' : 'https://'
+    return protocol === 'http://'
+      ? `${protocol}${p.DomainName}:${p.CustomOriginConfig.HTTPPort}${p.OriginPath}`
+      : `${protocol}${p.DomainName}:${p.CustomOriginConfig.HTTPSPort}${p.OriginPath}`
+  } else {
+    // bucket info lost... best we can do is bucket URL..
+    // put a user in there ??
+    return `https://${p.DomainName}${p.OriginPath}`
+  }
+}
+
 export const originItem = (_input: string | IcdnOriginItem, _index: number): ICdnOriginItem => {
   let uri: URL
   let ret: ICdnOriginItem
