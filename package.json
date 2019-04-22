@@ -27,7 +27,7 @@
     "cloud-templates",
     "infrastructure"
   ],
-  "author": "",
+  "author": "Eric D Moore",
   "license": "MIT",
   "dependencies": {
     "@sandfox/arn": "^2.1.0",

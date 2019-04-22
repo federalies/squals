@@ -185,7 +185,7 @@ export class CloudFrontCDN {
    * @param comment - Replace the comment.
    * @example
    * var myCDN = CloudFront({origins: 'https://federali.es'})
-   * var diffCDNObj = myCDN.comments('This Is the new comment String value')
+   * var diffCDNObj = myCDN.comments('This Is the new comment String value')š
    * console.log(myCDN === diffCDNObj) // false
    */
   comments (comment: string): CloudFrontCDN {
