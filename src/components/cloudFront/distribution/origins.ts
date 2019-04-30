@@ -1,4 +1,4 @@
-import { IRef } from '../../Template'
+import { IRef, IGetAtt } from '../../Template'
 import Url from 'url'
 
 /**
@@ -18,6 +18,8 @@ export const originsConfig = (_input: IcdnOriginInput): ICdnOrigins => {
 export const originsArrayConfig = (_input: IcdnOriginInput): ICdnOriginItem[] => {
   if (typeof _input === 'string') {
     return [originItem(_input, 0)]
+  } else if ('Fn::GetAtt' in _input) {
+    return [originItem(_input, 0)]
   } else {
     if (Array.isArray(_input)) {
       return _input.map((origin, idx) => originItem(origin, idx))
@@ -28,9 +30,12 @@ export const originsArrayConfig = (_input: IcdnOriginInput): ICdnOriginItem[] =>
 }
 
 export type IcdnInputItem = string | IcdnOriginItem
-export type IcdnOriginInput = IcdnInputItem | IcdnInputItem[]
+export type IcdnOriginInput = IcdnInputItem | IcdnInputItem[] | IGetAtt
 
-export const originItem = (_input: string | IcdnOriginItem, _index: number): ICdnOriginItem => {
+export const originItem = (
+  _input: string | IcdnOriginItem | IGetAtt,
+  _index: number
+): ICdnOriginItem => {
   let uri: URL
   let ret: ICdnOriginItem
 
@@ -54,6 +59,15 @@ export const originItem = (_input: string | IcdnOriginItem, _index: number): ICd
     } catch (e) {
       throw new Error(`the origin: ${_input} does not include an origin`)
     }
+  } else if ('Fn::GetAtt' in _input) {
+    ret = {
+      Id: _index.toString(),
+      DomainName: _input,
+      // OriginPath: '/index.html',
+      CustomOriginConfig: {
+        OriginProtocolPolicy: 'match-viewer'
+      }
+    } as ICdnOriginGetAtt
   } else if ('url' in _input) {
     // Item_http
     try {
@@ -144,6 +158,14 @@ interface IcdnOriginItem_http {
   keepAlive?: number
 }
 
+export interface ICdnOriginGetAtt {
+  Id: string // uniq constraint
+  DomainName: IGetAtt
+  CustomOriginConfig: {
+    OriginProtocolPolicy: 'match-viewer'
+  }
+}
+
 export interface ICdnOrigins_HTTP {
   Id: string // uniq constraint
   DomainName: string
@@ -165,7 +187,7 @@ interface ICdnOrigins_S3 {
   OriginCustomHeaders?: ICdnOriginsCustomHeader[]
   OriginPath?: string
   S3OriginConfig: {
-    OriginAccessIdentity?: string | IRef
+    OriginAccessIdentity?: string | IRef | IGetAtt
   }
 }
 
@@ -174,7 +196,7 @@ export interface ICdnOriginsCustomHeader {
   HeaderValue: string
 }
 
-export type ICdnOriginItem = ICdnOrigins_HTTP | ICdnOrigins_S3
+export type ICdnOriginItem = ICdnOrigins_HTTP | ICdnOrigins_S3 | ICdnOriginGetAtt
 
 export interface ICdnOrigins {
   Origins: ICdnOriginItem[]

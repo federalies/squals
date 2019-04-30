@@ -2,31 +2,24 @@
 
 export class Template {
   AWSTemplateFormatVersion: '2010-09-09'
-  Description: string
-  Metadata: object
-  Mappings: object
-  Conditions: object
   Resources: object
-  Transform: object
-  Outputs: object
+  Description?: string
+
+  Metadata?: object
+  Mappings?: object
+  Conditions?: object
+  Transform?: object
+  Outputs?: object
 
   constructor (props: any = {}) {
     this.AWSTemplateFormatVersion = '2010-09-09'
-    this.Description = 'AutoGen Description'
-    this.Metadata = { ...props.Metadata }
-    this.Mappings = { ...props.Mappings }
-    this.Conditions = { ...props.Conditions }
-    this.Resources = { ...props.Resources }
-    this.Transform = {}
-    this.Outputs = { ...props.Outputs }
-    // if (Object.keys(props)) {
-    //   intersection(
-    //     ['Description', 'Mappings', 'Conditions', 'Resources', 'Transform', 'Outputs'],
-    //     Object.keys(props)
-    //   ).map(yesValid => {
-    //     this[yesValid] = props[yesValid]
-    //   })
-    // }
+    this.Description = props.desc || `Squals AutoGen Description ${new Date().getTime()}`
+    this.Resources = { ...props.resources }
+    if (props.metadata) this.Metadata = { ...props.metadata }
+    if (props.mappings) this.Mappings = { ...props.mappings }
+    if (props.conditions) this.Conditions = { ...props.conditions }
+    if (props.transform) this.Transform = { ...props.transform }
+    if (props.outputs) this.Outputs = { ...props.outputs }
   }
   validate () {
     return { pass: true, msg: null }
@@ -37,36 +30,14 @@ export class Template {
   }
   toJSON () {
     let _this = this
+    if (Array.isArray(this.Resources)) {
+      _this.Resources = this.Resources.reduce((p, c) => ({ ...p, ...c.toJSON() }), {})
+    }
     return _this // cleaned up version
   }
   toString (replacer = null, spaces?: number) {
     return JSON.stringify(this.toJSON(), replacer, spaces)
   }
-}
-
-export interface IRef {
-  Ref: string
-}
-
-export interface IGetAtt {
-  'Fn::GetAtt': [string, string]
-}
-
-export interface Itags {
-  [key: string]: string
-}
-
-export interface ITags {
-  Key: string
-  Value: string
-}
-
-export interface IResourceTags {
-  Tags: ITags[]
-}
-
-export interface ITagFilters {
-  TagFilters: ITags[]
 }
 
 /**
@@ -117,10 +88,43 @@ export const TagFilters = (tagList: Itags | Itags[]): ITagFilters => {
     TagFilters: tags(tagList)
   }
 }
+
+export interface Itemplate {
+  resources: object
+  desc?: string
+  metadata?: object
+  mappings?: object
+  conditions?: object
+  transform?: object
+  outputs?: object
+}
 export interface IResourceTags {
   Tags: ITags[]
 }
 
 export interface ITagFilters {
   TagFilters: ITags[]
+}
+
+export enum StackChangeBehaviors {
+  noInteruption = 1,
+  someInteruption,
+  replacement
+}
+
+export interface IRef {
+  Ref: string
+}
+
+export interface IGetAtt {
+  'Fn::GetAtt': [string, string]
+}
+
+export interface Itags {
+  [key: string]: string
+}
+
+export interface ITags {
+  Key: string
+  Value: string
 }

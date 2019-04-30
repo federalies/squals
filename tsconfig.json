@@ -68,8 +68,8 @@
   },
   "compileOnSave": true,
   // "include": ["./src/**/*"],
-  "include": ["./src/**/*", "./tests/**/*"],
-  "exclude": ["lib", "dist", "*.json"],
+  "include": ["./src/**/*", "./tests/**/*", "src/components/elastiCache/.js"],
+  "exclude": ["lib", "dist", "*.json", "_scratch"],
   "typedocOptions": {
     "mode": "file",
     "out": "typeDocs"

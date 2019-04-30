@@ -7,21 +7,28 @@ interface Ref {
 }
 
 export class S3BucketPolicy {
+  name: string
   Type: 'AWS::S3::BucketPolicy'
-  name?: string
   Properties?: {
     Bucket: string | Ref
     PolicyDocument: AccessPolicy
   }
 
-  constructor (props: any = {}, name: string = '') {
+  constructor (props: any = {}) {
     this.Type = 'AWS::S3::BucketPolicy'
+    let defaultName = `${randomWord()}${new Randoma({
+      seed: new Date().getTime()
+    }).integer()}`
+
     this.Properties = { ...props }
-    this.name =
-      name === ''
-        ? `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
-          seed: new Date().getTime()
-        }).integer()}`
-        : name
+    this.name = { name: defaultName, ...props }.name
+  }
+  toJSON (): object {
+    return {
+      [this.name]: {
+        Type: this.Type,
+        Properties: this.Properties
+      }
+    }
   }
 }

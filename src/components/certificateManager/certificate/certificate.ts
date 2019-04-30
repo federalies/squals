@@ -4,7 +4,7 @@ import randomWord from 'random-word'
 import Randoma from 'randoma'
 import { Tags, Itags, ITags, tags } from '../../Template'
 import { IRef } from '../../Template'
-export class Certificate {
+export class AWSCertificate {
   name: string
   _price: number
   _schema?: {
@@ -50,7 +50,7 @@ export class Certificate {
 
     this.Type = 'AWS::CertificateManager::Certificate'
 
-    let defaultName = `${randomWord()}-${randomWord()}-${new Randoma({
+    let defaultName = `${randomWord()}${new Randoma({
       seed: new Date().getTime()
     }).integer()}`
 
@@ -81,10 +81,10 @@ export class Certificate {
       throw new Error('Certificate Constructor does not know what to do with the input')
     }
   }
-  addDomains (input: IcertDomainInput): Certificate {
+  addDomains (input: IcertDomainInput): AWSCertificate {
     return this
   }
-  proveViaEmail (useEmail: true) {
+  proveViaEmail (useEmail: true): AWSCertificate {
     const _this = this
 
     _this.Properties = {
@@ -94,7 +94,7 @@ export class Certificate {
 
     return _this
   }
-  tags (inTags: Itags | Itags[]) {
+  tags (inTags: Itags | Itags[]): AWSCertificate {
     const _this = this
 
     _this.Properties = {
@@ -104,13 +104,27 @@ export class Certificate {
 
     return _this
   }
-  MainDomain (): string {
-    return this.Properties.DomainName
-  }
   Ref (): IRef {
     return {
       Ref: this.name
     }
+  }
+  toJSON (): object {
+    return {
+      [this.name]: {
+        Type: this.Type,
+        Properties: this.Properties
+      }
+    }
+  }
+  everyDomain (): string[] {
+    return [this.Properties.DomainName, ...this.Properties.SubjectAlternativeNames]
+  }
+  altDomains (): string[] {
+    return [this.Properties.DomainName, ...this.Properties.SubjectAlternativeNames]
+  }
+  mainDomain (): string {
+    return this.Properties.DomainName
   }
   //
 } // end of class

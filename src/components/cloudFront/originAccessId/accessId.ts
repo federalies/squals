@@ -1,5 +1,6 @@
-//
-//
+import randomWord from 'random-word'
+import Randoma from 'randoma'
+
 export class OriginAccessID {
   name: string
   Type: 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
@@ -9,12 +10,13 @@ export class OriginAccessID {
     }
   }
   constructor (_in: { name?: string; comment: string }) {
-    const { name, comment } = _in
-    if (name) {
-      this.name = name
-    } else {
-      this.name = `Comment:${comment}`
-    }
+    const { comment } = _in
+
+    let defaultName = `${randomWord()}${new Randoma({
+      seed: new Date().getTime()
+    }).integer()}`
+
+    this.name = { name: defaultName, ..._in }.name
     this.Type = 'AWS::CloudFront::CloudFrontOriginAccessIdentity'
     this.Properties = { CloudFrontOriginAccessIdentityConfig: { Comment: comment } }
   }

@@ -30,6 +30,56 @@ search code base for
 
 `@\w+` `@todo` `@idea` `@help`
 
+# Component Priority
+
+- [] S3Bucket
+- [] CloudFront CDN
+- [] Route53
+- [] ACM Certificates
+- [] Lambda
+- [] Fargate
+- [] API Gateway
+- [] AppSync
+- [] Code Build
+- [] Code Deploy
+- [] Code Pipeline
+- [] Budget
+- [] Azn Cognito
+- [] DynamoDB
+- [] ElastiCache
+- [] Beanstalk
+- [] SQS
+- [] SNS
+- [] SES
+- [] CloudSearch
+- [] Athena
+- [] Kinesis/Kinesis Firehose
+- [] AI / ML :: SageMaker / Rekognition / Personalize / Comprehend / Lex/ Polly / Textract / Transcribe / Translate
+
+## Open Design Qurestions
+
+### Proposal: Create a Mode to inline/replace `GetAtt`s & `Ref`s
+
+- Pros
+
+  - JSON is sematic & complete
+  - Lends itself to reverse mode (motor is a generator in reverse)
+
+- Cons
+
+  - Makes the JSON more verbose
+  - harder to write by hand (but we dont do that anymore anyway)
+  - Obscures some valid use cases
+
+    - eg: `DNS Alias` are an explicit abstraction whereby AWS allows userland to create a semantic link between resources.
+    - It will be interesting to see if #Ref and #Fn::GetAtt serves a similar purpose via different mechanics
+
+- Strawman Idea
+
+  - so far it seems like this is merely the first step in the process of `ingine mode`
+  - generate: data moving in JS resources, create current AWS templates
+  - motor: from current AWS templates, create data movement in JS resources
+
 ## Conclusion
 
 Don't share lovers ; share love.

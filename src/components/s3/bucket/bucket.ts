@@ -96,7 +96,8 @@ export class S3Bucket {
    */
   constructor (props: IndexSignature = {}) {
     this.Type = 'AWS::S3::Bucket'
-    const defaultName = `arn:aws:s3:::${randomWord()}-${randomWord()}-${new Randoma({
+
+    let defaultName = `${randomWord()}${new Randoma({
       seed: new Date().getTime()
     }).integer()}`
 

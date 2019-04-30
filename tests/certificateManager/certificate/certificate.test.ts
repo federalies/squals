@@ -65,7 +65,7 @@ describe('certificate mgr intenral ƒ.helpers', () => {
 
   test('constructor1 test', () => {
     const domain = 'example.com'
-    const a = new c.Certificate(domain)
+    const a = new c.AWSCertificate(domain)
     const e = {
       DomainName: domain,
       ValidationMethod: 'EMAIL'
@@ -78,7 +78,7 @@ describe('certificate mgr intenral ƒ.helpers', () => {
 
   test('constructor2 test', () => {
     const domain = ['example.com', 'example.net']
-    const a = new c.Certificate(domain)
+    const a = new c.AWSCertificate(domain)
     const e = {
       DomainName: domain[0],
       SubjectAlternativeNames: [domain[1]],
@@ -92,7 +92,7 @@ describe('certificate mgr intenral ƒ.helpers', () => {
 
   test('constructor3 test', () => {
     const domain = ['example.com', 'example.net', 'example.org']
-    const a = new c.Certificate(domain)
+    const a = new c.AWSCertificate(domain)
     const e = {
       DomainName: domain[0],
       ValidationMethod: 'EMAIL',

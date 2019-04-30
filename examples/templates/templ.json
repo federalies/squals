@@ -1,0 +1,56 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Squals AutoGen Description 2019-04-30T15:55:05.873Z",
+  "Resources": {
+    "arnawss3inexpedientlyanthracic305024165": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "diastaticfremit305040972": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Origins": [
+            {
+              "Id": "0",
+              "DomainName": {
+                "Fn::GetAtt": [
+                  "arnawss3inexpedientlyanthracic305024165",
+                  "WebsiteURL"
+                ]
+              },
+              "CustomOriginConfig": {
+                "OriginProtocolPolicy": "match-viewer"
+              }
+            }
+          ],
+          "DefaultCacheBehavior": {
+            "TargetOriginId": "0",
+            "ViewerProtocolPolicy": "redirect-to-https",
+            "ForwardedValues": {
+              "QueryString": true
+            }
+          },
+          "Enabled": true,
+          "Comment": "made via fedarelies : squals",
+          "IPV6Enabled": true,
+          "PriceClass": "PriceClass_All",
+          "HttpVersion": "http2",
+          "DefaultRootObject": "/index.html"
+        }
+      }
+    },
+    "boulderingssnifflers305024165": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": "example.com"
+      }
+    },
+    "cosmeticisesreheels305024165": {
+      "Type": "AWS::CertificateManager::Certificate",
+      "Properties": {
+        "DomainName": "example.com",
+        "ValidationMethod": "EMAIL"
+      }
+    }
+  }
+}

@@ -51,33 +51,49 @@ export class CloudFrontCDN {
   constructor (props: icdnDistributiounInput) {
     this.Type = 'AWS::CloudFront::Distribution'
 
-    let defaultName = `${randomWord()}-${randomWord()}-${new Randoma({
+    let defaultName = `${randomWord()}${new Randoma({
       seed: new Date().getTime()
     }).integer()}`
 
     let { name } = { name: defaultName, ...props }
     this.name = name
 
-    // setup squals defaults
-    this.Properties = {
-      ...Tags(props.tags),
-      DistributionConfig: {
-        ...originsConfig(props.origins),
-        ...cacheDefaultBehaviorConfig(),
-        ...cacheBehaviorsConfig(props.behaviors),
-        ...restrictionsConfig(props.restrictions),
-        ...cutomErrorRespConfig(props.errResp),
-        ...loggingConfig(props.logging),
-        ...viewerCertConfig(props.viewerCertificate),
-        ...this.addAliases(props.aliases),
-        Enabled: typeof props.enabled === 'boolean' ? props.enabled : true,
-        Comment:
-          typeof props.comments === 'string' ? props.comments : 'made via fedarelies : squals',
-        IPV6Enabled: typeof props.isIpv6 === 'boolean' ? props.isIpv6 : true,
-        PriceClass: typeof props.priceClass === 'string' ? props.priceClass : validPriceClass.all,
-        HttpVersion: typeof props.httpVersion === 'string' ? props.httpVersion : 'http2',
-        DefaultRootObject:
-          typeof props.defaultRootObject === 'string' ? props.defaultRootObject : '/index.html'
+    if ('Fn::GetAtt' in props) {
+      this.Properties = {
+        ...Tags(),
+        DistributionConfig: {
+          ...originsConfig(props),
+          ...cacheDefaultBehaviorConfig(),
+          Enabled: true,
+          Comment: 'made via fedarelies : squals',
+          IPV6Enabled: true,
+          PriceClass: validPriceClass.all,
+          HttpVersion: 'http2',
+          DefaultRootObject: '/index.html'
+        }
+      }
+    } else {
+      // setup squals defaults
+      this.Properties = {
+        ...Tags(props.tags),
+        DistributionConfig: {
+          ...originsConfig(props.origins),
+          ...cacheDefaultBehaviorConfig(),
+          ...cacheBehaviorsConfig(props.behaviors),
+          ...restrictionsConfig(props.restrictions),
+          ...cutomErrorRespConfig(props.errResp),
+          ...loggingConfig(props.logging),
+          ...viewerCertConfig(props.viewerCertificate),
+          ...this.addAliases(props.aliases),
+          Enabled: typeof props.enabled === 'boolean' ? props.enabled : true,
+          Comment:
+            typeof props.comments === 'string' ? props.comments : 'made via fedarelies : squals',
+          IPV6Enabled: typeof props.isIpv6 === 'boolean' ? props.isIpv6 : true,
+          PriceClass: typeof props.priceClass === 'string' ? props.priceClass : validPriceClass.all,
+          HttpVersion: typeof props.httpVersion === 'string' ? props.httpVersion : 'http2',
+          DefaultRootObject:
+            typeof props.defaultRootObject === 'string' ? props.defaultRootObject : '/index.html'
+        }
       }
     }
   }
@@ -287,6 +303,15 @@ export class CloudFrontCDN {
     return _this
   }
 
+  toJSON (): object {
+    return {
+      [this.name]: {
+        Type: this.Type,
+        Properties: this.Properties
+      }
+    }
+  }
+
   Ref (): IRef {
     return { Ref: this.name }
   }
@@ -307,7 +332,9 @@ export enum validPriceClass {
   'all' = 'PriceClass_All'
 }
 
-interface icdnDistributiounInput {
+export type icdnDistributiounInput = icdnDistributionData | IGetAtt
+
+interface icdnDistributionData {
   origins: IcdnOriginInput
   defaultCacheBehavior?: IcdnCacheDefaultBehavior
   behaviors?: IcdnCaheBehavior | IcdnCaheBehavior[]
