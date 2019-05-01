@@ -8,7 +8,7 @@ import {
 } from '../enums'
 import { IRef, IGetAtt } from '../../Template'
 import Randoma from 'randoma'
-import randomWord = require('random-word')
+import randomWord from 'random-word'
 // import Joi, { JoiObject } from 'joi'
 
 /**

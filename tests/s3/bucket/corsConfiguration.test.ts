@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { corsConfig } from '../../../src/components/s3'
+import { corsConfig } from '../../../src/components/s3/bucket/corsConfiguration'
 
 describe('defaults', () => {
   test('Reasonable example', () => {

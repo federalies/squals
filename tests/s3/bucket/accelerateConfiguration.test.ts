@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { accelerate } from '../../../src/components/s3'
+import { accelerate } from '../../../src/components/s3/bucket/accelerateConfiguration'
 
 describe('defaults', () => {
   test('Default input', () => {

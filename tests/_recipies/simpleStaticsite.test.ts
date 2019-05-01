@@ -6,7 +6,7 @@ import {
   Route53HostedZone,
   S3Bucket,
   AWSCertificate
-} from '../../src/components/'
+} from '../../src/components'
 
 describe('simple static site', () => {
   const mydomain = 'example.com'

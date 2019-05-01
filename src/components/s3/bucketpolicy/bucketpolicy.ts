@@ -1,6 +1,6 @@
+import { AccessPolicy } from './accessPolicy'
 import randomWord from 'random-word'
 import Randoma from 'randoma'
-import { AccessPolicy } from './accessPolicy'
 
 interface Ref {
   Ref: string

@@ -234,7 +234,7 @@ export class CloudFrontCDN {
   }
   addAliases (aliases?: string | string[]): { Aliases: string[] } | object {
     if (Array.isArray(aliases)) {
-      return { Aliases: [...this.Properties.DistributionConfig.Aliases, ...aliases] }
+      return { Aliases: [...(this.Properties.DistributionConfig.Aliases as string[]), ...aliases] }
     } else if (aliases) {
       return { Aliases: [aliases] }
     } else {

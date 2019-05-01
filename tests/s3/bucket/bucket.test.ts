@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-import { S3Bucket, validS3notificationEvents } from '../../../src/components/s3'
+import { S3Bucket, validS3notificationEvents } from '../../../src/components/s3/bucket'
 // import {} from '../../../src/components/s3/bucket'
 
 describe('defaults', () => {
@@ -236,7 +236,7 @@ describe('defaults', () => {
 
   test('notifications mutator', () => {
     const name = 'coolS3Bucket'
-    const _event = validS3notificationEvents["s3:ObjectCreated:*"]
+    const _event = validS3notificationEvents['s3:ObjectCreated:*']
     const notifRule: any = {
       filterList: 'Yosem*',
       arn: 'arn:aws:lambda::123456789012:resA/div_abc',

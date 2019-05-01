@@ -33,14 +33,15 @@ search code base for
 # Component Priority
 
 - [] S3Bucket
-- [] CloudFront CDN
+- [] CloudFrontCDN
 - [] Route53
 - [] ACM Certificates
+- [] IAM
+- [] Code Build
 - [] Lambda
 - [] Fargate
 - [] API Gateway
 - [] AppSync
-- [] Code Build
 - [] Code Deploy
 - [] Code Pipeline
 - [] Budget

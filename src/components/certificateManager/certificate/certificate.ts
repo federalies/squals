@@ -1,9 +1,9 @@
 import Url from 'url'
-// import Joi, { JoiObject } from 'joi'
 import randomWord from 'random-word'
 import Randoma from 'randoma'
-import { Tags, Itags, ITags, tags } from '../../Template'
-import { IRef } from '../../Template'
+import { IRef, Tags, Itags, ITags } from '../../Template'
+// import Joi, { JoiObject } from 'joi'
+//
 export class AWSCertificate {
   name: string
   _price: number
@@ -118,10 +118,10 @@ export class AWSCertificate {
     }
   }
   everyDomain (): string[] {
-    return [this.Properties.DomainName, ...this.Properties.SubjectAlternativeNames]
+    return [this.Properties.DomainName, ...(this.Properties.SubjectAlternativeNames as string[])]
   }
   altDomains (): string[] {
-    return [this.Properties.DomainName, ...this.Properties.SubjectAlternativeNames]
+    return [...(this.Properties.SubjectAlternativeNames as string[])]
   }
   mainDomain (): string {
     return this.Properties.DomainName

@@ -6,7 +6,7 @@ import {
   IcdnViewerCert,
   validSSLMethods
 } from '../../../src/components/cloudFront/distribution/viewerCertificate'
-import { validSSLversions } from '../../../src/components/cloudFront'
+// import { validSSLversions } from '../../../src/components/cloudFront'
 
 describe('origins', () => {
   test('Default Values', () => {

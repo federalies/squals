@@ -1,0 +1,58 @@
+version: 0.2
+# run-as: Linux-user-name
+# env:
+#   variables:
+#     key: "value"
+#     key: "value"
+#   parameter-store:
+#     key: "value"
+#     key: "value"
+phases:
+  install:
+    run-as: Linux-user-name
+    commands:
+      - npm i
+    # finally:
+    #   - command available after each <phase>.commands
+  pre_build:
+    run-as: Linux-user-name
+    commands:
+      - npm test
+  build:
+    run-as: Linux-user-name
+    commands:
+      - tsc
+  # post_build:
+  #   run-as: Linux-user-name
+  #   commands:
+  #     - command
+  #     - command
+artifacts:
+  name: dist
+  discard-paths: yes
+  base-directory: dist
+  files:
+    - location
+    - location
+  
+  secondary-artifacts:
+    artifactIdentifier:
+      name: secondary-artifact-name
+      discard-paths: yes
+      base-directory: location
+      
+      files:
+        - location
+        - location
+      
+    artifactIdentifier:
+      files:
+        - location
+        - location
+      discard-paths: yes
+      base-directory: location
+
+# cache:
+#   paths:
+#     - path
+#     - path

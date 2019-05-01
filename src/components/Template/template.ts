@@ -1,10 +1,11 @@
 // import { isEmpty, intersection } from 'lodash-es'
 
+import * as yaml from 'js-yaml'
+
 export class Template {
   AWSTemplateFormatVersion: '2010-09-09'
   Resources: object
   Description?: string
-
   Metadata?: object
   Mappings?: object
   Conditions?: object
@@ -28,7 +29,7 @@ export class Template {
     this.Resources = { ...this.Resources, ..._inputs }
     return this
   }
-  toJSON () {
+  toJSON (): object {
     let _this = this
     if (Array.isArray(this.Resources)) {
       _this.Resources = this.Resources.reduce((p, c) => ({ ...p, ...c.toJSON() }), {})
@@ -37,6 +38,12 @@ export class Template {
   }
   toString (replacer = null, spaces?: number) {
     return JSON.stringify(this.toJSON(), replacer, spaces)
+  }
+
+  fromYAML () {}
+  toYAML (): string {
+    const t = this.toJSON()
+    return yaml.dump(t)
   }
 }
 

@@ -1,5 +1,5 @@
 import { Route53Record } from '../../../src/components/route53/recordSet'
-import { Route53HostedZone } from '../../../src/components/route53'
+// import { Route53HostedZone } from '../../../src/components/route53'
 
 describe('Route53 RecordSet', () => {
   test('simple policy object', () => {

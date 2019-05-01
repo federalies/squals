@@ -13,7 +13,7 @@ import {
   CloudFrontCDN,
   Route53RecordSetGroup,
   Route53HostedZone
-} from '../../../src/components/'
+} from '../../../src/components'
 import { S3Bucket } from '../../../src/components/s3' //  why can I not add this above? @todo @researc
 import { AWSCertificate } from '../../../src/components/certificateManager'
 
@@ -32,6 +32,6 @@ const printMe = new Template({
 
 printMe.Resources = [webContent, MyCDN, DomainRecords, awsCert]
 
-console.log(printMe)
+console.log(printMe.toJSON())
 
 export default printMe

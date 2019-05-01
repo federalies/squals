@@ -88,7 +88,7 @@ export const originItem = (
           let outbound_HdrList: ICdnOriginsCustomHeader[] = _input.headers.reduce(
             (p, c) => {
               return [
-                ...p,
+                ...(p as ICdnOriginsCustomHeader[]),
                 ...Object.entries(c).map(([key, value]) => ({
                   HeaderName: key,
                   HeaderValue: value

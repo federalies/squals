@@ -10,7 +10,7 @@ import randomWord from 'random-word'
 import Randoma from 'randoma'
 import { IRef, IGetAtt } from '../../Template'
 import { validRoute53HostId } from '../enums'
-import { CountryCodes_ISO3166 } from '../../cloudFront/distribution/restriction_enums'
+// import { CountryCodes_ISO3166 } from '../../cloudFront/distribution/restriction_enums'
 import { IdnsRecord } from '../recordSet/recordSet'
 
 export class Route53RecordSetGroup {

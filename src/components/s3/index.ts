@@ -1,2 +1,2 @@
-export * from './bucketpolicy'
-export * from './bucket'
+export * from './bucketpolicy/bucketpolicy'
+export * from './bucket/bucket'
