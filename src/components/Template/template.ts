@@ -30,17 +30,27 @@ export class Template {
     return this
   }
   toJSON (): object {
-    let _this = this
+    const _this = this
     if (Array.isArray(this.Resources)) {
-      _this.Resources = this.Resources.reduce((p, c) => ({ ...p, ...c.toJSON() }), {})
+      _this.Resources = this.Resources.reduce((p, c) => ({ ...p, ...(c as any).toJSON() }), {})
     }
     return _this // cleaned up version
   }
-  toString (replacer = null, spaces?: number) {
+  toString (replacer = null, spaces?: number): string {
     return JSON.stringify(this.toJSON(), replacer, spaces)
   }
-
-  fromYAML () {}
+  resourceArray (): object[] {
+    if (Array.isArray(this.Resources)) {
+      return this.Resources
+    } else {
+      return Object.entries(this.Resources).map((k, v) => {
+        return { [(k as unknown) as string]: v }
+      })
+    }
+  }
+  fromYAML (input: string): Template {
+    return new Template()
+  }
   toYAML (): string {
     const t = this.toJSON()
     return yaml.dump(t)

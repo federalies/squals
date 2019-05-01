@@ -1,5 +1,3 @@
-import { Template } from '../../src/components'
-
 /**
  * Example:
  * Is this a Sensible Syntax:
@@ -38,25 +36,29 @@ import { Template } from '../../src/components'
 //   JSON.stringify(distribution.addOrigins(['www.mywebsite.com']), null, 2)
 // )
 
-const simpleWebsite = (
-  template,
-  publicSiteURL,
-  { bucket, distribution, recordSet }
-) => {
-  if (!template || !bucket || !distribution || !recordSet) {
+import { Template, CloudFrontCDN, S3Bucket, Route53RecordSetGroup } from '../components'
+
+const simpleWebsite = (template: Template, publicSiteURL: string, resources: unknown): Template => {
+  const { bucket, records, distribution } = resources as {
+    bucket: S3Bucket
+    records: Route53RecordSetGroup
+    distribution: CloudFrontCDN
+  }
+
+  if (!template || !bucket || !distribution || !records) {
     throw new Error(
       'The `simpleWebsite` composer requires a (1)template, (2)bucket, (3)distribution, and (4)recordSet'
     )
-  }
-  recordSet.addCNAME(
-    publicSiteURL,
-    distribution.addOrigns([bucket.website(true).WebsiteURL()]).domain()
-  )
+  } else {
+    distribution.origins(bucket.website(true).WebsiteURL())
+    records.CNAME(['www.', distribution.DomainName()])
 
-  return new Template({
-    Description: template.Description,
-    Resources: { ...template.Resources, bucket, distribution, recordSet }
-  })
+    // don't mutate the input
+    return new Template({
+      Description: template.Description,
+      Resources: [...template.resourceArray(), bucket, distribution, records]
+    })
+  }
 }
 
 export default simpleWebsite
