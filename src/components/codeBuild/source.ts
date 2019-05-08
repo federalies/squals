@@ -9,8 +9,8 @@ import * as Url from 'url'
  * @example
  * var a = sourceConfig()
  */
-export const sourceConfig = (input: IcodeBuildsource): any => {
-  // ICodeBuildSource => {
+export const sourceConfig = (input: IcodeBuildsource): ICodeBuildSource => {
+  //  => {
   if (!input) {
     return {}
   } else {

@@ -1,5 +1,7 @@
 import { ITags } from '../Template'
 import { ICodeBuildArtifactData } from './artifacts'
+import { ICodeBuildSource } from './source'
+import { ICodeBuildEnvironmentData } from './environment'
 
 export class CodeBuildProject {
   name: string
@@ -16,11 +18,11 @@ export class CodeBuildProject {
     Artifacts?: ICodeBuildArtifactData // *
     SecondaryArtifacts?: ICodeBuildArtifactData[]
 
-    Source?: 'Source' // *
-    SecondarySources?: ['Source']
+    Source?: ICodeBuildSource // *
+    SecondarySources?: ICodeBuildSource[]
 
     Cache?: 'ProjectCache'
-    Environment?: 'Environment' // *
+    Environment?: ICodeBuildEnvironmentData
 
     LogsConfig?: 'LogsConfig'
 

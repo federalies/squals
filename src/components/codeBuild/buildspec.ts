@@ -1,6 +1,8 @@
 export interface IbuildSpecPhases_Step {
   commands: string[]
   finally?: string[]
+  'run-as'?: string
+  'runtime-versions'?: { [lang: string]: number }
 }
 export type IbuildSpecPhases =
   | IbuildSpecPhases_Step_Install
@@ -83,6 +85,8 @@ env:
 
 phases:
   install:
+    runtime-versions:
+      - nodejs: 10
     commands:
       - echo Entered the install phase...
       - apt-get update -y
