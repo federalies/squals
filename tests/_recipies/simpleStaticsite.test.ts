@@ -8,7 +8,7 @@ import {
   AWSCertificate
 } from '../../src/components'
 
-describe('simple static site', () => {
+describe.skip('simple static site', () => {
   const mydomain = 'example.com'
   const awsCert = new AWSCertificate(mydomain)
   const DomainRecords = new Route53RecordSetGroup(new Route53HostedZone(mydomain))

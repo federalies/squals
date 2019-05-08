@@ -1,3 +1,6 @@
+import { ITags } from '../Template'
+import { ICodeBuildArtifactData } from './artifacts'
+
 export class CodeBuildProject {
   name: string
   Type: 'AWS::CodeBuild::Project'
@@ -10,20 +13,20 @@ export class CodeBuildProject {
     QueuedTimeoutInMinutes?: number
     TimeoutInMinutes?: number
 
-    Cache?: 'ProjectCache'
-    Environment?: 'Environment' // *
-
-    Artifacts?: 'Artifacts' // *
-    SecondaryArtifacts?: [' Artifacts']
-
-    LogsConfig?: 'LogsConfig'
+    Artifacts?: ICodeBuildArtifactData // *
+    SecondaryArtifacts?: ICodeBuildArtifactData[]
 
     Source?: 'Source' // *
     SecondarySources?: ['Source']
 
+    Cache?: 'ProjectCache'
+    Environment?: 'Environment' // *
+
+    LogsConfig?: 'LogsConfig'
+
     Triggers?: 'ProjectTriggers'
     VpcConfig?: 'VpcConfig'
-    Tags?: ['Tag']
+    Tags?: ITags
   }
 
   constructor () {

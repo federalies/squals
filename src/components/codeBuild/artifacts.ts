@@ -1,4 +1,5 @@
 import s3Url from 's3-url'
+import path from 'path'
 
 /**
  * @description Multi-Use Function where Array has special meaning.
@@ -29,8 +30,18 @@ export const artifactsConfig = (input: Iartifact | Iartifact[]) => {
   }
 }
 
+/**
+ * @description artifact builder
+ * @param input
+ * @example
+ * var a  = artifacts()
+ * var b  = artifacts('s3://bucket/key')
+ * var c  = artifacts(['s3://bucket/key'])
+ * var d  = artifacts({'s3://bucket/key':{id:'artifacId'}})
+ * var e  = artifacts(['s3://bucket/key','s3://bucket2/key2'])
+ */
 export const artifacts = (
-  input: Iartifact | Iartifact[]
+  input?: Iartifact | Iartifact[]
 ): ICodeBuildArtifactData | ICodeBuildArtifactData[] => {
   // maintain input shape array->array | obj->obj
   return Array.isArray(input) ? input.map(v => artifactItem(v)) : artifactItem(input)
@@ -41,67 +52,134 @@ export const artifacts = (
  * @description generate an artifact.
  * @param input
  * @example
- * var a = artifactItem('s3://bucket/path/to/dir/<BUILD_ID>/name')
- * var b = artifactItem({'s3://bucket/path/to/dir/<BUILD_ID>/name.zip':{id:"artifact", override:true, encOff:true}})
- * var c = artifactItem({s3:{ bucket:'bucket', path:'some/path',  useBuildId: true, name: 'myFile', zip:true }})
- * var d = artifactItem({pipeline: {id:'artifactId', zip:true, override:true, encOff:true }})
- * var e = artifactItem({'': {id:'myArtifactId' })
- * var f = artifactItem()``
- *
+ * var fromUndefIn = artifactItem()
+ * var fromStrIn = artifactItem('s3://bucket/path/to/dir/<BUILD_ID>/name')
+ * var fromS3KeyIn = artifactItem({'s3://bucket/path/to/dir/<BUILD_ID>/name.zip':{id:"artifact", override:true, encOff:true}})
+ * var fromS3Obj = artifactItem({s3:{ bucket:'bucket', path:'some/path',  useBuildId: true, name: 'myFile', zip:true }})
+ * var fromPipeObj = artifactItem({pipeline: {id:'artifactId', zip:true, override:true, encOff:true }})
+ * var fromEmptyStrIn = artifactItem({'': {id:'myArtifactId' }})
  */
-export const artifactItem = (input: Iartifact): ICodeBuildArtifactData => {
+export const artifactItem = (input?: Iartifact): ICodeBuildArtifactData => {
   if (input) {
-    if (Object.keys(input).length > 1) {
+    if (typeof input === 'string') {
+      // example:a
+      return handleStr(input)
+    } else if (Array.isArray(input) || Object.keys(input).length > 1) {
       throw new Error('only doing 1 key at a time.')
     } else {
-      if (typeof input === 'string') {
-        // example:a
-        if (input.startsWith('s3://')) {
-          const r = s3Url.urlToOptions(input)
-          if (r.Bucket && r.Key) {
-            return { Type: 'S3', Location: r.Bucket, Name: r.Key }
-          } else {
-            throw new Error('expected s3uri starts with s3:// , has bucket and has key')
-          }
-        } else {
-          throw new Error('not a valid s3 uri')
-        }
+      if ('s3' in input && 'bucket' in input.s3) {
+        // {'s3':{bucket:''. name:'', ...opts}}
+        return handleS3type(input as Iartifcat_s3)
+      } else if ('pipeline' in input) {
+        // {'pipeline':{opts}}
+        return handlePipeline(input as Iartifcat_pipeline)
+      } else if ('' in input) {
+        // {'':{opts}}
+        return handleNoArtifact(input as Iartifcat_namedNoArtifact)
+      } else if (firstKey(input).startsWith('s3://')) {
+        // {s3://bucket/path/file.zip:{opts}}
+        return handleS3UriObj(input as Iartifcat_s3uri)
       } else {
-        if ('s3' in input) {
-          // example: c
-          const ret: ICodeBuildArtifact_s3 = { Type: 'S3', Location: 'bucket', Name: 'name' }
-          return ret
-        } else if ('pipeline' in input) {
-          // example: d
-          const ret: ICodeBuildArtifact_noneS3 = { Type: 'CODEPIPELINE' }
-          return ret
-        } else if ('' in input) {
-          // example: e
-          return { Type: 'NO_ARTIFACTS' }
-        } else if (firstKey(input).startsWith('s3://')) {
-          const s3data = s3Url.urlToOptions(firstKey(input))
-          if (s3data.Bucket && s3data.Key) {
-            return { Type: 'S3', Location: s3data.Bucket, Name: s3data.Key }
-          } else {
-            throw new Error('expected s3uri starts with s3:// , has bucket and has key')
-          }
-        } else {
-          throw new Error(
-            `was expcting : string | {s3:{...}} | {pipeline:{...}} | {'':{...}} | {<s3://bucket/path/key>:{...}} |`
-          )
-        }
+        throw new Error(
+          `was expcting : string | {s3:{...}} | {pipeline:{...}} | {'':{...}} | {<s3://bucket/path/key>:{...}} |`
+        )
       }
     }
   } else {
-    // example: f
-    // no artifact
+    // input === undefined --> no artifact
     return { Type: 'NO_ARTIFACTS' }
   }
 }
 
-type indexableStrorNumber = { [key: string]: object }[] | { [key: string]: object }
+export const handleStr = (s3string: string): ICodeBuildArtifactData => {
+  if (s3string.startsWith('s3://')) {
+    const s3data = s3Url.urlToOptions(s3string)
 
-export const firstKey = (input: indexableStrorNumber): string => {
+    if (s3data.Bucket && s3data.Key) {
+      let s3path: string = s3string
+        .slice('s3://'.length)
+        .slice(s3data.Bucket.length)
+        .replace(/([<:]*BUILD_ID+[>]*[/]*)/gi, '')
+
+      return handleS3type({
+        s3: {
+          bucket: s3data.Bucket,
+          name: path.parse(s3data.Key).name,
+          path: path.parse(s3path).dir.slice(1),
+          useBuildId: s3string.includes(`<BUILD_ID>`) || s3string.includes(`:BUILD_ID`),
+          zip: s3string.endsWith(`.zip`)
+        }
+      })
+    } else {
+      throw new Error('expected s3uri should start with s3://  AND have a bucket and key present')
+    }
+  } else {
+    throw new Error('epxecting a valid s3uri which should start with `s3://` ')
+  }
+}
+
+export const handleS3UriObj = (data: Iartifcat_s3uri): ICodeBuildArtifactData => {
+  const s3key = Object.keys(data)[0]
+  const artifactOpts = Object.values(data)[0]
+  const s3data = s3Url.urlToOptions(s3key)
+
+  if (s3data.Bucket && s3data.Key) {
+    //
+    let s3path: string = s3key
+      .slice('s3://'.length)
+      .slice(s3data.Bucket.length)
+      .replace(/([<:]*BUILD_ID+[>]*[/]*)/gi, '')
+
+    return handleS3type({
+      s3: {
+        bucket: s3data.Bucket,
+        name: path.parse(s3data.Key).name,
+        path: path.parse(s3path).dir.slice(1),
+        useBuildId: s3key.includes(`<BUILD_ID>`) || s3key.includes(`:BUILD_ID`),
+        zip: s3key.endsWith(`.zip`),
+        encOff: artifactOpts.encOff,
+        id: artifactOpts.id,
+        override: artifactOpts.override
+      }
+    })
+  } else {
+    throw new Error('expected s3uri starts with s3:// , has bucket and has key')
+  }
+}
+export const handleS3type = (input: Iartifcat_s3): ICodeBuildArtifactData => {
+  const data = input as Iartifcat_s3
+  const ret: ICodeBuildArtifact_s3 = {
+    Type: 'S3',
+    Location: data.s3.bucket,
+    Name: data.s3.name
+  }
+  if (data.s3.id) ret['ArtifactIdentifier'] = data.s3.id
+  if (data.s3.path) ret['Path'] = data.s3.path
+  if ('encOff' in data.s3) ret['EncryptionDisabled'] = !!data.s3.encOff
+  if ('override' in data.s3) ret['OverrideArtifactName'] = !!data.s3.override
+  if ('useBuildId' in data.s3) ret['NamespaceType'] = data.s3.useBuildId ? 'BUILD_ID' : 'NONE'
+  if ('zip' in data.s3) ret['Packaging'] = data.s3.zip ? 'ZIP' : 'NONE'
+  return ret
+}
+
+export const handlePipeline = (input: Iartifcat_pipeline): ICodeBuildArtifactData => {
+  const ret: ICodeBuildArtifact_noneS3 = { Type: 'CODEPIPELINE' }
+  if (input.pipeline.id) ret['ArtifactIdentifier'] = input.pipeline.id
+  if ('zip' in input.pipeline) ret['Packaging'] = input.pipeline.zip ? 'ZIP' : 'NONE'
+  if ('override' in input.pipeline) ret['OverrideArtifactName'] = !!input.pipeline.override
+  return ret
+}
+
+export const handleNoArtifact = (input: Iartifcat_namedNoArtifact) => {
+  const ret: ICodeBuildArtifact_noneS3 = { Type: 'NO_ARTIFACTS' }
+  const val = input['']
+  if (val.id) ret['ArtifactIdentifier'] = val.id
+  return ret
+}
+
+export type indexableStrOrNumber<T> = { [key: string]: T }[] | { [key: string]: T }
+
+export const firstKey = function<T> (input: T): string {
   if (Array.isArray(input)) {
     return Object.keys(input[0])[0]
   } else {
@@ -109,19 +187,21 @@ export const firstKey = (input: indexableStrorNumber): string => {
   }
 }
 
-export const firstVal = (input: indexableStrorNumber): object => {
+export const firstVal = function<T> (input: indexableStrOrNumber<T>): T {
   if (Array.isArray(input)) {
+    // const f:T =
     return Object.values(input[0])[0]
   } else {
     return Object.values(input)[0]
   }
 }
-export const first = (input: indexableStrorNumber): object => {
+export const first = function<T> (input: indexableStrOrNumber<T>): { [key: string]: T } {
   if (Array.isArray(input)) {
     return input[0]
   } else {
-    const k = Object.keys(input)[0]
-    return { [k]: input[k] }
+    const k: string = Object.keys(input)[0]
+    const v = input[k]
+    return { [k]: v }
   }
 }
 
@@ -139,30 +219,36 @@ export type Iartifact =
   | string
 
 interface Iartifcat_s3uri {
-  [uri: string]: { id?: 'artifact'; override?: true; encOff?: true }
+  [uri: string]: {
+    id?: string
+    override?: boolean
+    encOff?: boolean
+  }
 }
 
 interface Iartifcat_s3 {
   s3: {
     bucket: string
+    name: string
     path?: string
     useBuildId?: boolean
-    name?: string
     zip?: boolean
+    id?: string
+    override?: boolean
+    encOff?: boolean
   }
 }
 
 interface Iartifcat_pipeline {
   pipeline: {
-    id?: 'artifactId'
-    zip?: true
-    override?: true
-    encOff: true
+    id?: string
+    zip?: boolean
+    override?: boolean
   }
 }
 
 interface Iartifcat_namedNoArtifact {
-  '': { id?: 'artifactId' }
+  '': { id?: string }
 }
 
 export type ICodeBuildArtifactData = ICodeBuildArtifact_noneS3 | ICodeBuildArtifact_s3
@@ -175,9 +261,10 @@ export interface ICodeBuildArtifact_noneS3 {
 }
 
 export interface ICodeBuildArtifact_s3 extends ICodeBuildArtifact_noneS3 {
+  Type: 'S3'
   Location: string // aka bucket
-  NamespaceType?: 'BUILD_ID' | 'NONE' // default = NONE
   Name: string
+  NamespaceType?: 'BUILD_ID' | 'NONE' // default = NONE
   Path?: string // default = ''
   EncryptionDisabled?: boolean
 }
