@@ -10,10 +10,10 @@ import path from 'path'
  * var aTricky = artifactsConfig([{}])
  * var bSecondary = artifactsConfig([{},{}])
  */
-export const artifactsConfig = (input: Iartifact | Iartifact[]) => {
+export const artifactsConfig = (input?: Iartifact | Iartifact[]) => {
   if (Array.isArray(input)) {
     const _in = [...input]
-    if (_in.length > 2) {
+    if (_in.length > 1) {
       return {
         Artifacts: artifacts(_in.shift()),
         SecondaryArtifacts: artifacts(_in)
@@ -57,7 +57,7 @@ export const artifacts = (
  * var fromS3KeyIn = artifactItem({'s3://bucket/path/to/dir/<BUILD_ID>/name.zip':{id:"artifact", override:true, encOff:true}})
  * var fromS3Obj = artifactItem({s3:{ bucket:'bucket', path:'some/path',  useBuildId: true, name: 'myFile', zip:true }})
  * var fromPipeObj = artifactItem({pipeline: {id:'artifactId', zip:true, override:true, encOff:true }})
- * var fromEmptyStrIn = artifactItem({'': {id:'myArtifactId' }})
+ * var fromEmptyStrIn = artifactItem({'none': {id:'myArtifactId' }})
  */
 export const artifactItem = (input?: Iartifact): ICodeBuildArtifactData => {
   if (input) {
@@ -73,7 +73,7 @@ export const artifactItem = (input?: Iartifact): ICodeBuildArtifactData => {
       } else if ('pipeline' in input) {
         // {'pipeline':{opts}}
         return handlePipeline(input as Iartifcat_pipeline)
-      } else if ('' in input) {
+      } else if ('none' in input) {
         // {'':{opts}}
         return handleNoArtifact(input as Iartifcat_namedNoArtifact)
       } else if (firstKey(input).startsWith('s3://')) {
@@ -92,7 +92,7 @@ export const artifactItem = (input?: Iartifact): ICodeBuildArtifactData => {
 }
 
 export const handleStr = (s3string: string): ICodeBuildArtifactData => {
-  if (s3string.startsWith('s3://')) {
+  if (s3string.toLowerCase().startsWith('s3://')) {
     const s3data = s3Url.urlToOptions(s3string)
 
     if (s3data.Bucket && s3data.Key) {
@@ -111,7 +111,7 @@ export const handleStr = (s3string: string): ICodeBuildArtifactData => {
         }
       })
     } else {
-      throw new Error('expected s3uri should start with s3://  AND have a bucket and key present')
+      throw new Error('expected s3uri should start with s3:// AND have a bucket and key present')
     }
   } else {
     throw new Error('epxecting a valid s3uri which should start with `s3://` ')
@@ -172,7 +172,7 @@ export const handlePipeline = (input: Iartifcat_pipeline): ICodeBuildArtifactDat
 
 export const handleNoArtifact = (input: Iartifcat_namedNoArtifact) => {
   const ret: ICodeBuildArtifact_noneS3 = { Type: 'NO_ARTIFACTS' }
-  const val = input['']
+  const val = input['none']
   if (val.id) ret['ArtifactIdentifier'] = val.id
   return ret
 }
@@ -187,23 +187,23 @@ export const firstKey = function<T> (input: T): string {
   }
 }
 
-export const firstVal = function<T> (input: indexableStrOrNumber<T>): T {
-  if (Array.isArray(input)) {
-    // const f:T =
-    return Object.values(input[0])[0]
-  } else {
-    return Object.values(input)[0]
-  }
-}
-export const first = function<T> (input: indexableStrOrNumber<T>): { [key: string]: T } {
-  if (Array.isArray(input)) {
-    return input[0]
-  } else {
-    const k: string = Object.keys(input)[0]
-    const v = input[k]
-    return { [k]: v }
-  }
-}
+// export const firstVal = function<T> (input: indexableStrOrNumber<T>): T {
+//   if (Array.isArray(input)) {
+//     // const f:T =
+//     return Object.values(input[0])[0]
+//   } else {
+//     return Object.values(input)[0]
+//   }
+// }
+// export const first = function<T> (input: indexableStrOrNumber<T>): { [key: string]: T } {
+//   if (Array.isArray(input)) {
+//     return input[0]
+//   } else {
+//     const k: string = Object.keys(input)[0]
+//     const v = input[k]
+//     return { [k]: v }
+//   }
+// }
 
 export interface ICodeBuildArtifact {
   Artifacts?: ICodeBuildArtifactData
@@ -219,7 +219,7 @@ export type Iartifact =
   | string
 
 interface Iartifcat_s3uri {
-  [uri: string]: {
+  [s3uri: string]: {
     id?: string
     override?: boolean
     encOff?: boolean
@@ -248,7 +248,7 @@ interface Iartifcat_pipeline {
 }
 
 interface Iartifcat_namedNoArtifact {
-  '': { id?: string }
+  none: { id?: string }
 }
 
 export type ICodeBuildArtifactData = ICodeBuildArtifact_noneS3 | ICodeBuildArtifact_s3

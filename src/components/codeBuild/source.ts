@@ -1,5 +1,5 @@
 import { BuildSpec } from './buildspec'
-import { indexableStrOrNumber, first, firstKey, firstVal } from './artifacts'
+import { firstKey } from './artifacts'
 import * as Url from 'url'
 
 /**
