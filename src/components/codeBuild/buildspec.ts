@@ -1,3 +1,5 @@
+type stringish = string | string[]
+
 export class BuildSpec {
   version = 0.2
   phases?: IbuildSpecPhases
@@ -154,36 +156,62 @@ export class BuildSpec {
 
     return this
   }
-  Artifacts (input: IbuildSpecArtifactData | IbuildSpecArtifactData[]): BuildSpec {
-    if (!Array.isArray(input)) {
-      this.artifacts = input
-    } else {
+  Artifacts (
+    input: string | IbuildSpecArtifactDatastringish | IbuildSpecArtifactDatastringish[]
+  ): BuildSpec {
+    if (typeof input === 'string') {
+      // ''
+      this.artifacts = { files: [input] }
+    } else if (Array.isArray(input)) {
+      // [{}, {}]
       if (input.length > 1) {
-        this.artifacts = input[0]
-        this.artifacts['secondary-artifacts'] = { ...input.slice(1) }
+        // [{}, {}]
+        // deal with [0]
+        this.artifacts = stringish2Arr(input[0]) as IbuildSpecArtifactData
+        this.artifacts['secondary-artifacts'] = secondaryArtifacts(input.slice(1))
       } else {
-        this.artifacts = input[0]
+        this.artifacts = stringish2Arr(input[0]) as IbuildSpecArtifactData
       }
+    } else if (Array.isArray(input.files)) {
+      // {'':[]}
+      this.artifacts = input as IbuildSpecArtifactData
+    } else {
+      // {'':''}
+      this.artifacts = { ...input, files: [input.files] }
     }
     return this
   }
-  Env (_env: {
-  variables: { [prefix: string]: string }
-  'parameter-store': { [prefix: string]: string }
+  Env (_env?: {
+  variables?: { [prefix: string]: string }
+  parameterStore?: { [prefix: string]: string }
   }): BuildSpec {
     if (
       // if we have state AND you pass in state - then lets fold it in. else reseth the internet state
       this.env &&
-      !(Object.keys(_env.variables).length === 0 && Object.keys(_env.variables).length === 0)
+      _env &&
+      (_env.variables || _env.parameterStore) &&
+      !(
+        Object.keys(_env.variables || {}).length === 0 &&
+        Object.keys(_env.parameterStore || {}).length === 0
+      )
     ) {
       this.env = {
         variables: { ...this.env.variables, ..._env.variables },
-        'parameter-store': { ...this.env['parameter-store'], ..._env['parameter-store'] }
+        'parameter-store': { ...this.env['parameter-store'], ..._env.parameterStore }
       }
     } else {
-      this.env = {
-        variables: { ..._env.variables },
-        'parameter-store': { ..._env['parameter-store'] }
+      if (_env) {
+        // can this happen?
+        this.env = {
+          variables: { ..._env.variables },
+          'parameter-store': { ..._env.parameterStore }
+        }
+      } else {
+        // empty input var
+        this.env = {
+          variables: {},
+          'parameter-store': {}
+        }
       }
     }
 
@@ -224,6 +252,22 @@ type verboseOptions =
   | number[]
   | string[]
   | boolean[]
+
+export const stringish2Arr = (input: IbuildSpecArtifactDatastringish): IbuildSpecArtifactData => {
+  if (Array.isArray(input.files)) {
+    return input as IbuildSpecArtifactData
+  } else {
+    return { ...input, files: [input.files] }
+  }
+}
+
+export const secondaryArtifacts = (
+  _in: IbuildSpecArtifactDatastringish[]
+): IbuildSpecArtifactSecondaryMap_IdxStr => {
+  return _in.reduce((p, c, i) => {
+    return { ...p, [i.toString()]: stringish2Arr(c as IbuildSpecArtifactDatastringish) }
+  }, {})
+}
 
 export const makeOptKey = (optKey: string, data?: verboseOptions) => {
   if (!data) {
@@ -274,89 +318,6 @@ export const stringishMerge = (in1?: stringish, in2?: stringish): string[] => {
   }
 }
 
-// export const isArrayofArtifactTuples = (
-//   input: [string[], boolean?] | [string[], boolean?][]
-// ): boolean => {
-//   if (Array.isArray(input[1])) {
-//     return true
-//   } else {
-//     return false
-//   }
-// }
-
-/*
-
-buildspec({env:{JAVADIR:'/usr/lib'}})
-.Install('npm i', {andfinally: 'npm test'})
-.Prebuild()
-.Build('npm run build')
-.PostBuild('npm run save')
-.Env()
-.Cache()
-.Artifacts()
-
-*/
-
-/*
-
-version: 0.2
-
-env:
-  variables:
-    JAVA_HOME: "/usr/lib/jvm/java-8-openjdk-amd64"
-  parameter-store:
-    LOGIN_PASSWORD: /CodeBuild/dockerLoginPassword
-
-phases:
-  install:
-    runtime-versions:
-      - nodejs: 10
-    commands:
-      - echo Entered the install phase...
-      - apt-get update -y
-      - apt-get install -y maven
-    finally:
-      - echo This always runs even if the update or install command fails
-  pre_build:
-    commands:
-      - echo Entered the pre_build phase...
-      - docker login –u User –p $LOGIN_PASSWORD
-    finally:
-      - echo This always runs even if the login command fails
-  build:
-    commands:
-      - echo Entered the build phase...
-      - echo Build started on `date`
-      - mvn install
-    finally:
-      - echo This always runs even if the install command fails
-  post_build:
-    commands:
-      - echo Entered the post_build phase...
-      - echo Build completed on `date`
-
-artifacts:
-  files:
-    - target/messageUtil-1.0.jar
-  discard-paths: yes
-  secondary-artifacts:
-    artifact1:
-      files:
-        - target/messageUtil-1.0.jar
-      discard-paths: yes
-    artifact2:
-      files:
-        - target/messageUtil-1.0.jar
-      discard-paths: yes
-
-cache:
-  paths:
-    - '/root/.m2/* * / *'
-    - '/root/.m3/* * / *'
-
-*/
-type stringish = string | string[]
-
 export interface IbuildSpecPhases_Step_InstallOnly {
   commands: string[]
   finally?: string[]
@@ -393,12 +354,27 @@ export interface IbuildSpecPhases_Step_PostBuild {
 }
 
 export interface IbuildSpecArtifactData {
-  files: string[] // glob pattern
+  files: string[]
   name?: string
   'discard-paths'?: boolean
   'base-directory'?: string
 }
 
-export interface IbuildSpecArtifactSecondaryMap {
+export interface IbuildSpecArtifactDatastringish {
+  files: stringish // glob pattern
+  name?: string
+  'discard-paths'?: boolean
+  'base-directory'?: string
+}
+
+type IbuildSpecArtifactSecondaryMap =
+  | IbuildSpecArtifactSecondaryMap_IdxStr
+  | IbuildSpecArtifactSecondaryMap_IdxInt
+
+export interface IbuildSpecArtifactSecondaryMap_IdxStr {
+  [artifactId: string]: IbuildSpecArtifactData
+}
+
+export interface IbuildSpecArtifactSecondaryMap_IdxInt {
   [artifactId: number]: IbuildSpecArtifactData
 }

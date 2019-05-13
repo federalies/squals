@@ -130,17 +130,23 @@ export interface ICodeBuildEnvironmentData {
 
 export const envVar = (input: IcodeBuildEnvVar): ICodeBuildEnvironmentVariable[] => {
   if ('paramStore' in input) {
-    return Object.entries(input.paramStore).map(([key, value]) => ({
-      Type: 'PARAMETER_STORE',
-      Name: key,
-      Value: value
-    }))
+    return Object.entries(input.paramStore).map(
+      ([key, value]) =>
+        ({
+          Type: 'PARAMETER_STORE',
+          Name: key,
+          Value: value
+        } as ICodeBuildEnvironmentVariable)
+    )
   } else {
-    return Object.entries(input).map(([key, value]) => ({
-      Type: 'PLAINTEXT',
-      Name: key,
-      Value: value
-    }))
+    return Object.entries(input).map(
+      ([key, value]) =>
+        ({
+          Type: 'PLAINTEXT',
+          Name: key,
+          Value: value
+        } as ICodeBuildEnvironmentVariable)
+    )
   }
 }
 
@@ -178,5 +184,5 @@ export interface IcodeBuildEnvVar_ParamStore {
 export interface ICodeBuildEnvironmentVariable {
   Name: string
   Value: string
-  Type?: 'PARAMETER_STORE' | 'PLAINTEXT'
+  Type: 'PARAMETER_STORE' | 'PLAINTEXT'
 }
