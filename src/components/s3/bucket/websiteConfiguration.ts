@@ -68,8 +68,9 @@ export const websiteConfig = (param?: IbucketWebsiteConfig): IBucketWebsiteConfi
       }
     } catch (err) {
       // invalid  redirALL
-      console.log({ redir })
-      console.error(err)
+      //
+      // console.log({ redir })
+      // console.error(err)
       throw new Error(
         `ƒ.websiteConfig was expects the field: redir to be - as a URL string starting with ` +
           `https(s) or an array of redir rules ` +

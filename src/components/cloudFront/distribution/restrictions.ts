@@ -20,8 +20,8 @@ export const restrictionsConfig = (_input: IcacheRestrictions = {}): ICdnGeoRest
   } else {
     console.warn(
       `You passed someting into the CDN restrictionsConfig but it was not what the funciton was expecting - you gave:${_input}` +
-        `was expecting: an empty object, object with a { [key: "whitelist" | "blacklist"] : string | string[] } ` +
-        `giving you the benefir of the doubt - just going to nudge the output to valid "no restictions"`
+        `was expecting: an {}, or { [key: "whitelist" | "blacklist"] : string | string[] } \n` +
+        `Giving you the benefit of the doubt... and nudging the output to a valid "no restictions"`
     )
     return allCountries()
   }

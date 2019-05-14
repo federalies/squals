@@ -1,13 +1,21 @@
 import { IGetAtt } from '../Template/index'
 
+/**
+ * Configure the CodeBuild Computing Environment.
+ *
+ * @description handle the environment key of the codeBuild cloudformation data object
+ * @param input -
+ * @example
+ * const a = envConfig({ 'small:linux': { image: 'someImage/@latest' } })
+ */
 export const envConfig = (input: IcodeBuildEnv): ICodeBuildEnvironmentData => {
-  const sizeNOs: string = Object.keys(input)[0]
+  const sizeAndOs: string = Object.keys(input)[0]
   const d: IcodeBuildEnv_data = Object.values(input)[0]
 
   let size: 'small' | 'medium' | 'large'
   let operatingSys: 'linux' | 'windows'
 
-  switch (sizeNOs) {
+  switch (sizeAndOs) {
     case 'small:linux':
       size = 'small'
       operatingSys = 'linux'
@@ -33,33 +41,47 @@ export const envConfig = (input: IcodeBuildEnv): ICodeBuildEnvironmentData => {
       operatingSys = 'windows'
       break
     default:
-      throw new Error('CodeBuild/environment :: id not get the correct object key for `size:os`:{}')
+      if (d.size && d.os) {
+        size = d.size
+        operatingSys = d.os
+      } else {
+        throw new Error(
+          'CodeBuild/environment :: id not get the correct object key for `size:os`:{}'
+        )
+      }
   }
 
   // required fields for initialization
   const ret: ICodeBuildEnvironmentData = {
     Type: operatingSys === 'linux' ? 'LINUX_CONTAINER' : 'WINDOWS_CONTAINER',
     ComputeType: _size(size) as ICodeBuildComputeSizes,
-    Image: d.image
+    Image: d.image,
+    PrivilegedMode: !('privleged' in d) ? false : d.privleged,
+    ImagePullCredentialsType: !('useServiceRole' in d)
+      ? 'SERVICE_ROLE'
+      : d.useServiceRole
+        ? 'SERVICE_ROLE'
+        : 'CODEBUILD'
   }
 
-  // layer in optional fields
-  const vars: ICodeBuildEnvironmentVariable[] = []
-
   if (d.cert) ret['Certificate'] = d.cert
-  if (d.privleged) ret['PrivilegedMode'] = d.privleged
-  if (d.envVars) vars.concat(envVar(d.envVars))
-  if (d.paramstore) vars.concat(envVar({ paramStore: { ...d.paramstore } }))
+  if ('privleged' in d) ret['PrivilegedMode'] = d.privleged
+  if (d.envVars) {
+    ret['EnvironmentVariables'] = envVar(d.envVars).concat(
+      envVar({ paramStore: { ...d.paramStore } })
+    )
+  }
   if (d.registryCreds) {
     ret['RegistryCredential'] = {
       Credential: d.registryCreds,
       CredentialProvider: 'SECRETS_MANAGER'
     }
   }
-  if ('useServiceRole' in d) {
-    ret['ImagePullCredentialsType'] = d.useServiceRole ? 'SERVICE_ROLE' : 'CODEBUILD'
-  }
-  if (vars.length > 0) ret['EnvironmentVariables'] = vars
+  ret['ImagePullCredentialsType'] = !('useServiceRole' in d)
+    ? 'SERVICE_ROLE'
+    : d.useServiceRole
+      ? 'SERVICE_ROLE'
+      : 'CODEBUILD'
 
   return ret
 }
@@ -78,9 +100,11 @@ export interface IcodeBuildEnv_data {
   useServiceRole?: boolean
   privleged?: boolean
   cert?: string
-  paramstore?: IcodeBuildEnvVar_plain
+  paramStore?: IcodeBuildEnvVar_plain
   envVars?: IcodeBuildEnvVar_plain
   registryCreds?: string
+  os?: 'linux' | 'windows'
+  size?: 'small' | 'medium' | 'large'
 }
 export interface IcodeBuildEnv_smallLinux {
   'small:linux': IcodeBuildEnv_data
@@ -95,10 +119,10 @@ export interface IcodeBuildEnv_smallWindows {
   'small:windows': IcodeBuildEnv_data
 }
 export interface IcodeBuildEnv_mediumWindows {
-  'small:windows': IcodeBuildEnv_data
+  'medium:windows': IcodeBuildEnv_data
 }
 export interface IcodeBuildEnv_largeWindows {
-  'small:windows': IcodeBuildEnv_data
+  'large:windows': IcodeBuildEnv_data
 }
 
 export type IcodeBuildEnv =
@@ -128,25 +152,29 @@ export interface ICodeBuildEnvironmentData {
   }
 }
 
-export const envVar = (input: IcodeBuildEnvVar): ICodeBuildEnvironmentVariable[] => {
-  if ('paramStore' in input) {
-    return Object.entries(input.paramStore).map(
-      ([key, value]) =>
-        ({
-          Type: 'PARAMETER_STORE',
-          Name: key,
-          Value: value
-        } as ICodeBuildEnvironmentVariable)
-    )
+export const envVar = (input?: IcodeBuildEnvVar): ICodeBuildEnvironmentVariable[] => {
+  if (!input) {
+    return []
   } else {
-    return Object.entries(input).map(
-      ([key, value]) =>
-        ({
-          Type: 'PLAINTEXT',
-          Name: key,
-          Value: value
-        } as ICodeBuildEnvironmentVariable)
-    )
+    if ('paramStore' in input) {
+      return Object.entries(input.paramStore).map(
+        ([key, value]) =>
+          ({
+            Type: 'PARAMETER_STORE',
+            Name: key,
+            Value: value
+          } as ICodeBuildEnvironmentVariable)
+      )
+    } else {
+      return Object.entries(input).map(
+        ([key, value]) =>
+          ({
+            Type: 'PLAINTEXT',
+            Name: key,
+            Value: value
+          } as ICodeBuildEnvironmentVariable)
+      )
+    }
   }
 }
 
@@ -162,7 +190,6 @@ export type IcodeBuildEnvVar = IcodeBuildEnvVar_plain | IcodeBuildEnvVar_ParamSt
  */
 export interface IcodeBuildEnvVar_plain {
   [name: string]: string
-  paramStore: never
 }
 
 /**

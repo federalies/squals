@@ -1,4 +1,6 @@
-type stringish = string | string[]
+import * as yaml from 'js-yaml'
+
+export type stringish = string | string[]
 
 export class BuildSpec {
   version = 0.2
@@ -18,7 +20,17 @@ export class BuildSpec {
 
     'secondary-artifacts'?: IbuildSpecArtifactSecondaryMap
   }
+
   constructor () {}
+
+  /**
+   *
+   * @description Setup the Install Phase of the Build Spec
+   * @param commands - Installation commands : string or string[].
+   * @param opts - Optional params: andfinally | runAs | runTimes | clearState.
+   * @example
+   * const bspec = new BuildSpec().Install('npm i')
+   */
   Install (
     commands: stringish,
     opts: {
@@ -40,7 +52,28 @@ export class BuildSpec {
         ? opts.andfinally
         : new Array(opts.andfinally)
     }
-    if (opts.runTimes) inputPhase.install['runtime-versions'] = opts.runTimes
+
+    if (opts.runTimes) {
+      if (
+        Object.keys(opts.runTimes).every(v => {
+          // for list @see https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec-ref-example f
+          return [
+            'android',
+            'docker',
+            'dotnet',
+            'golang',
+            'nodejs',
+            'java',
+            'php',
+            'python',
+            'ruby'
+          ].includes(v)
+        })
+      ) {
+        inputPhase.install['runtime-versions'] = opts.runTimes
+      }
+    }
+
     if (opts.runAs) inputPhase.install['run-as'] = opts.runAs
 
     // keeping state - AND there is some state to keep AND there is the right state to keep
@@ -55,6 +88,13 @@ export class BuildSpec {
 
     return this
   }
+  /**
+   * @description Setup the PreBuild Phase of the BuildSpec
+   * @param commands - Add the PreBuild commands : string or string[].
+   * @param opts - Optional params: andfinally | runAs  | clearState=false.
+   * @example
+   * const bspec = new BuildSpec().PreBuild('npm test')
+   */
   PreBuild (
     commands: stringish,
     opts: {
@@ -88,6 +128,13 @@ export class BuildSpec {
 
     return this
   }
+  /**
+   * @description Setup the Build Phase of the BuildSpec
+   * @param commands - Add the Build commands : string or string[].
+   * @param opts - Optional params: andfinally | runAs  | clearState=false.
+   * @example
+   * const bspec = new BuildSpec().Build('npm test')
+   */
   Build (
     commands: stringish,
     opts: {
@@ -122,6 +169,13 @@ export class BuildSpec {
 
     return this
   }
+  /**
+   * @description Setup the PostBuild Phase of the BuildSpec
+   * @param commands - Add the PostBuild commands : string or string[].
+   * @param opts - Optional params: andfinally | runAs | clearState=false.
+   * @example
+   * const bspec = new BuildSpec().PostBuild('npm test')
+   */
   PostBuild (
     commands: stringish,
     opts: {
@@ -156,9 +210,18 @@ export class BuildSpec {
 
     return this
   }
+  /**
+   * @description Add Artifacts
+   * @param input - Accepts a string file set of or annoted object included files.
+   */
   Artifacts (
     input: string | IbuildSpecArtifactDatastringish | IbuildSpecArtifactDatastringish[]
   ): BuildSpec {
+    //
+    // @todo what do about state retention, seems like if we call Artifacts repeatedly
+    // the latest should be in the artifact slot and everything else should be demoted down to secondary--artifacts
+    //
+
     if (typeof input === 'string') {
       // ''
       this.artifacts = { files: [input] }
@@ -208,10 +271,7 @@ export class BuildSpec {
         }
       } else {
         // empty input var
-        this.env = {
-          variables: {},
-          'parameter-store': {}
-        }
+        delete this.env
       }
     }
 
@@ -233,13 +293,78 @@ export class BuildSpec {
     return { ...this }
   }
   toYAML (): string {
-    throw new Error('Not implemented yet')
-    // return ''
+    return yaml.dump(this.toJSON())
   }
   fromYAML (input: string): BuildSpec {
-    // parse string
-    throw new Error('Not implemented yet')
-    // return new BuildSpec()
+    const _buildspec = yaml.safeLoad(input)
+    if (!('version' in _buildspec) || !('phases' in _buildspec)) {
+      throw new Error(
+        `'version' + 'phases' are required in the yaml input @see : <https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec-ref-example>`
+      )
+    } else {
+      const ret = new BuildSpec()
+      const _ph = _buildspec.phases
+      if ('install' in _ph) {
+        ret.Install(_ph.install.commands, {
+          andfinally: _ph.install.finally,
+          runTimes: _ph.install['runtime-versions'],
+          runAs: _ph.install['run-as']
+        })
+      }
+      if ('pre_build' in _ph) {
+        ret.PreBuild(_ph.pre_build.commands, {
+          andfinally: _ph.pre_build.finally,
+          runAs: _ph.pre_build['run-as']
+        })
+      }
+      if ('build' in _ph) {
+        ret.Build(_ph.build.commands, {
+          andfinally: _ph.build.finally,
+          runAs: _ph.build['run-as']
+        })
+      }
+      if ('post_build' in _ph) {
+        ret.PostBuild(_ph.post_build.commands, {
+          andfinally: _ph.post_build.finally,
+          runAs: _ph.post_build['run-as']
+        })
+      }
+      if ('artifacts' in _buildspec) {
+        let acc: IbuildSpecArtifactDatastringish[] = []
+        const { artifacts } = _buildspec
+
+        if ('secondary-artifacts' in _buildspec.artifacts) {
+          acc = acc.concat(Object.values(artifacts['secondary-artifacts']))
+        }
+        delete artifacts['secondary-artifacts']
+        const b = acc.concat([{ ...artifacts }])
+
+        ret.Artifacts(b.reverse())
+      }
+      if ('env' in _buildspec) {
+        if ('variables' in _buildspec.env) {
+          ret.Env({ variables: { ..._buildspec.env.variables } })
+        }
+        if ('parameter-store' in _buildspec.env) {
+          ret.Env({ parameterStore: { ..._buildspec.env['parameter-store'] } })
+        }
+        if (
+          !Object.keys(_buildspec.env).every(v => {
+            return ['paremeter-store', 'variables'].includes(v)
+          })
+        ) {
+          console.warn(
+            `the yaml contents used to configure the BuildSpec does not include env.variables && env.parameter-store which are required to both be avilable`
+          )
+        }
+      }
+
+      if ('cache' in _buildspec && 'paths' in _buildspec.cache) {
+        ret.Cache(_buildspec.cache.paths)
+      }
+
+      return ret
+    }
   }
 }
 

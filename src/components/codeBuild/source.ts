@@ -10,7 +10,6 @@ import * as Url from 'url'
  * var a = sourceConfig()
  */
 export const sourceConfig = (input: IcodeBuildsource): ICodeBuildSource => {
-  //  => {
   if (!input) {
     return {}
   } else {
