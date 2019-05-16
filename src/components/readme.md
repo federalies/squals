@@ -2,10 +2,21 @@
 
 ## Principles
 
-1. Sane Defaults
-2. Highly Documented in ways that help intellisense, documnetation generation
-3. Idiomatic meaning keeping with comfy language concepts is more important than memorizing template keys/properties
-4. Use Errors/Failures during Template Build Time to increase developer iteration speed
+1. Reduce Objects as much as reasonable - using sane defaults + removing all non-essential data fields
+2. Consider where input fields should also accept - `IGetAtt` | `IRef`
+3. Constuctors should accept their own kind as an input - which would be akin to a `duplicate` function
+4. Balance input Flexibility with enough structure to so that intellisense can provide real help
+5. my Squals file should pass `eslint defaults` (as a concept - not as an implementation)
+6. "`Plays nice` with comfy language concepts" over users memorizing template keys/properties
+7. Use Errors/Failures during Template Build Time to increase developer iteration speed
+8. Methods should be able to set and unset various options
+
+  ```
+  obj.method('dataInput') => might `set` the proper data structure via the helper
+  obj.method() => might `unset` the same data structure
+  ```
+
+9. other rules continued
 
 # List of Sharable Components
 

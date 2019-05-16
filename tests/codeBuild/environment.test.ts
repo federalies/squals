@@ -1,12 +1,12 @@
 import {
-  envConfig,
+  envItem,
   envVar,
   ICodeBuildEnvironmentData
 } from '../../src/components/codeBuild/environment'
 
 describe('CodeBuild::BuildSpec', () => {
   test('defaults', () => {
-    const a = envConfig({ 'small:linux': { image: 'someImage/@latest' } })
+    const a = envItem({ 'small:linux': { image: 'someImage/@latest' } })
     const e = {
       Type: 'LINUX_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_SMALL',
@@ -18,7 +18,7 @@ describe('CodeBuild::BuildSpec', () => {
   })
 
   test('Versbose Option', () => {
-    const a = envConfig({
+    const a = envItem({
       'small:linux': {
         cert: 'someCert',
         image: '@latest',
@@ -52,7 +52,7 @@ describe('CodeBuild::BuildSpec', () => {
     const configObj1: any = {
       junk: { os: 'linux', size: 'small', image: '@latest', useServiceRole: true }
     }
-    const a1 = envConfig(configObj1)
+    const a1 = envItem(configObj1)
     const e = {
       Type: 'LINUX_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_SMALL',
@@ -63,12 +63,12 @@ describe('CodeBuild::BuildSpec', () => {
     expect(a1).toEqual(e)
 
     const configObj2: any = { junk: { image: '@latest' } }
-    const a2 = () => envConfig(configObj2)
+    const a2 = () => envItem(configObj2)
     expect(a2).toThrow()
   })
 
   test('Other Configs', () => {
-    expect(envConfig({ 'small:windows': { image: '@latest' } })).toEqual({
+    expect(envItem({ 'small:windows': { image: '@latest' } })).toEqual({
       Type: 'WINDOWS_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_SMALL',
       ImagePullCredentialsType: 'SERVICE_ROLE',
@@ -76,7 +76,7 @@ describe('CodeBuild::BuildSpec', () => {
       PrivilegedMode: false
     })
 
-    expect(envConfig({ 'medium:windows': { image: '@latest' } })).toEqual({
+    expect(envItem({ 'medium:windows': { image: '@latest' } })).toEqual({
       Type: 'WINDOWS_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_MEDIUM',
       ImagePullCredentialsType: 'SERVICE_ROLE',
@@ -84,7 +84,7 @@ describe('CodeBuild::BuildSpec', () => {
       PrivilegedMode: false
     })
 
-    expect(envConfig({ 'large:windows': { image: '@latest' } })).toEqual({
+    expect(envItem({ 'large:windows': { image: '@latest' } })).toEqual({
       Type: 'WINDOWS_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_LARGE',
       ImagePullCredentialsType: 'SERVICE_ROLE',
@@ -92,7 +92,7 @@ describe('CodeBuild::BuildSpec', () => {
       PrivilegedMode: false
     })
 
-    expect(envConfig({ 'small:linux': { image: '@latest' } })).toEqual({
+    expect(envItem({ 'small:linux': { image: '@latest' } })).toEqual({
       Type: 'LINUX_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_SMALL',
       ImagePullCredentialsType: 'SERVICE_ROLE',
@@ -100,7 +100,7 @@ describe('CodeBuild::BuildSpec', () => {
       PrivilegedMode: false
     })
 
-    expect(envConfig({ 'medium:linux': { image: '@latest' } })).toEqual({
+    expect(envItem({ 'medium:linux': { image: '@latest' } })).toEqual({
       Type: 'LINUX_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_MEDIUM',
       ImagePullCredentialsType: 'SERVICE_ROLE',
@@ -108,7 +108,7 @@ describe('CodeBuild::BuildSpec', () => {
       PrivilegedMode: false
     })
 
-    expect(envConfig({ 'large:linux': { image: '@latest' } })).toEqual({
+    expect(envItem({ 'large:linux': { image: '@latest' } })).toEqual({
       Type: 'LINUX_CONTAINER',
       ComputeType: 'BUILD_GENERAL1_LARGE',
       ImagePullCredentialsType: 'SERVICE_ROLE',

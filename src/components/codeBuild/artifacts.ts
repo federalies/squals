@@ -1,6 +1,15 @@
 import s3Url from 's3-url'
 import path from 'path'
 
+export type ICodeBuildArtifactReturn = ICodeBuildArtifactReturn_one | ICodeBuildArtifactReturn_multi
+export interface ICodeBuildArtifactReturn_one {
+  Artifacts: ICodeBuildArtifactData
+}
+export interface ICodeBuildArtifactReturn_multi {
+  Artifacts: ICodeBuildArtifactData
+  SecondaryArtifacts: ICodeBuildArtifactData[]
+}
+
 /**
  * @description Multi-Use Function where Array has special meaning.
  * @param input
@@ -10,23 +19,23 @@ import path from 'path'
  * var aTricky = artifactsConfig([{}])
  * var bSecondary = artifactsConfig([{},{}])
  */
-export const artifactsConfig = (input?: Iartifact | Iartifact[]) => {
+export const artifactsConfig = (input?: Iartifact | Iartifact[]): ICodeBuildArtifactReturn => {
   if (Array.isArray(input)) {
     const _in = [...input]
     if (_in.length > 1) {
       return {
         Artifacts: artifacts(_in.shift()),
         SecondaryArtifacts: artifacts(_in)
-      }
+      } as ICodeBuildArtifactReturn_multi
     } else {
       return {
         Artifacts: artifacts(_in.pop())
-      }
+      } as ICodeBuildArtifactReturn_one
     }
   } else {
     return {
       Artifacts: artifacts(input)
-    }
+    } as ICodeBuildArtifactReturn_one
   }
 }
 
@@ -215,7 +224,6 @@ export type Iartifact =
   | Iartifcat_s3
   | Iartifcat_pipeline
   | Iartifcat_namedNoArtifact
-  | undefined
   | string
 
 interface Iartifcat_s3uri {

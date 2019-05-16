@@ -1,58 +1,103 @@
 import { BuildSpec } from './buildspec'
-import { firstKey } from './artifacts'
 import * as Url from 'url'
+
+export const sourceConfig = (
+  input?: IcodeBuildsource | IcodeBuildsource[]
+): ICodeBuildSourceConfig => {
+  if (Array.isArray(input)) {
+    const _in = [...input]
+
+    if (_in.length > 1) {
+      return {
+        Source: sources(_in.shift()),
+        SecondarySources: sources(_in)
+      } as ICodeBuildSourceConfig_multi
+    } else {
+      return {
+        Source: sources(_in.pop())
+      } as ICodeBuildSourceConfig_one
+    }
+  } else {
+    return {
+      Source: sources(input)
+    } as ICodeBuildSourceConfig_one
+  }
+}
+
+export const sources = (
+  input?: IcodeBuildsource | IcodeBuildsource[]
+): ICodeBuildSource | ICodeBuildSource[] => {
+  // maintain input shape array->array | obj->obj
+  return Array.isArray(input) ? input.map(v => sourceItem(v)) : sourceItem(input)
+}
 
 /**
  *
  * @description create a Code Build Source Data Elemen
  * @param input
+ * @see
  * @example
- * var a = sourceConfig()
+ * var a = sources({'https://github.com/federalies/squals')
  */
-export const sourceConfig = (input: IcodeBuildsource): ICodeBuildSource => {
+export const sourceItem = (input?: IcodeBuildsource): ICodeBuildSource => {
   if (!input) {
-    return {}
+    return { Type: 'NO_SOURCE' }
   } else {
-    //
-    // common
-    const [key, _value] = Object.entries(input)[0]
-    let ret: ICodeBuildSource = { Type: 'NO_SOURCE' }
-    let value = _value as IcodeBuildSource
-    if (value.buildSpec) ret['BuildSpec'] = value.buildSpec
-    if (value.gitCloneDepth) ret['GitCloneDepth'] = value.gitCloneDepth
-    if (value.sourceId) ret['SourceIdentifier'] = value.sourceId
-    if ('reportBuild' in value) ret['ReportBuildStatus'] = !!value.reportBuild
-    if ('allowInsureSsl' in value) ret['InsecureSsl'] = value.allowInsureSsl
-    if ('allowFetchGitSubModules' in value) {
-      ret['GitSubmodulesConfig'] = { FetchSubmodules: !!value.allowFetchGitSubModules }
-    }
-
-    // handle location not pipeline
-    if (
-      's3' in input ||
-      'codeCommit' in input ||
-      'github' in input ||
-      'githubEnterprise' in input ||
-      'bitbucket' in input
-    ) {
-      let value = _value as IcodeBuildSource_notPipeline
-      ret = { ...ret, Type: TypeTransform(firstKey(input)) }
-      if (value.location) ret['Location'] = value.location
-    } else if (key === 'pipeline') {
-      // yes pipeline
-      ret = { ...ret, Type: TypeTransform(key) }
-    } else {
-      // uri string key
-      let uri: string
-      try {
-        uri = new Url.URL(key).hostname
-      } catch (e) {
-        // or invalid
-        throw new Error('the repo url given is not a valid URL')
+    if (typeof input === 'string') {
+      let ret: ICodeBuildSource = {
+        Type: typeTransform(input, false),
+        Location: input,
+        BuildSpec: 'buildspec.yml'
       }
-      ret = { ...ret, Type: TypeTransform(uri) }
+      return ret
+    } else {
+      // common
+      const [key, _value] = Object.entries(input)[0]
+      let value = _value as IcodeBuildSource
+
+      let ret: ICodeBuildSource = { Type: 'NO_SOURCE' }
+
+      if (value.buildSpec) {
+        ret['BuildSpec'] =
+          typeof value.buildSpec === 'string'
+            ? value.buildSpec
+            : (value.buildSpec as BuildSpec).toYAML()
+      }
+      if (value.gitCloneDepth) ret['GitCloneDepth'] = value.gitCloneDepth
+      if (value.sourceId) ret['SourceIdentifier'] = value.sourceId
+      if ('reportBuild' in value) ret['ReportBuildStatus'] = !!value.reportBuild
+      if ('allowInsureSsl' in value) ret['InsecureSsl'] = value.allowInsureSsl
+      if ('allowFetchGitSubModules' in value) {
+        ret['GitSubmodulesConfig'] = { FetchSubmodules: !!value.allowFetchGitSubModules }
+      }
+
+      // handle location not pipeline
+      if (
+        key === 's3' ||
+        key === 'codeCommit' ||
+        key === 'github' ||
+        key === 'githubEnterprise' ||
+        key === 'bitbucket'
+      ) {
+        let value = _value as IcodeBuildSource_wLoc
+        ret = { ...ret, Type: typeTransform(key) }
+        if (value.location) ret['Location'] = value.location
+      } else if (key === 'pipeline') {
+        // yes pipeline
+        ret = { ...ret, Type: typeTransform(key) }
+      } else {
+        // uri string key
+        let uriHostname: string
+        try {
+          uriHostname = new Url.URL(key).hostname
+        } catch (e) {
+          // or invalid
+          throw new Error('the repo url given is not a valid URL')
+        }
+        ret = { ...ret, Type: typeTransform(uriHostname), Location: key }
+      }
+      return ret
     }
-    return ret
   }
 }
 
@@ -61,62 +106,73 @@ export const sourceConfig = (input: IcodeBuildsource): ICodeBuildSource => {
  * @description Type Transform
  * @param input
  * @example
- * console.log(TypeTransform() // "NO_SOURCE"
- * console.log(TypeTransform('')) // "NO_SOURCE"
- * console.log(TypeTransform('githubEnterprise')) // "GITHUB_ENTERPRISE"
- * console.log(TypeTransform('s3')) // "S3"
- * console.log(TypeTransform('codeCommit')) // "CODECOMMIT"
- * console.log(TypeTransform('bitbucket')) // "BITBUCKET"
- * console.log(TypeTransform('https://github.com/federalies/squals.git')) // "GITHUB"
- * console.log(TypeTransform('https://bitbucket.org/federalies/squals.git')) // "BITBUCKET"
- * console.log(TypeTransform('https://git-codecommit.region-ID.amazonaws.com/v1/repos/repo-name')) // "CODECOMMIT"
- * console.log(TypeTransform('https://somevaliddomain.com/withRepo/path')) // "GITHUB_ENTERPRISE"
- * var a TypeTransform('ftp://somevaliddomain.com/withRepo/path') // throws Error
+ * console.log(typeTransform() // "NO_SOURCE"
+ * console.log(typeTransform('')) // "NO_SOURCE"
+ * console.log(typeTransform('githubEnterprise')) // "GITHUB_ENTERPRISE"
+ * console.log(typeTransform('s3')) // "S3"
+ * console.log(typeTransform('codeCommit')) // "CODECOMMIT"
+ * console.log(typeTransform('bitbucket')) // "BITBUCKET"
+ * console.log(typeTransform('https://github.com/federalies/squals.git')) // "GITHUB"
+ * console.log(typeTransform('https://bitbucket.org/federalies/squals.git')) // "BITBUCKET"
+ * console.log(typeTransform('https://git-codecommit.region-ID.amazonaws.com/v1/repos/repo-name')) // "CODECOMMIT"
+ * console.log(typeTransform('https://somevaliddomain.com/withRepo/path')) // "GITHUB_ENTERPRISE"
+ * var a typeTransform('ftp://somevaliddomain.com/withRepo/path') // throws Error
  */
-export const TypeTransform = (input: IcodeSourceTypes): ICodeBuildTypes => {
-  if (!input) {
+export const typeTransform = (
+  hostFQDN?: IcodeSourceTypes,
+  validatedDomain = true
+): ICodeBuildTypes => {
+  if (!hostFQDN) {
     return 'NO_SOURCE'
   } else {
-    switch (input) {
+    switch (hostFQDN) {
       case 'githubEnterprise':
         return 'GITHUB_ENTERPRISE'
-      case '':
-        return 'NO_SOURCE'
+      case 'pipeline':
+      case 'codepipeline':
+        return 'CODEPIPELINE'
       case 's3':
       case 'codeCommit':
       case 'bitbucket':
-        return input.toUpperCase() as ICodeBuildTypes
+        return hostFQDN.toUpperCase() as ICodeBuildTypes
       default:
-        let domain: string
-        try {
-          domain = new Url.URL(input).hostname
-        } catch (e) {
-          throw new Error('the key was not a valid URL')
-        }
-        if (domain.toLowerCase().includes('github.com')) {
+        if (hostFQDN.toLowerCase().includes('github.com')) {
           return 'GITHUB'
-        } else if (domain.toLowerCase().includes('bitbucket.org')) {
+        } else if (hostFQDN.toLowerCase().includes('bitbucket.org')) {
           return 'BITBUCKET'
-        } else if (domain.toLowerCase().match(/codecommit\.[-(\w)]+\.amazonaws.com/g)) {
+        } else if (hostFQDN.toLowerCase().match(/codecommit\.[-(\w)]+\.amazonaws.com/g)) {
           return 'CODECOMMIT'
         } else {
-          console.warn(`assuming this URL: ${domain} is github enterprise url`)
-          return 'GITHUB_ENTERPRISE'
+          if (!validatedDomain) {
+            let domain: string = hostFQDN
+            try {
+              domain = new Url.URL(hostFQDN).hostname
+              console.warn(`assuming this URL: ${domain} is github enterprise url`)
+              return 'GITHUB_ENTERPRISE'
+            } catch (err) {
+              console.error(hostFQDN)
+              throw new Error(
+                'the URI must be valid + starting with `http(s)://` - Even for a github enterprise domain name'
+              )
+            }
+          } else {
+            console.warn(`assuming this URL: ${hostFQDN} is github enterprise url`)
+            return 'GITHUB_ENTERPRISE'
+          }
         }
     }
   }
 }
 
 export interface ICodeBuildSource {
-  Type?: ICodeBuildTypes
-
+  Type: ICodeBuildTypes
   Location?: string
   // ignored for PIPELINE
   // s3 needs bucket+path to .zip or folder
   // CodeCommit - https clone URL
   // github - https clone URL
   // bitbucket - https clone URL
-  BuildSpec?: string | BuildSpec
+  BuildSpec?: string
   GitCloneDepth?: number // not supported with s3 source Type
   GitSubmodulesConfig?: {
     FetchSubmodules: boolean
@@ -130,21 +186,30 @@ export interface ICodeBuildSource {
   }
 }
 
+export type ICodeBuildSourceConfig = ICodeBuildSourceConfig_one | ICodeBuildSourceConfig_multi
+export interface ICodeBuildSourceConfig_one {
+  Source: ICodeBuildSource
+}
+export interface ICodeBuildSourceConfig_multi extends ICodeBuildSourceConfig_one {
+  SecondarySources: ICodeBuildSource[]
+}
+
 export type IcodeBuildsource =
+  | string
   | IcodeBuildSource_httpsCloneUrl
-  | { s3: IcodeBuildSource_notPipeline }
-  | { codeCommit: IcodeBuildSource_notPipeline }
-  | { bitbucket: IcodeBuildSource_notPipeline }
-  | { github: IcodeBuildSource_notPipeline }
-  | { githubEnterprise: IcodeBuildSource_notPipeline }
-  | { pipeline: IcodeBuildSource_pipeline }
+  | { s3: IcodeBuildSource_wLoc }
+  | { codeCommit: IcodeBuildSource_wLoc }
+  | { bitbucket: IcodeBuildSource_wLoc }
+  | { github: IcodeBuildSource_wLoc }
+  | { githubEnterprise: IcodeBuildSource_wLoc }
+  | { pipeline: IcodeBuildSource_noLoc }
 
 export interface IcodeBuildSource_httpsCloneUrl {
-  [url: string]: IcodeBuildSource_pipeline
+  [url: string]: IcodeBuildSource_noLoc
 }
 
 export interface IcodeBuildSource {
-  buildSpec?: string
+  buildSpec?: string | BuildSpec
   gitCloneDepth?: number
   sourceId?: string
   allowFetchGitSubModules?: boolean
@@ -152,11 +217,11 @@ export interface IcodeBuildSource {
   reportBuild?: boolean
 }
 
-export interface IcodeBuildSource_pipeline extends IcodeBuildSource {
+export interface IcodeBuildSource_noLoc extends IcodeBuildSource {
   location?: never
 }
 
-export interface IcodeBuildSource_notPipeline extends IcodeBuildSource {
+export interface IcodeBuildSource_wLoc extends IcodeBuildSource {
   location: string
 }
 
