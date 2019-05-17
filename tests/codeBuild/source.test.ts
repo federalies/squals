@@ -7,6 +7,8 @@ import {
 } from '../../src/components/codeBuild/source'
 import { BuildSpec } from '../../src/components/codeBuild/buildspec'
 
+test.todo('Sources should accept an array of input objects')
+
 describe('CodeBuild::Source ', () => {
   test('default', () => {
     expect(sourceItem()).toEqual({ Type: 'NO_SOURCE' })

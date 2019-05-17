@@ -13,7 +13,9 @@ export const envConfig = (input?: IcodeBuildEnv): { Environment: ICodeBuildEnvir
  * const a = envConfig({ 'small:linux': { image: 'someImage/@latest' } })
  */
 export const envItem = (input?: IcodeBuildEnv): ICodeBuildEnvironmentData => {
-  // set defaults in the codebuild calling function
+  // class may override defaults based on presets, etc
+  //
+  // item defaults
   if (!input) {
     const ret: ICodeBuildEnvironmentData = {
       Type: 'LINUX_CONTAINER',
@@ -32,10 +34,11 @@ export const envItem = (input?: IcodeBuildEnv): ICodeBuildEnvironmentData => {
       }
       if (_input.cert) ret['Certificate'] = _input.cert
       if ('privleged' in _input) ret['PrivilegedMode'] = _input.privleged
-
-      ret['EnvironmentVariables'] = envVar(_input.envVars).concat(
-        envVar({ paramStore: { ..._input.paramStore } })
-      )
+      if (_input.envVars) {
+        ret['EnvironmentVariables'] = envVar(_input.envVars).concat(
+          envVar({ paramStore: { ..._input.paramStore } })
+        )
+      }
       if (_input.registryCreds) {
         ret['RegistryCredential'] = {
           Credential: _input.registryCreds,

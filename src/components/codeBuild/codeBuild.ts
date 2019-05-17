@@ -1,5 +1,5 @@
 import s3uri from 's3-url'
-import { ITags, IGetAtt, Itags, IRef } from '../Template'
+import { ITags, IGetAtt, Itags, IRef, Tags } from '../Template'
 import { ICodeBuildArtifactData, Iartifact, artifactsConfig } from './artifacts'
 import { ICodeBuildSource, IcodeBuildsource, sourceConfig } from './source'
 import {
@@ -11,6 +11,13 @@ import {
 } from './environment'
 import Randoma from 'randoma'
 import randomWord from 'random-word'
+
+export const firstKey = (data: object): string => {
+  return Object.keys(data)[0]
+}
+export const firstVal = (data: object): object => {
+  return Object.values(data)[0]
+}
 
 export class CodeBuildProject {
   name: string
@@ -57,11 +64,10 @@ export class CodeBuildProject {
       FilterGroups?: IFilterGroup[]
     }
     VpcConfig?: {
+      VpcId: string
       SecurityGroupIds: string[]
       Subnets: string[]
-      VpcId: string
     }
-
     Tags?: ITags[] // max len === 50
   }
 
@@ -71,9 +77,9 @@ export class CodeBuildProject {
     let defaultName = `${randomWord()}${new Randoma({
       seed: new Date().getTime()
     }).integer()}`
-
+    this.name = defaultName
+    // input is string
     if (typeof props === 'string') {
-      this.name = defaultName
       this.Properties = {
         BadgeEnabled: true,
         ServiceRole: props,
@@ -82,61 +88,98 @@ export class CodeBuildProject {
         ...artifactsConfig()
       }
     } else {
-      // input == object
-      if ('Fn:GetAtt' in (props as IGetAtt)) {
-        this.name = defaultName
+      // input is object
+      if (['Fn::GetAtt', 'Ref'].includes(Object.keys(props)[0])) {
         this.Properties = {
           BadgeEnabled: true,
-          ServiceRole: props as IGetAtt,
-          ...sourceConfig(),
-          ...artifactsConfig(),
-          ...envConfig()
-        }
-      }
-      if ('Ref' in (props as IRef)) {
-        this.name = defaultName
-        this.Properties = {
-          BadgeEnabled: true,
-          ServiceRole: props as IRef,
+          ServiceRole: props as IGetAtt | IRef,
           ...sourceConfig(),
           ...artifactsConfig(),
           ...envConfig()
         }
       } else {
-        const _props = props as IcodeBuild
-        this.name = { name: defaultName, ..._props }.name
+        props = props as IcodeBuild
+        this.name = { name: defaultName, ...props }.name
+
         this.Properties = {
-          BadgeEnabled: !('enabledBadge' in _props) ? true : _props.enabledBadge,
-          ServiceRole: _props.serviceRoleArn,
-          ...sourceConfig(_props.sources),
-          ...artifactsConfig(_props.artifacts),
-          ...envConfig(_props.env)
+          BadgeEnabled: !('enabledBadge' in props) ? true : props.enabledBadge,
+          ServiceRole: props.serviceRoleArn,
+          ...sourceConfig(props.sources),
+          ...artifactsConfig(props.artifacts),
+          ...envConfig(props.env)
         }
-        this.Properties.Cache = !_props.cache
+        this.Properties.Cache = !props.cache
           ? { Type: 'NO_CACHE' }
-          : Array.isArray(_props.cache)
-            ? { Type: 'LOCAL', Modes: _props.cache }
+          : Array.isArray(props.cache)
+            ? { Type: 'LOCAL', Modes: props.cache }
             : {
               Type: 'S3',
-              Location: `${s3uri.urlToOptions(_props.cache).Bucket}/${
-                s3uri.urlToOptions(_props.cache).Key
+              Location: `${s3uri.urlToOptions(props.cache).Bucket}/${
+                s3uri.urlToOptions(props.cache).Key
               }`
             }
 
-        if (_props.description) this.Properties.Description = _props.description
-        if (_props.logs) {
+        if (props.description) this.Properties.Description = props.description
+        if (props.logs && props.logs.s3) {
           this.Properties.LogsConfig = {
-            S3Logs: { Status: 'ENABLED' },
-            CloudWatchLogs: { Status: 'ENABLED' }
+            ...this.Properties.LogsConfig,
+            S3Logs: {
+              Status: 'ENABLED',
+              Location: props.logs.s3.loc,
+              EncryptionDisabled: !('encOff' in props.logs.s3) ? false : props.logs.s3.encOff
+            }
           }
         }
-        _props.logs
-        // if(_props.name)
-        // if(_props.preset)
-        // if(_props.tags)
-        // if(_props.timeOutBuildAfter)
-        // if(_props.triggers)
-        // if(_props.vpc)
+        if (props.logs && props.logs.cw) {
+          const [GroupName, StreamName] = props.logs.cw.split('.')
+
+          this.Properties.LogsConfig = {
+            ...this.Properties.LogsConfig,
+            CloudWatchLogs: {
+              Status: 'ENABLED',
+              GroupName,
+              StreamName
+            }
+          }
+        }
+
+        if (props.name) this.Properties.Name = props.name
+        if (props.preset) {
+          this.Properties = { ...this.Properties, ...envConfig(envPresets(props.preset)) }
+        }
+        if (props.tags) this.Properties = { ...this.Properties, ...Tags(props.tags) }
+        if (props.timeOutBuildAfter) this.Properties.TimeoutInMinutes = props.timeOutBuildAfter
+        if (props.triggers) {
+          const _in = Array.isArray(props.triggers) ? props.triggers : new Array(props.triggers)
+
+          this.Properties.Triggers = {
+            Webhook: true,
+            FilterGroups: _in.map(v => {
+              return {
+                Type: v.type,
+                Pattern:
+                  v.type !== 'EVENT'
+                    ? v.pattern
+                    : Array.isArray(v.pattern)
+                      ? v.pattern.join(', ')
+                      : v.pattern,
+                ExcludeMatchedPattern: v.isMatchingPattern
+              }
+            })
+          }
+        }
+
+        if (props.vpc) {
+          this.Properties.VpcConfig = {
+            VpcId: props.vpc.id,
+            SecurityGroupIds: Array.isArray(props.vpc.secGrpIds)
+              ? props.vpc.secGrpIds
+              : new Array(props.vpc.secGrpIds),
+            Subnets: Array.isArray(props.vpc.subnets)
+              ? props.vpc.subnets
+              : new Array(props.vpc.subnets)
+          }
+        }
       }
     }
   }
@@ -265,15 +308,11 @@ export class CodeBuildProject {
     }
     return this
   }
-  vpc (_in: {
-  SecGrpIds: string | string[]
-  subnets: string | string[]
-  vpcId: string
-  }): CodeBuildProject {
+  vpc (_in: IcodeBuildVpc): CodeBuildProject {
     this.Properties.VpcConfig = {
-      SecurityGroupIds: Array.isArray(_in.SecGrpIds) ? _in.SecGrpIds : new Array(_in.SecGrpIds),
+      SecurityGroupIds: Array.isArray(_in.secGrpIds) ? _in.secGrpIds : new Array(_in.secGrpIds),
       Subnets: Array.isArray(_in.subnets) ? _in.subnets : new Array(_in.subnets),
-      VpcId: _in.vpcId
+      VpcId: _in.id
     }
     return this
   }
@@ -314,12 +353,19 @@ export interface IcodeBuild {
   name?: string
   description?: string
   timeOutBuildAfter?: number
-  logs?: IcodeBuildLogs
   enabledBadge?: boolean
+
+  logs?: IcodeBuildLogs
   cache?: IcodeBuildcache
-  vpc?: string
-  triggers?: string
+  vpc?: IcodeBuildVpc
+  triggers?: IcodeBuildTriggerKinds | IcodeBuildTriggerKinds[]
   tags?: Itags | Itags[]
+}
+
+export interface IcodeBuildVpc {
+  id: string
+  secGrpIds: string | string[]
+  subnets: string | string[]
 }
 
 type IcodeBuildcache = ILocalCacheMode[] | undefined | string /* s3uri */
@@ -334,7 +380,7 @@ type IcodeBuildTriggerKinds =
   | IcodeBuildTriggerFiterGroup_head
 
 export interface IcodeBuildLogs {
-  cw?: string
+  cw?: string // GOURP.THREAD expects a dot separation
   s3?: { loc: string; encOff?: boolean }
 }
 
