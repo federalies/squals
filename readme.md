@@ -39,3 +39,15 @@ or
 ## Docs
 
 [WIP Docs](https://raw.githack.com/federalies/squals/master/docs/index.html)
+
+## FAQ
+
+_Q1_: Did you know the project has a mis-spelled name?
+
+_A1_: Yes, welcome to the internet.
+
+__
+
+_Q2_: Did you know this problem is about N years too late?
+
+_A2_: Sure Cloudformation (and similar declarative configs) have been around a bit, but they still are hard to use, and keep out plenty of smart people who just suffer from not enough time in the day syndrome to get around to `CFMN templates`
