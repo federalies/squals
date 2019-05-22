@@ -18,7 +18,8 @@
 
   ```
   obj.method('dataInput') => might `set` the proper data structure via the helper
-  obj.method() => might `unset` the same data structure
+  obj.method() => should use the defaults
+  obj.method(null) => might `unset` the same data structure
   ```
 
 8. Non reducible keys can have required inputs on helper

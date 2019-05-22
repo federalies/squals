@@ -12,12 +12,12 @@ import {
 import Randoma from 'randoma'
 import randomWord from 'random-word'
 
-export const firstKey = (data: object): string => {
-  return Object.keys(data)[0]
-}
-export const firstVal = (data: object): object => {
-  return Object.values(data)[0]
-}
+// export const firstKey = (data: object): string => {
+//   return Object.keys(data)[0]
+// }
+// export const firstVal = (data: object): object => {
+//   return Object.values(data)[0]
+// }
 
 export class CodeBuildProject {
   name: string
@@ -71,6 +71,50 @@ export class CodeBuildProject {
     Tags?: ITags[] // max len === 50
   }
 
+  static triggerEventNameTransform (event: string): string {
+    switch (event) {
+      case 'event':
+        return 'EVENT'
+      case 'base':
+        return 'BASE_REF'
+      case 'actor':
+        return 'ACTOR_ACCOUNT_ID'
+      case 'path':
+        return 'FILE_PATH'
+      case 'head':
+        return 'HEAD_REF'
+      default:
+        throw new Error('invalid top level key for the event object')
+    }
+  }
+
+  static triggerFilterGroupConfig (
+    input: IcodeBuildTriggerTypes | IcodeBuildTriggerTypes[]
+  ): { FilterGroups: IFilterGroup[] } {
+    const ret = (Array.isArray(input) ? input : new Array(input)).map(v => {
+      const eventType = Object.keys(v)[0]
+      const filterData = Object.values(v)[0]
+
+      if (eventType === 'event') {
+        return {
+          Type: CodeBuildProject.triggerEventNameTransform(eventType) as IFilterGroupKinds,
+          Pattern: Array.isArray(filterData.pattern)
+            ? filterData.pattern.join(',').toUpperCase()
+            : filterData.pattern.toUpperCase(),
+          ExcludeMatchedPattern: !('isExclusion' in filterData) ? true : filterData.isExclusion
+        }
+      } else {
+        return {
+          Type: CodeBuildProject.triggerEventNameTransform(eventType) as IFilterGroupKinds,
+          Pattern: filterData.pattern,
+          ExcludeMatchedPattern: !('isExclusion' in filterData) ? true : filterData.isExclusion
+        }
+      }
+    })
+
+    return { FilterGroups: ret }
+  }
+
   constructor (props: IcodeBuild | string | IGetAtt | IRef) {
     this.Type = 'AWS::CodeBuild::Project'
 
@@ -120,7 +164,7 @@ export class CodeBuildProject {
             }
 
         if (props.description) this.Properties.Description = props.description
-        if (props.logs && props.logs.s3) {
+        if (props.logs && 's3' in props.logs) {
           this.Properties.LogsConfig = {
             ...this.Properties.LogsConfig,
             S3Logs: {
@@ -130,9 +174,18 @@ export class CodeBuildProject {
             }
           }
         }
-        if (props.logs && props.logs.cw) {
-          const [GroupName, StreamName] = props.logs.cw.split('.')
+        if (props.logs && 'cw' in props.logs) {
+          let GroupName: string, StreamName: string
 
+          if (props.logs.cw.includes(':')) {
+            ;[GroupName, StreamName] = props.logs.cw.split(':')
+          } else if (props.logs.cw.includes('.')) {
+            ;[GroupName, StreamName] = props.logs.cw.split('.')
+          } else {
+            throw new Error(
+              'the <CodeBuildProject>.logs.cw string is assumed to be a string separated by a : or .'
+            )
+          }
           this.Properties.LogsConfig = {
             ...this.Properties.LogsConfig,
             CloudWatchLogs: {
@@ -149,23 +202,11 @@ export class CodeBuildProject {
         }
         if (props.tags) this.Properties = { ...this.Properties, ...Tags(props.tags) }
         if (props.timeOutBuildAfter) this.Properties.TimeoutInMinutes = props.timeOutBuildAfter
-        if (props.triggers) {
-          const _in = Array.isArray(props.triggers) ? props.triggers : new Array(props.triggers)
 
+        if (props.triggers) {
           this.Properties.Triggers = {
             Webhook: true,
-            FilterGroups: _in.map(v => {
-              return {
-                Type: v.type,
-                Pattern:
-                  v.type !== 'EVENT'
-                    ? v.pattern
-                    : Array.isArray(v.pattern)
-                      ? v.pattern.join(', ')
-                      : v.pattern,
-                ExcludeMatchedPattern: v.isMatchingPattern
-              }
-            })
+            ...CodeBuildProject.triggerFilterGroupConfig(props.triggers)
           }
         }
 
@@ -190,25 +231,23 @@ export class CodeBuildProject {
     return { 'Fn::GetAtt': [this.name, 'Arn'] }
   }
 
-  artifacts (input?: Iartifact | Iartifact[]): CodeBuildProject {
-    if (input) {
-      this.Properties = { ...this.Properties, ...artifactsConfig(input) }
+  artifacts (input?: Iartifact | Iartifact[] | null): CodeBuildProject {
+    if (input === null) {
+      // not removable
+      this.Properties = { ...this.Properties, ...artifactsConfig() }
     } else {
-      const { Artifacts, SecondaryArtifacts, ...theRest } = this.Properties
-      this.Properties = {
-        ...theRest,
-        ...artifactsConfig()
-      }
+      this.Properties = { ...this.Properties, ...artifactsConfig(input) }
     }
     return this
   }
-  env (env?: IcodeBuildEnv): CodeBuildProject {
-    if (env) {
-      this.Properties = { ...this.Properties, ...envConfig(env) }
-    } else {
+  env (env?: IcodeBuildEnv | null): CodeBuildProject {
+    if (env === null) {
       const { Environment, ...theRest } = this.Properties
       this.Properties = { ...theRest, ...envConfig() }
+    } else {
+      this.Properties = { ...this.Properties, ...envConfig(env) }
     }
+
     return this
   }
   envPreset (
@@ -217,7 +256,7 @@ export class CodeBuildProject {
     size?: 'small' | 'medium' | 'large'
     os?: 'linux' | 'windows'
     image?: string
-    }
+    } = { size: 'small', os: 'linux' }
   ): CodeBuildProject {
     const { os, size, image } = envPresets(preset, {
       size: opts.size,
@@ -227,101 +266,127 @@ export class CodeBuildProject {
 
     return this.env({ os, size, image })
   }
-  cache (input: IcodeBuildcache): CodeBuildProject {
-    if (input) {
-      if (Array.isArray(input)) {
-        // must be LOCAL
-        this.Properties = { ...this.Properties, Cache: { Type: 'LOCAL', Modes: input } }
+  cache (input?: IcodeBuildcache | null): CodeBuildProject {
+    if (input !== null) {
+      if (input) {
+        if (Array.isArray(input)) {
+          // must be LOCAL mode
+          this.Properties.Cache = { Type: 'LOCAL', Modes: input }
+        } else {
+          // input:'s3://string'
+          if (!input.startsWith('s3://')) {
+            throw new Error(
+              'string caches are assumed to be an S3 locaiton - which should be formatted as s3://<bucket>/<pathprefixed/keyname>'
+            )
+          } else {
+            const { Bucket, Key } = s3uri.urlToOptions(input)
+            this.Properties.Cache = { Type: 'S3', Location: `${Bucket}/${Key}` }
+          }
+        }
       } else {
-        // must be s3 string
-        const { Bucket, Key } = s3uri.urlToOptions(input)
-        this.Properties = {
-          ...this.Properties,
-          Cache: { Type: 'S3', Location: `${Bucket}/${Key}` }
-        }
+        // input:void
+        this.Properties.Cache = { Type: 'NO_CACHE' }
       }
     } else {
-      this.Properties = { ...this.Properties, Cache: { Type: 'NO_CACHE' } }
+      // input:null
+      this.Properties.Cache = { Type: 'NO_CACHE' }
     }
     return this
   }
-  logs (_in: IcodeBuildLogs): CodeBuildProject {
-    const defaulted = { ...{ s3: { encOff: false } }, ..._in }
-
-    if ('cw' in defaulted && defaulted.cw) {
-      const [GroupName, StreamName] = defaulted.cw.split(':')
-
-      this.Properties.LogsConfig = {
-        ...this.Properties.LogsConfig,
-        CloudWatchLogs: {
-          Status: 'ENABLED',
-          GroupName,
-          StreamName
-        }
-      }
+  logs (_in: IcodeBuildLogs | null): CodeBuildProject {
+    if (_in === null) {
+      delete this.Properties.LogsConfig
     } else {
-      delete (this.Properties.LogsConfig as any).CloudWatchLogs
-    }
+      if ('cw' in _in) {
+        let GroupName: string, StreamName: string
 
-    if ('s3' in defaulted && 'loc' in defaulted.s3) {
-      const { Bucket, Key } = s3uri.urlToOptions(defaulted.s3.loc)
-      const Location = `${Bucket}/${Key}`
-
-      this.Properties.LogsConfig = {
-        ...this.Properties.LogsConfig,
-        S3Logs: {
-          Status: 'ENABLED',
-          Location,
-          EncryptionDisabled: defaulted.s3.encOff
+        if (_in.cw.includes(':')) {
+          ;[GroupName, StreamName] = _in.cw.split(':')
+        } else if (_in.cw.includes('.')) {
+          ;[GroupName, StreamName] = _in.cw.split('.')
+        } else {
+          throw new Error(
+            'the <CodeBuildProject>.logs.cw string is assumed to be a string separated by a : or .'
+          )
         }
+        this.Properties.LogsConfig = {
+          ...this.Properties.LogsConfig,
+          CloudWatchLogs: {
+            Status: 'ENABLED',
+            GroupName,
+            StreamName
+          }
+        }
+      } else {
+        delete (this.Properties.LogsConfig as any).CloudWatchLogs
       }
-    } else {
-      delete (this.Properties.LogsConfig as any).S3Logs
+      if ('s3' in _in && 'loc' in _in.s3) {
+        if (!_in.s3.loc.startsWith('s3://')) {
+          throw new Error(
+            'string caches are assumed to be an S3 locaiton - which should be formatted as s3://<bucket>/<pathprefixed/keyname>'
+          )
+        } else {
+          const { Bucket, Key } = s3uri.urlToOptions(_in.s3.loc)
+          const Location = `${Bucket}/${Key}`
+
+          this.Properties.LogsConfig = {
+            ...this.Properties.LogsConfig,
+            S3Logs: {
+              Status: 'ENABLED',
+              Location,
+              EncryptionDisabled: !('encOff' in _in.s3) ? false : _in.s3.encOff
+            }
+          }
+        }
+      } else {
+        delete (this.Properties.LogsConfig as any).S3Logs
+      }
     }
 
     return this
   }
-  sources (input: IcodeBuildsource | IcodeBuildsource[]): CodeBuildProject {
-    this.Properties = { ...this.Properties, ...sourceConfig(input) }
+  sources (input?: IcodeBuildsource | IcodeBuildsource[] | null): CodeBuildProject {
+    if (input === null) {
+      // not fully removeable
+      this.Properties = { ...this.Properties, ...sourceConfig() }
+    } else {
+      this.Properties = { ...this.Properties, ...sourceConfig(input) }
+    }
     return this
   }
-  triggers (input?: IcodeBuildTriggerKinds | IcodeBuildTriggerKinds[]): CodeBuildProject {
-    if (input) {
-      const _in = Array.isArray(input) ? input : new Array(input)
+  triggers (input: IcodeBuildTriggerTypes | IcodeBuildTriggerTypes[] | null): CodeBuildProject {
+    if (input !== null) {
       this.Properties.Triggers = {
         Webhook: true,
-        FilterGroups: _in.map(v => {
-          return {
-            Type: v.type,
-            Pattern:
-              v.type !== 'EVENT'
-                ? v.pattern
-                : Array.isArray(v.pattern)
-                  ? v.pattern.join(', ')
-                  : v.pattern,
-            ExcludeMatchedPattern: v.isMatchingPattern
-          }
-        })
+        ...CodeBuildProject.triggerFilterGroupConfig(input)
       }
     } else {
       delete this.Properties.Triggers
     }
     return this
   }
-  vpc (_in: IcodeBuildVpc): CodeBuildProject {
-    this.Properties.VpcConfig = {
-      SecurityGroupIds: Array.isArray(_in.secGrpIds) ? _in.secGrpIds : new Array(_in.secGrpIds),
-      Subnets: Array.isArray(_in.subnets) ? _in.subnets : new Array(_in.subnets),
-      VpcId: _in.id
+  vpc (_in: IcodeBuildVpc | null): CodeBuildProject {
+    if (_in !== null) {
+      this.Properties.VpcConfig = {
+        SecurityGroupIds: Array.isArray(_in.secGrpIds) ? _in.secGrpIds : new Array(_in.secGrpIds),
+        Subnets: Array.isArray(_in.subnets) ? _in.subnets : new Array(_in.subnets),
+        VpcId: _in.id
+      }
+    } else {
+      delete this.Properties.VpcConfig
     }
     return this
   }
-  enableBadge (turnOn: boolean): CodeBuildProject {
+  enableBadge (turnOn: boolean = true): CodeBuildProject {
     this.Properties.BadgeEnabled = turnOn
     return this
   }
-  encryptionKey (encKey: string): CodeBuildProject {
-    this.Properties.EncryptionKey = encKey
+  encryptionKey (encKey: string | null): CodeBuildProject {
+    if (encKey !== null) {
+      this.Properties.EncryptionKey = encKey
+    } else {
+      delete this.Properties.EncryptionKey
+    }
     return this
   }
   toJSON (): object {
@@ -358,7 +423,7 @@ export interface IcodeBuild {
   logs?: IcodeBuildLogs
   cache?: IcodeBuildcache
   vpc?: IcodeBuildVpc
-  triggers?: IcodeBuildTriggerKinds | IcodeBuildTriggerKinds[]
+  triggers?: IcodeBuildTriggerTypes | IcodeBuildTriggerTypes[]
   tags?: Itags | Itags[]
 }
 
@@ -368,54 +433,51 @@ export interface IcodeBuildVpc {
   subnets: string | string[]
 }
 
-type IcodeBuildcache = ILocalCacheMode[] | undefined | string /* s3uri */
+type IcodeBuildcache = ILocalCacheMode[] | string /* s3uri */
 
 type ILocalCacheMode = 'LOCAL_SOURCE_CACHE' | 'LOCAL_DOCKER_LAYER_CACHE' | 'LOCAL_CUSTOM_CACHE'
 
-type IcodeBuildTriggerKinds =
-  | IcodeBuildTriggerFiterGroup_base
-  | IcodeBuildTriggerFiterGroup_event
-  | IcodeBuildTriggerFiterGroup_actor
-  | IcodeBuildTriggerFiterGroup_file
-  | IcodeBuildTriggerFiterGroup_head
+export type IcodeBuildLogs = IcodeBuildLogs_cw | IcodeBuildLogs_s3 | IcodeBuildLogs_both
 
-export interface IcodeBuildLogs {
-  cw?: string // GOURP.THREAD expects a dot separation
-  s3?: { loc: string; encOff?: boolean }
+export interface IcodeBuildLogs_cw {
+  cw: string // GROUP.THREAD expects a dot or colon separation
+}
+export interface IcodeBuildLogs_s3 {
+  s3: { loc: string; encOff?: boolean }
+}
+export interface IcodeBuildLogs_both {
+  cw: string // GROUP.THREAD expects a dot or colon separation
+  s3: { loc: string; encOff?: boolean }
 }
 
-export interface IcodeBuildTriggerFiterGroup_base {
-  isMatchingPattern: boolean
-  pattern: string
-  type: 'BASE_REF'
+type IcodeBuildTriggerTypes =
+  | IcodeBuildTrigger_event
+  | IcodeBuildTrigger_base
+  | IcodeBuildTrigger_actor
+  | IcodeBuildTrigger_path
+  | IcodeBuildTrigger_head
+
+export interface IcodeBuildTrigger_event {
+  event: {
+    pattern: eventPatterns_lower | eventPatterns_lower[]
+    isExclusion?: boolean
+  }
+}
+export interface IcodeBuildTrigger_base {
+  base: { pattern: string; isExclusion?: boolean }
+}
+export interface IcodeBuildTrigger_actor {
+  actor: { pattern: string; isExclusion?: boolean }
+}
+export interface IcodeBuildTrigger_path {
+  path: { pattern: string; isExclusion?: boolean }
+}
+export interface IcodeBuildTrigger_head {
+  head: { pattern: string; isExclusion?: boolean }
 }
 
-export interface IcodeBuildTriggerFiterGroup_event {
-  isMatchingPattern: boolean
-  pattern: eventPatterns | eventPatterns[]
-  type: 'EVENT'
-}
-
-export interface IcodeBuildTriggerFiterGroup_actor {
-  isMatchingPattern: boolean
-  pattern: string
-  type: 'ACTOR_ACCOUNT_ID'
-}
-
-export interface IcodeBuildTriggerFiterGroup_file {
-  isMatchingPattern: boolean
-  pattern: string
-  type: 'FILE_PATH'
-}
-
-export interface IcodeBuildTriggerFiterGroup_head {
-  isMatchingPattern: boolean
-  pattern: string
-  type: 'HEAD_REF'
-}
-
-type eventPatterns =
-  | 'PUSH'
-  | 'PULL_REQUEST_CREATED'
-  | 'PULL_REQUEST_UPDATED'
-  | 'PULL_REQUEST_REOPENED'
+type eventPatterns_lower =
+  | 'push'
+  | 'pull_request_created'
+  | 'pull_request_updated'
+  | 'pull_request_reopened'

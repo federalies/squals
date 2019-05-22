@@ -132,6 +132,7 @@ export const typeTransform = (
       case 'codepipeline':
         return 'CODEPIPELINE'
       case 's3':
+      case 'github':
       case 'codeCommit':
       case 'bitbucket':
         return hostFQDN.toUpperCase() as ICodeBuildTypes

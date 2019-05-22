@@ -31,6 +31,7 @@
   "license": "MIT",
   "dependencies": {
     "@sandfox/arn": "^2.1.0",
+    "acorn": "^6.1.1",
     "aws-sdk": "^2.441.0",
     "esm": "^3.2.4",
     "getopts": "^2.2.3",
