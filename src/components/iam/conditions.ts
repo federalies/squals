@@ -53,7 +53,7 @@ const NumberFuncs = (
     }
   }
 }
-const StringFuns_singular = (
+const StringFuncs_singular = (
   svcName: string,
   dataField: string,
   o: {
@@ -66,6 +66,7 @@ const StringFuns_singular = (
   isAll?: boolean
   } = { isAny: false, isAll: false }
 ): IStringConditions_singularFuncs => {
+  /* istanbul ignore next */
   if (multi.isAny && multi.isAll) {
     throw new Error(
       'Can not setup an IAM condition on one data field using both ANY and ALL conditional operators - use only one.'
@@ -231,15 +232,15 @@ const StringFuncs = (
   return (((svcName: string) => {
     return {
       [dataField]: {
-        ...StringFuns_singular(svcName, dataField),
+        ...StringFuncs_singular(svcName, dataField, { enums }),
         ifExists: {
-          ...StringFuns_singular(svcName, dataField, { enums, ifExists: true })
+          ...StringFuncs_singular(svcName, dataField, { enums, ifExists: true })
         },
         ignoringCase: {
-          ...StringFuns_singular(svcName, dataField, { enums, isCaseIgnored: true })
+          ...StringFuncs_singular(svcName, dataField, { enums, isCaseIgnored: true })
         },
         ignoreCaseIfExists: {
-          ...StringFuns_singular(svcName, dataField, { enums, isCaseIgnored: true, ifExists: true })
+          ...StringFuncs_singular(svcName, dataField, { enums, isCaseIgnored: true, ifExists: true })
         },
         ...StringArrFuncs(dataField, enums)(svcName)[dataField]
       }
@@ -254,31 +255,50 @@ const StringArrFuncs = (
     return {
       [dataField]: {
         all: {
-          ...StringFuncs_plural(svcName, dataField),
-          ifExists: { ...StringFuncs_plural(svcName, dataField, { enums, ifExists: true }) },
+          ...StringFuncs_plural(svcName, dataField, { enums }),
+          ifExists: {
+            ...StringFuncs_plural(svcName, dataField, { enums, ifExists: true }, { isAll: true })
+          },
           ignoringCase: {
-            ...StringFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true })
+            ...StringFuncs_plural(
+              svcName,
+              dataField,
+              { enums, isCaseIgnored: true },
+              { isAll: true }
+            )
           },
           ignoreCaseIfExists: {
-            ...StringFuncs_plural(svcName, dataField, {
-              enums,
-              isCaseIgnored: true,
-              ifExists: true
-            })
+            ...StringFuncs_plural(
+              svcName,
+              dataField,
+              {
+                enums,
+                isCaseIgnored: true,
+                ifExists: true
+              },
+              { isAll: true }
+            )
           }
         },
         any: {
-          ...StringFuncs_plural(svcName, dataField),
-          ifExists: { ...StringFuncs_plural(svcName, dataField, { enums, ifExists: true }) },
+          ...StringFuncs_plural(svcName, dataField, { enums }, { isAny: true }),
+          ifExists: {
+            ...StringFuncs_plural(svcName, dataField, { enums, ifExists: true }, { isAny: true })
+          },
           ignoringCase: {
             ...StringFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true })
           },
           ignoreCaseIfExists: {
-            ...StringFuncs_plural(svcName, dataField, {
-              enums,
-              isCaseIgnored: true,
-              ifExists: true
-            })
+            ...StringFuncs_plural(
+              svcName,
+              dataField,
+              {
+                enums,
+                isCaseIgnored: true,
+                ifExists: true
+              },
+              { isAny: true }
+            )
           }
         }
       }
@@ -466,7 +486,7 @@ const TagFuncs = (
   return (((svcName: string) => {
     return {
       [dataField]: {
-        ...TagFuncs_singular(svcName, dataField),
+        ...TagFuncs_singular(svcName, dataField, { enums }),
         ifExists: {
           ...TagFuncs_singular(svcName, dataField, { enums, ifExists: true })
         },
@@ -489,31 +509,45 @@ const TagArrFuncs = (
     return {
       [dataField]: {
         all: {
-          ...TagFuncs_plural(svcName, dataField),
-          ifExists: { ...TagFuncs_plural(svcName, dataField, { enums, ifExists: true }) },
+          ...TagFuncs_plural(svcName, dataField, { enums }, { isAll: true }),
+          ifExists: {
+            ...TagFuncs_plural(svcName, dataField, { enums, ifExists: true }, { isAll: true })
+          },
           ignoringCase: {
-            ...TagFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true })
+            ...TagFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true }, { isAll: true })
           },
           ignoreCaseIfExists: {
-            ...TagFuncs_plural(svcName, dataField, {
-              enums,
-              isCaseIgnored: true,
-              ifExists: true
-            })
+            ...TagFuncs_plural(
+              svcName,
+              dataField,
+              {
+                enums,
+                isCaseIgnored: true,
+                ifExists: true
+              },
+              { isAll: true }
+            )
           }
         },
         any: {
-          ...TagFuncs_plural(svcName, dataField),
-          ifExists: { ...TagFuncs_plural(svcName, dataField, { enums, ifExists: true }) },
+          ...TagFuncs_plural(svcName, dataField, { enums }, { isAny: true }),
+          ifExists: {
+            ...TagFuncs_plural(svcName, dataField, { enums, ifExists: true }, { isAny: true })
+          },
           ignoringCase: {
-            ...TagFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true })
+            ...TagFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true }, { isAny: true })
           },
           ignoreCaseIfExists: {
-            ...TagFuncs_plural(svcName, dataField, {
-              enums,
-              isCaseIgnored: true,
-              ifExists: true
-            })
+            ...TagFuncs_plural(
+              svcName,
+              dataField,
+              {
+                enums,
+                isCaseIgnored: true,
+                ifExists: true
+              },
+              { isAny: true }
+            )
           }
         }
       }
@@ -523,12 +557,12 @@ const TagArrFuncs = (
 const ArnFuncs = (dataField: string): ConditionFunction => {
   return (svcName: string) => {
     return {
-      [dataField]: {
+      [dataField]: ({
         is: (arn: string) => ({ ArnEquals: { [`${svcName}:${dataField}`]: arn } }),
         isNot: (arn: string) => ({ ArnNotEquals: { [`${svcName}:${dataField}`]: arn } }),
-        isLike: (arn: string) => ({ ArnLike: { [`${svcName}:${dataField}`]: arn } }),
-        isNotLike: (arn: string) => ({ ArnNotLike: { [`${svcName}:${dataField}`]: arn } })
-      } as IArnConditions
+        isLike: (...arn: string[]) => ({ ArnLike: { [`${svcName}:${dataField}`]: arn } }),
+        isNotLike: (...arn: string[]) => ({ ArnNotLike: { [`${svcName}:${dataField}`]: arn } })
+      } as unknown) as IArnConditions
     }
   }
 }
@@ -1005,8 +1039,8 @@ interface IIPAddressConditions {
 interface IArnConditions {
   is(arn: string): { ArnEquals: { [resource: string]: string } }
   isNot(arn: string): { ArnNotEquals: { [resource: string]: string } }
-  isLike(arn: string): { ArnLike: { [resource: string]: string } }
-  isNotLike(arn: string): { ArnNotLike: { [resource: string]: string } }
+  isLike(...arn: string[]): { ArnLike: { [resource: string]: string } }
+  isNotLike(...arn: string[]): { ArnNotLike: { [resource: string]: string } }
 }
 
 interface IIamSvcMappings {
