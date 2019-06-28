@@ -1,7 +1,7 @@
-import { IIamStatement, IamPolicy, IamStatement, actions } from '../../src/components/iam/index'
+import { IamPolicy, IamStatement } from '../../src/components/iam/index'
 
 describe('IAM Policy Objects', () => {
-  const c = IamStatement.cond
+  const c = IamStatement.c
   test('Defaults', () => {
     const name = 'name'
     const a = new IamPolicy(name).statements(new IamStatement())
@@ -94,7 +94,7 @@ describe('IAM Policy Objects', () => {
   })
   test('Test Using helper', () => {
     const stmt = IamStatement
-    const act = actions()
+    const act = IamStatement.a
     const c1 = c.s3.prefix.equals('someprefix')
     const c2 = c.s3.versionid.equals('versionString')
     const a = new IamPolicy().statements(
@@ -131,6 +131,64 @@ describe('IAM Policy Objects', () => {
     expect(a).toHaveProperty('name')
     expect(a.Type).toEqual('AWS::IAM::Policy')
     expect(a.Properties.PolicyDocument.Statement).toEqual(e)
+  })
+  test('https://aws.amazon.com/premiumsupport/knowledge-center/s3-folder-user-access/', () => {
+    const e = {
+      Version: '2012-10-17',
+      Statement: [
+        {
+          Sid: 'AllowStatement1',
+          Action: ['s3:ListAllMyBuckets', 's3:GetBucketLocation'],
+          Effect: 'Allow',
+          Resource: ['arn:aws:s3:::*']
+        },
+        {
+          Sid: 'AllowStatement2A',
+          Action: ['s3:ListBucket'],
+          Effect: 'Allow',
+          Resource: ['arn:aws:s3:::awsexamplebucket'],
+          Condition: { StringEquals: { 's3:prefix': ['', 'media'] } }
+        },
+        {
+          Sid: 'AllowStatement3',
+          Action: ['s3:ListBucket'],
+          Effect: 'Allow',
+          Resource: ['arn:aws:s3:::awsexamplebucket'],
+          Condition: { StringLike: { 's3:prefix': ['media/*'] } }
+        },
+        {
+          Sid: 'AllowStatement4A',
+          Effect: 'Allow',
+          Action: ['s3:GetObject'],
+          Resource: ['arn:aws:s3:::awsexamplebucket/media/*']
+        }
+      ]
+    }
+    const a = IamStatement.a
+    const c = IamStatement.c
+    const r = IamStatement.r
+    const Statement = [
+      new IamStatement('AllowStatement1')
+        .allows()
+        .actions(a.s3.listAllMyBuckets, a.s3.getBucketLocation)
+        .resources(r({ svc: 's3' })),
+      new IamStatement('AllowStatement2A')
+        .allows()
+        .actions(a.s3.listBucket)
+        .resources(r({ svc: 's3', resource: 'awsexamplebucket' }))
+        .when(c.s3.prefix.equals('media')),
+      new IamStatement('AllowStatement3')
+        .allows()
+        .actions(a.s3.listBucket)
+        .resources(r({ svc: 's3', resource: 'awsexamplebucket' }))
+        .when(c.s3.prefix.like('media/*')),
+      new IamStatement('AllowStatement4A')
+        .allows()
+        .actions(a.s3.getObject)
+        .resources(r({ svc: 's3', resource: 'awsexamplebucket/media/*' }))
+    ]
+    const actual = new IamPolicy().statements(...Statement)
+    expect(actual.Properties.PolicyDocument.Statement).toEqual(e.Statement)
   })
 })
 

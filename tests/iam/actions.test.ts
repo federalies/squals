@@ -1,4 +1,4 @@
-import { actions } from '../../src/components/iam/actions'
+import { actions } from '../../src/components/iam/statement/actions'
 
 describe('IAM Statement Conditions', () => {
   test('Start with S3 ', () => {

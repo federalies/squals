@@ -36,7 +36,9 @@ export function actions () {
       updateVirtualService: 'appmesh:UpdateVirtualService'
     },
     s3: {
-      ALL: 's3.*',
+      ALL: 's3:*',
+      ALLgets: 's3:Get*',
+      ALLlist: 's3:List*',
       abortMultiPartUpload: 's3:AbortMultipartUpload',
       createBucket: 's3:CreateBucket',
       createJob: 's3:CreateJob',
@@ -118,7 +120,10 @@ export function actions () {
       replicateTags: 's3:ReplicateTags',
       restoreObject: 's3:RestoreObject',
       updateJobPriority: 's3:UpdateJobPriority',
-      updateJobStatus: 's3:UpdateJobStatus'
+      updateJobStatus: 's3:UpdateJobStatus',
+      _lists: {
+        BASIC: ['s3:Get*', 's3:PutObject', 's3:ListBucket', 's3:ListBucketVersions']
+      }
     },
     certificate: {
       addTagsToCertificate: 'acm:AddTagsToCertificate',

@@ -1,4 +1,4 @@
-import { IamStatement } from '../../src/components/iam/index'
+import { IamStatement, IamPolicy } from '../../src/components/iam/index'
 
 describe('IAM Statememt Objects', () => {
   test('Defaults', () => {
@@ -44,6 +44,60 @@ describe('IAM Statememt Objects', () => {
           { 's3:key': ['myKey', 'otherOptions'] },
           { 's3:funkyStuff': ['got', 'the', 'funk'] }
         ]
+      }
+    }
+    expect(a).toEqual(e)
+  })
+  test('toJSON', () => {
+    const a = new IamPolicy('myName')
+      .statements(
+        new IamStatement('myId1')
+          .allows()
+          .actions(IamStatement.a.s3.ALL)
+          .resources('*')
+          .when(IamStatement.c.s3.signatureage.lessThan(100))
+      )
+      .addStatements(
+        new IamStatement('id2')
+          .allows()
+          .actions(IamStatement.a.eb.describeAccountAttributes)
+          .resources('elasticbeanstalk.*')
+          .when(IamStatement.c.s3.signatureage.lessThan(100)),
+        new IamStatement('id3')
+          .denies()
+          .actions('*')
+          .resources('*')
+      )
+      .toJSON()
+    const e = {
+      myName: {
+        Type: 'AWS::IAM::Policy',
+        Properties: {
+          PolicyName: 'myName',
+          PolicyDocument: {
+            Version: '2012-10-17',
+            Id: 'myName',
+            Statement: [
+              {
+                Sid: 'myId1',
+                Effect: 'Allow',
+                Action: 's3:*',
+                Resource: '*',
+                Condition: {
+                  NumericLessThan: { 's3:signatureage': 100 }
+                }
+              },
+              {
+                Sid: 'id2',
+                Effect: 'Allow',
+                Action: 'elasticbeanstalk:DescribeAccountAttributes',
+                Resource: 'elasticbeanstalk.*',
+                Condition: { NumericLessThan: { 's3:signatureage': 100 } }
+              },
+              { Sid: 'id3', Effect: 'Deny', Action: '*', Resource: '*' }
+            ]
+          }
+        }
       }
     }
     expect(a).toEqual(e)

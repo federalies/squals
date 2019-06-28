@@ -65,7 +65,7 @@ const StringFuncs_singular = (
   isAny?: boolean
   isAll?: boolean
   } = { isAny: false, isAll: false }
-): IStringConditions_singularFuncs => {
+): IStringFuncConditions => {
   /* istanbul ignore next */
   if (multi.isAny && multi.isAll) {
     throw new Error(
@@ -81,9 +81,20 @@ const StringFuncs_singular = (
   if (o.isCaseIgnored) suffix += 'IgnoreCase'
   if (o.ifExists) suffix += 'IfExists'
 
+  const setDiff = (setA: Set<string>, setB: Set<string>) => {
+    const _difference = new Set(setA)
+    for (var elem of setB) {
+      _difference.delete(elem)
+    }
+    return _difference
+  }
+
   return ({
-    equals: (s: string) => {
-      if (o.enums && !o.enums.includes(s)) {
+    equals: (...s: string[]) => {
+      const enumSet = new Set(o.enums)
+      const inputStrSet = new Set(s)
+      // all inputs must be valid - any that hang out v the enums is a problem
+      if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
         throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
       }
       return {
@@ -92,8 +103,11 @@ const StringFuncs_singular = (
         }
       }
     },
-    notEquals: (s: string) => {
-      if (o.enums && !o.enums.includes(s)) {
+    notEquals: (...s: string[]) => {
+      const enumSet = new Set(o.enums)
+      const inputStrSet = new Set(s)
+      // all inputs must be valid - any that hang out v the enums is a problem
+      if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
         throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
       }
       return {
@@ -130,7 +144,7 @@ const StringFuncs_singular = (
         }
       }
     }
-  } as unknown) as IStringConditions_singularFuncs
+  } as unknown) as IStringFuncConditions
 }
 const StringFuncs_plural = (
   // basically the same thing as singular
@@ -146,7 +160,7 @@ const StringFuncs_plural = (
   isAny?: boolean
   isAll?: boolean
   } = { isAny: false, isAll: false }
-): IStringConditions_pluralFuncs => {
+): IStringFuncConditions => {
   if (multi.isAny && multi.isAll) {
     throw new Error(
       'Can not setup an IAM condition on one data field using both ANY and ALL conditional operators - use only one.'
@@ -223,29 +237,33 @@ const StringFuncs_plural = (
         }
       }
     }
-  } as unknown) as IStringConditions_pluralFuncs
+  } as unknown) as IStringFuncConditions
 }
 const StringFuncs = (
   dataField: string,
   enums?: string[]
-): ((svc: string) => { [dfield: string]: IStringConditions }) => {
+): ((svc: string) => { [dfield: string]: IStringConditions_singular }) => {
   return (((svcName: string) => {
     return {
       [dataField]: {
-        ...StringFuncs_singular(svcName, dataField, { enums }),
+        ...StringFuncs_plural(svcName, dataField, { enums }),
         ifExists: {
-          ...StringFuncs_singular(svcName, dataField, { enums, ifExists: true })
+          ...StringFuncs_plural(svcName, dataField, { enums, ifExists: true })
         },
         ignoringCase: {
-          ...StringFuncs_singular(svcName, dataField, { enums, isCaseIgnored: true })
+          ...StringFuncs_plural(svcName, dataField, { enums, isCaseIgnored: true })
         },
         ignoreCaseIfExists: {
-          ...StringFuncs_singular(svcName, dataField, { enums, isCaseIgnored: true, ifExists: true })
+          ...StringFuncs_plural(svcName, dataField, {
+            enums,
+            isCaseIgnored: true,
+            ifExists: true
+          })
         },
         ...StringArrFuncs(dataField, enums)(svcName)[dataField]
       }
     }
-  }) as unknown) as ((svc: string) => { [dfield: string]: IStringConditions })
+  }) as unknown) as ((svc: string) => { [dfield: string]: IStringConditions_singular })
 }
 const StringArrFuncs = (
   dataField: string,
@@ -468,6 +486,7 @@ const TagFuncs_plural = (
       const enumSet = new Set(o.enums)
       const inputStrSet = new Set(value)
       // all inputs must be valid - any that hang out vs the enums is a problem
+      /* istanbul ignore next */
       if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
         throw new Error(`invalid option given: ${value} when was expecting: ${o.enums}`)
       }
@@ -764,23 +783,23 @@ export interface IPolicyConditions_aws {
     TokenIssueTime: IDateConditions
 
     EpochTime: INumericConditions
-    FederatedProvider: IStringConditions
-    RequestObjectTag: IStringConditions
+    FederatedProvider: IStringConditions_singular
+    RequestObjectTag: IStringConditions_singular
 
     PrincipalArn: IArnConditions
     SourceArn: IArnConditions
     MultiFactorAuthAge: INumericConditions
 
-    userid: IStringConditions
-    username: IStringConditions
-    PrincipalOrgID: IStringConditions
-    PrincipalType: IStringConditions
-    Referer: IStringConditions
-    RequestedRegion: IStringConditions
-    UserAgent: IStringConditions
-    SourceAccount: IStringConditions
-    SourceVpc: IStringConditions
-    SourceVpce: IStringConditions
+    userid: IStringConditions_singular
+    username: IStringConditions_singular
+    PrincipalOrgID: IStringConditions_singular
+    PrincipalType: IStringConditions_singular
+    Referer: IStringConditions_singular
+    RequestedRegion: IStringConditions_singular
+    UserAgent: IStringConditions_singular
+    SourceAccount: IStringConditions_singular
+    SourceVpc: IStringConditions_singular
+    SourceVpce: IStringConditions_singular
 
     MultiFactorAuthPresent: IBoolConditions
     SecureTransport: IBoolConditions
@@ -796,24 +815,24 @@ export interface IPolicyConditions_aws {
 }
 export interface IPolicyConditions_iam {
   iam: {
-    AWSServiceName: IStringConditions
-    PassedToService: IStringConditions
-    OrganizationsPolicyId: IStringConditions
-    PermissionsBoundary: IStringConditions
+    AWSServiceName: IStringConditions_singular
+    PassedToService: IStringConditions_singular
+    OrganizationsPolicyId: IStringConditions_singular
+    PermissionsBoundary: IStringConditions_singular
     PolicyARN: IArnConditions
     ResourceTag: ITagConditions
   }
   saml: {
-    aud: IStringConditions
-    cn: IStringConditions
-    doc: IStringConditions
+    aud: IStringConditions_singular
+    cn: IStringConditions_singular
+    doc: IStringConditions_singular
     edupersonaffiliation: IStringConditions_plural
     edupersonassurance: IStringConditions_plural
     edupersonentitlement: string
     edupersonnickname: IStringConditions_plural
-    edupersonorgdn: IStringConditions
+    edupersonorgdn: IStringConditions_singular
     edupersonorgunitdn: IStringConditions_plural
-    edupersonprimaryaffiliation: IStringConditions
+    edupersonprimaryaffiliation: IStringConditions_singular
     edupersonprimaryorgunitdn: IStringConditions_plural
     edupersonprincipalname: IStringConditions_plural
     edupersonscopedaffiliation: IStringConditions_plural
@@ -823,82 +842,82 @@ export interface IPolicyConditions_iam {
     eduorglegalname: IStringConditions_plural
     eduorgsuperioruri: IStringConditions_plural
     eduorgwhitepagesuri: IStringConditions_plural
-    namequalifier: IStringConditions
-    iss: IStringConditions
-    sub: IStringConditions
-    sub_type: IStringConditions
+    namequalifier: IStringConditions_singular
+    iss: IStringConditions_singular
+    sub: IStringConditions_singular
+    sub_type: IStringConditions_singular
   }
 }
 
 export interface IPolicyConditions_s3 {
   s3: {
-    authtype: IStringConditions
-    delimiter: IStringConditions
+    authtype: IStringConditions_singular
+    delimiter: IStringConditions_singular
     signatureage: INumericConditions
-    signatureversion: IStringConditions
-    prefix: IStringConditions
-    TagKeys: IStringConditions
+    signatureversion: IStringConditions_singular
+    prefix: IStringConditions_singular
+    TagKeys: IStringConditions_singular
     // available in Both Capitalization  Options
-    locationconstraint: IStringConditions
-    LocationConstraint: IStringConditions
+    locationconstraint: IStringConditions_singular
+    LocationConstraint: IStringConditions_singular
     // available in Both Capitalization  Options
-    versionid: IStringConditions
-    VersionId: IStringConditions
+    versionid: IStringConditions_singular
+    VersionId: IStringConditions_singular
     'max-keys': INumericConditions
-    'x-amz-acl': IStringConditions
-    'x-amz-content-sha256': IStringConditions
-    'x-amz-copy-source': IStringConditions
-    'x-amz-grant-full-control': IStringConditions
-    'x-amz-grant-read': IStringConditions
-    'x-amz-grant-read-acp': IStringConditions
-    'x-amz-grant-write': IStringConditions
-    'x-amz-grant-write-acp': IStringConditions
-    'x-amz-metadata-directive': IStringConditions
-    'x-amz-server-side-encryption': IStringConditions
-    'x-amz-server-side-encryption-aws-kms-key-id': IStringConditions
-    'x-amz-storage-class': IStringConditions
-    'x-amz-website-redirect-location': IStringConditions
-    'object-lock-legal-hold': IStringConditions
-    'object-lock-mode': IStringConditions
-    'object-lock-remaining-retention-days': IStringConditions
-    'object-lock-retain-until-date': IStringConditions
+    'x-amz-acl': IStringConditions_singular
+    'x-amz-content-sha256': IStringConditions_singular
+    'x-amz-copy-source': IStringConditions_singular
+    'x-amz-grant-full-control': IStringConditions_singular
+    'x-amz-grant-read': IStringConditions_singular
+    'x-amz-grant-read-acp': IStringConditions_singular
+    'x-amz-grant-write': IStringConditions_singular
+    'x-amz-grant-write-acp': IStringConditions_singular
+    'x-amz-metadata-directive': IStringConditions_singular
+    'x-amz-server-side-encryption': IStringConditions_singular
+    'x-amz-server-side-encryption-aws-kms-key-id': IStringConditions_singular
+    'x-amz-storage-class': IStringConditions_singular
+    'x-amz-website-redirect-location': IStringConditions_singular
+    'object-lock-legal-hold': IStringConditions_singular
+    'object-lock-mode': IStringConditions_singular
+    'object-lock-remaining-retention-days': IStringConditions_singular
+    'object-lock-retain-until-date': IStringConditions_singular
     ExistingObjectTag: ITagConditions
     RequestObjectTag: ITagConditions
-    RequestObjectTagKeys: IStringConditions
-    ExistingJobOperation: IStringConditions
+    RequestObjectTagKeys: IStringConditions_singular
+    ExistingJobOperation: IStringConditions_singular
     ExistingJobPriority: INumericConditions
-    JobSuspendedCause: IStringConditions
-    RequestJobOperation: IStringConditions
+    JobSuspendedCause: IStringConditions_singular
+    RequestJobOperation: IStringConditions_singular
     RequestJobPriority: INumericConditions
   }
 }
 export interface IPolicyConditions_dynamodb {
   dynamodb: {
-    Attributes: IStringConditions
-    EnclosingOperation: IStringConditions
+    Attributes: IStringConditions_singular
+    EnclosingOperation: IStringConditions_singular
     LeadingKeys: IStringConditions_plural
-    Select: IStringConditions
-    ReturnConsumedCapacity: IStringConditions
-    ReturnValues: IStringConditions
+    Select: IStringConditions_singular
+    ReturnConsumedCapacity: IStringConditions_singular
+    ReturnValues: IStringConditions_singular
   }
 }
 export interface IPolicyConditions_cloudformation {
   cloudformation: {
-    ChangeSetName: IStringConditions
-    ResourceTypes: IStringConditions
+    ChangeSetName: IStringConditions_singular
+    ResourceTypes: IStringConditions_singular
     RoleArnL: IArnConditions
-    StackPolicyUrl: IStringConditions
-    TemplateUrl: IStringConditions
+    StackPolicyUrl: IStringConditions_singular
+    TemplateUrl: IStringConditions_singular
   }
 }
 export interface IPolicyConditions_codecommit {
-  codecommit: { References: IStringConditions }
+  codecommit: { References: IStringConditions_singular }
 }
 export interface IPolicyConditions_lambda {
   lambda: {
     FunctionArn: IArnConditions
-    Layer: IStringConditions
-    Principal: IStringConditions
+    Layer: IStringConditions_singular
+    Principal: IStringConditions_singular
   }
 }
 export interface IPolicyConditions_eb {
@@ -919,20 +938,20 @@ export interface IPolicyConditions_ecr {
 }
 export interface IPolicyConditions_ses {
   ses: {
-    FeedbackAddres: IStringConditions
-    FromAddress: IStringConditions
-    FromDisplayName: IStringConditions
-    Recipients: IStringConditions
+    FeedbackAddres: IStringConditions_singular
+    FromAddress: IStringConditions_singular
+    FromDisplayName: IStringConditions_singular
+    Recipients: IStringConditions_singular
   }
 }
 export interface IPolicyConditions_sns {
   sns: {
-    Endpoint: IStringConditions
-    Protocol: IStringConditions
+    Endpoint: IStringConditions_singular
+    Protocol: IStringConditions_singular
   }
 }
 export interface IPolicyConditions_sts {
-  sts: { ExternalId: IStringConditions }
+  sts: { ExternalId: IStringConditions_singular }
 }
 
 interface IDateConditions {
@@ -952,39 +971,27 @@ interface INumericConditions {
   lesserOrEqualto(n: number): { NumericLessThanEquals: { [Attr: string]: number } }
 }
 
-interface IStringConditions_singularFuncs {
-  equals(s: string): { [StringEquals: string]: { [Attr: string]: string } }
-  notEquals(s: string): { [StringEquals: string]: { [Attr: string]: string } }
+interface IStringFuncConditions {
+  equals(...s: string[]): { [StringEquals: string]: { [Attr: string]: string[] } }
+  notEquals(...s: string[]): { [StringEquals: string]: { [Attr: string]: string[] } }
   like(...s: string[]): { [StringEquals: string]: { [Attr: string]: string[] } }
   notLike(...s: string[]): { [StringEquals: string]: { [Attr: string]: string[] } }
 }
-interface IStringConditions_singular_withConditions {
-  ifExists: IStringConditions_singularFuncs
-  ignoringCase: IStringConditions_singularFuncs
-  ignoreCaseIfExists: IStringConditions_singularFuncs
+interface IStringFuncConditions_withConditions {
+  ifExists: IStringFuncConditions
+  ignoringCase: IStringFuncConditions
+  ignoreCaseIfExists: IStringFuncConditions
 }
-// mix these two togther ^^
-type IStringConditions_singular = IStringConditions_singularFuncs &
-  IStringConditions_singular_withConditions
 
-interface IStringConditions_pluralFuncs {
-  // all funcs require stting[]
-  equals(...s: string[]): { [prefix: string]: { [Attr: string]: string[] } }
-  notEquals(...s: string[]): { [prefix: string]: { [Attr: string]: string[] } }
-  like(...s: string[]): { [prefix: string]: { [Attr: string]: string[] } }
-  notLike(...s: string[]): { [prefix: string]: { [Attr: string]: string[] } }
-}
-interface IStringConditions_plural_withConditions {
-  ifExists: IStringConditions_pluralFuncs
-  ignoringCase: IStringConditions_pluralFuncs
-  ignoreCaseIfExists: IStringConditions_pluralFuncs
-}
-// mix these two togther ^^
 interface IStringConditions_plural {
-  all: IStringConditions_plural_withConditions & IStringConditions_pluralFuncs
-  any: IStringConditions_plural_withConditions & IStringConditions_pluralFuncs
+  any: IStringFuncConditions_withConditions & IStringFuncConditions
+  all: IStringFuncConditions_withConditions & IStringFuncConditions
 }
-type IStringConditions = IStringConditions_singular & IStringConditions_plural
+
+// mix these two togther ^^
+type IStringConditions_singular = IStringFuncConditions &
+  IStringFuncConditions_withConditions &
+  IStringConditions_plural
 
 interface ITagConditions_singularFuncs {
   equals(tagKey: string, value: string): { [StringEquals: string]: { [Attr: string]: string } }
@@ -1053,7 +1060,7 @@ type ConditionFunction = (svc: string) => { [dataField: string]: IIamPolicyCondi
 type IIamPolicyConditions =
   | IDateConditions
   | INumericConditions
-  | IStringConditions
+  | IStringConditions_singular
   | IStringConditions_plural
   | IBoolConditions
   | IIPAddressConditions
