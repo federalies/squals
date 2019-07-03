@@ -63,18 +63,18 @@ describe('IAM Policy Objects', () => {
         Sid: 'All_s3and_ec2',
         Effect: 'Allow',
         Action: ['s3.*', 'ec2.*'],
-        Resource: 'someResourceString',
+        Resource: ['someResourceString'],
         Condition: {
-          StringEquals: [{ 's3:prefix': 'myPrefix' }, { 's3:versionid': 'someVersionId' }],
+          StringEquals: [{ 's3:prefix': ['myPrefix'] }, { 's3:versionid': ['someVersionId'] }],
           IpAddress: { 'aws:SourceIp': '11.11.11.11' }
         }
       },
       {
         Sid: 'no containers - yes to dynamo',
         Effect: 'Deny',
-        Action: ['ecs.*', 'ecr.*'],
         Resource: '*',
-        NotAction: 'dynamo.*',
+        Action: ['ecs.*', 'ecr.*'],
+        NotAction: ['dynamo.*'],
         NotResource: ['dynamo:west*', 'dynamo:east*']
       }
     ]
@@ -114,10 +114,10 @@ describe('IAM Policy Objects', () => {
       {
         Sid: 'myId',
         Effect: 'Allow',
-        Action: 's3.*',
+        Action: ['s3:*'],
         Resource: '*',
         Condition: {
-          StringEquals: [{ 's3:prefix': 'someprefix' }, { 's3:versionid': 'versionString' }]
+          StringEquals: [{ 's3:prefix': ['someprefix'] }, { 's3:versionid': ['versionString'] }]
         }
       },
       {
@@ -127,7 +127,6 @@ describe('IAM Policy Objects', () => {
         Resource: '*'
       }
     ]
-
     expect(a).toHaveProperty('name')
     expect(a.Type).toEqual('AWS::IAM::Policy')
     expect(a.Properties.PolicyDocument.Statement).toEqual(e)
@@ -176,7 +175,7 @@ describe('IAM Policy Objects', () => {
         .allows()
         .actions(a.s3.listBucket)
         .resources(r({ svc: 's3', resource: 'awsexamplebucket' }))
-        .when(c.s3.prefix.equals('media')),
+        .when(c.s3.prefix.equals('', 'media')),
       new IamStatement('AllowStatement3')
         .allows()
         .actions(a.s3.listBucket)

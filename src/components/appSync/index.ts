@@ -1,4 +1,3 @@
-export * from './api'
 export * from './apiKey'
 export * from './config'
 export * from './dataSource'

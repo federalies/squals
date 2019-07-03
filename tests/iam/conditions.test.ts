@@ -1,5 +1,5 @@
 import { IamStatement } from '../../src/components/iam/index'
-import { conditions } from '../../src/components/iam/statement/conditions'
+import { conditions, StringFuncs } from '../../src/components/iam/statement/conditions'
 
 describe('IAM Statement Conditions', () => {
   const c = conditions()
@@ -8,7 +8,7 @@ describe('IAM Statement Conditions', () => {
     const a1 = IamStatement.c.s3.prefix.equals('someString')
     const a2 = c.s3.prefix.equals('someString')
 
-    const e = { StringEquals: { 's3:prefix': 'someString' } }
+    const e = { StringEquals: { 's3:prefix': ['someString'] } }
     expect(a1).toEqual(e)
     expect(a2).toEqual(e)
   })
@@ -36,11 +36,21 @@ describe('IAM Statement Conditions', () => {
     expect(a1).toEqual(e)
     expect(a2).toEqual(e)
   })
+  test('String Funcs`', () => {
+    const a = StringFuncs('someDataFiled')('mySvc')
 
-  test('String Arr Func', () => {
-    const a = 1
-    const e = 1
-    expect(a).toEqual(e)
+    expect(a.someDataFiled.equals('field1', 'field2')).toEqual({
+      StringEquals: { 'mySvc:someDataFiled': ['field1', 'field2'] }
+    })
+    expect(a.someDataFiled.notEquals('field1', 'field2')).toEqual({
+      StringNotEquals: { 'mySvc:someDataFiled': ['field1', 'field2'] }
+    })
+    expect(a.someDataFiled.like('field1', 'field2')).toEqual({
+      StringLike: { 'mySvc:someDataFiled': ['field1', 'field2'] }
+    })
+    expect(a.someDataFiled.notLike('field1', 'field2')).toEqual({
+      StringNotLike: { 'mySvc:someDataFiled': ['field1', 'field2'] }
+    })
   })
 
   test('Tag Func', () => {

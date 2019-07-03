@@ -3,6 +3,9 @@ import generate from 'nanoid/generate'
 import { actions } from './statement/actions'
 import { conditions } from './statement/conditions'
 import { resourceArn } from './statement/resources'
+import deepEqual from 'deep-equal'
+//
+// import { isEqual } from 'lodash-es' // see: https://github.com/kulshekhar/ts-jest/issues/494
 
 // #region Statements
 export class IamStatement {
@@ -76,12 +79,13 @@ export class IamStatement {
     this.Sid = id
     return this
   }
+
   actions (...actions: string[]) {
-    this.Action = actions
+    this.Action = this._arrEq(actions, ['*']) ? '*' : actions
     return this
   }
   omittedActions (...actions: string[]) {
-    this.NotAction = actions
+    this.NotAction = this._arrEq(actions, ['*']) ? '*' : actions
     return this
   }
   principal (...principals: ['*'] | IPrincipalKinds[]) {
@@ -92,19 +96,21 @@ export class IamStatement {
     this.NotPrincipal = principals === ['*'] ? '*' : (principals as IPrincipalKinds[])
     return this
   }
-  resources (...resources: string[] | ['*']) {
-    // this.Resource = resources === ['*'] ? '*' : resources
-    this.Resource = resources
+  resources (...resources: string[]) {
+    this.Resource = this._arrEq(resources, ['*']) ? '*' : resources
     return this
   }
-  omittedResources (...resources: string[] | ['*']) {
-    this.NotResource = resources
+  omittedResources (...resources: string[]) {
+    this.NotResource = this._arrEq(resources, ['*']) ? '*' : resources
     return this
   }
   when (...conditions: ICondition_in[]) {
     // merge the array based on the operand key then assign to this
     this.Condition = mergeOnOperand(conditions)
     return this
+  }
+  private _arrEq (arr1: any[], arr2: any[]): boolean {
+    return deepEqual(arr1, arr2)
   }
   //
   // andWhen (...conditions: ICondition_in[]) {

@@ -1,6 +1,4 @@
-import randomWord from 'random-word'
-import Randoma from 'randoma'
-import { IRef } from '../Template'
+import { IRef, genComponentName } from '../Template'
 import { IamStatement } from './statements'
 import generate from 'nanoid/generate'
 
@@ -21,12 +19,7 @@ export class IamPolicy {
   }
 
   constructor (name?: string) {
-    this.name =
-      name ||
-      `${randomWord()}${new Randoma({
-        seed: new Date().getTime()
-      }).integer()}`
-
+    this.name = name || genComponentName()
     this.Properties = {
       PolicyName: this.name,
       PolicyDocument: {

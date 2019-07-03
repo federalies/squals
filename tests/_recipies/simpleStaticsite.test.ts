@@ -1,4 +1,5 @@
-import Joi from 'joi'
+import Joi from '@hapi/joi'
+
 import {
   Template,
   CloudFrontCDN,

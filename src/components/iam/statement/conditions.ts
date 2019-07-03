@@ -1,5 +1,5 @@
 // #region TypedConditionalFuncSets
-const DateFuncs = (dataField: string): ((svc: string) => { [dfield: string]: IDateConditions }) => {
+export const DateFuncs = (dataField: string): ((svc: string) => { [dfield: string]: IDateConditions }) => {
   return (svcName: string) => {
     return {
       [dataField]: {
@@ -33,7 +33,7 @@ const DateFuncs = (dataField: string): ((svc: string) => { [dfield: string]: IDa
     }
   }
 }
-const NumberFuncs = (
+export const NumberFuncs = (
   dataField: string
 ): ((svc: string) => { [dfield: string]: INumericConditions }) => {
   return (svcName: string) => {
@@ -53,100 +53,8 @@ const NumberFuncs = (
     }
   }
 }
-const StringFuncs_singular = (
-  svcName: string,
-  dataField: string,
-  o: {
-  isCaseIgnored?: boolean
-  ifExists?: boolean
-  enums?: string[]
-  } = { isCaseIgnored: false, ifExists: false, enums: undefined },
-  multi: {
-  isAny?: boolean
-  isAll?: boolean
-  } = { isAny: false, isAll: false }
-): IStringFuncConditions => {
-  /* istanbul ignore next */
-  if (multi.isAny && multi.isAll) {
-    throw new Error(
-      'Can not setup an IAM condition on one data field using both ANY and ALL conditional operators - use only one.'
-    )
-  }
 
-  let prefix: string = ''
-  if (multi.isAny) prefix += 'ForAnyValue:'
-  if (multi.isAll) prefix += 'ForAllValues:'
-
-  let suffix: string = ''
-  if (o.isCaseIgnored) suffix += 'IgnoreCase'
-  if (o.ifExists) suffix += 'IfExists'
-
-  const setDiff = (setA: Set<string>, setB: Set<string>) => {
-    const _difference = new Set(setA)
-    for (var elem of setB) {
-      _difference.delete(elem)
-    }
-    return _difference
-  }
-
-  return ({
-    equals: (...s: string[]) => {
-      const enumSet = new Set(o.enums)
-      const inputStrSet = new Set(s)
-      // all inputs must be valid - any that hang out v the enums is a problem
-      if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
-        throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
-      }
-      return {
-        [`${prefix}StringEquals${suffix}`]: {
-          [`${svcName}:${dataField}`]: s
-        }
-      }
-    },
-    notEquals: (...s: string[]) => {
-      const enumSet = new Set(o.enums)
-      const inputStrSet = new Set(s)
-      // all inputs must be valid - any that hang out v the enums is a problem
-      if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
-        throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
-      }
-      return {
-        [`${prefix}StringNotEquals${suffix}`]: {
-          [`${svcName}:${dataField}`]: s
-        }
-      }
-    },
-    like: (...s: string[]) => {
-      if (o.enums) {
-        if (Array.isArray(s)) {
-          if (!s.every(v => (o.enums as string[]).includes(v))) {
-            throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
-          }
-        } else {
-          if (!o.enums.includes(s)) {
-            throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
-          }
-        }
-      }
-      return {
-        [`${prefix}StringLike${suffix}`]: {
-          [`${svcName}:${dataField}`]: s
-        }
-      }
-    },
-    notLike: (s: string) => {
-      if (o.enums && !o.enums.includes(s)) {
-        throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
-      }
-      return {
-        [`${prefix}StringNotLike${suffix}`]: {
-          [`${svcName}:${dataField}`]: s
-        }
-      }
-    }
-  } as unknown) as IStringFuncConditions
-}
-const StringFuncs_plural = (
+export const StringFuncs_plural = (
   // basically the same thing as singular
   // but all the added functions accept variadic string inputs
   svcName: string,
@@ -239,7 +147,7 @@ const StringFuncs_plural = (
     }
   } as unknown) as IStringFuncConditions
 }
-const StringFuncs = (
+export const StringFuncs = (
   dataField: string,
   enums?: string[]
 ): ((svc: string) => { [dfield: string]: IStringConditions_singular }) => {
@@ -265,7 +173,7 @@ const StringFuncs = (
     }
   }) as unknown) as ((svc: string) => { [dfield: string]: IStringConditions_singular })
 }
-const StringArrFuncs = (
+export const StringArrFuncs = (
   dataField: string,
   enums?: string[]
 ): ((svc: string) => { [dataField: string]: IStringConditions_plural }) => {
@@ -323,7 +231,7 @@ const StringArrFuncs = (
     }
   }
 }
-const TagFuncs_singular = (
+export const TagFuncs_singular = (
   svcName: string,
   dataField: string,
   o: {
@@ -407,7 +315,7 @@ const TagFuncs_singular = (
     }
   } as unknown) as ITagConditions_singularFuncs
 }
-const TagFuncs_plural = (
+export const TagFuncs_plural = (
   svcName: string,
   dataField: string,
   o: {
@@ -498,7 +406,7 @@ const TagFuncs_plural = (
     }
   } as unknown) as ITagConditions_pluralFuncs
 }
-const TagFuncs = (
+export const TagFuncs = (
   dataField: string,
   enums?: string[]
 ): ((svc: string) => { [dfield: string]: ITagConditions }) => {
@@ -520,7 +428,7 @@ const TagFuncs = (
     }
   }) as unknown) as ((svc: string) => { [dfield: string]: ITagConditions })
 }
-const TagArrFuncs = (
+export const TagArrFuncs = (
   dataField: string,
   enums?: string[]
 ): ((svc: string) => { [dataField: string]: ITagConditions_plural }) => {
@@ -573,7 +481,7 @@ const TagArrFuncs = (
     }
   }
 }
-const ArnFuncs = (dataField: string): ConditionFunction => {
+export const ArnFuncs = (dataField: string): ConditionFunction => {
   return (svcName: string) => {
     return {
       [dataField]: ({
@@ -585,7 +493,7 @@ const ArnFuncs = (dataField: string): ConditionFunction => {
     }
   }
 }
-const IPAddressFuncs = (dataField: string): ConditionFunction => {
+export const IPAddressFuncs = (dataField: string): ConditionFunction => {
   return (svcName: string) => {
     return {
       [dataField]: {
@@ -599,7 +507,7 @@ const IPAddressFuncs = (dataField: string): ConditionFunction => {
     }
   }
 }
-const BoolFuncs = (dataField: string): ConditionFunction => {
+export const BoolFuncs = (dataField: string): ConditionFunction => {
   return (svcName: string) => {
     return {
       [dataField]: {
@@ -744,6 +652,100 @@ export const conditions = (): IPolicyConditions => {
     ) as unknown) as IPolicyConditions_sts)
   } as unknown) as IPolicyConditions // #shakey
 }
+
+// const StringFuncs_singular = (
+//   svcName: string,
+//   dataField: string,
+//   o: {
+//   isCaseIgnored?: boolean
+//   ifExists?: boolean
+//   enums?: string[]
+//   } = { isCaseIgnored: false, ifExists: false, enums: undefined },
+//   multi: {
+//   isAny?: boolean
+//   isAll?: boolean
+//   } = { isAny: false, isAll: false }
+// ): IStringFuncConditions => {
+//   /* istanbul ignore next */
+//   if (multi.isAny && multi.isAll) {
+//     throw new Error(
+//       'Can not setup an IAM condition on one data field using both ANY and ALL conditional operators - use only one.'
+//     )
+//   }
+
+//   let prefix: string = ''
+//   if (multi.isAny) prefix += 'ForAnyValue:'
+//   if (multi.isAll) prefix += 'ForAllValues:'
+
+//   let suffix: string = ''
+//   if (o.isCaseIgnored) suffix += 'IgnoreCase'
+//   if (o.ifExists) suffix += 'IfExists'
+
+//   const setDiff = (setA: Set<string>, setB: Set<string>) => {
+//     const _difference = new Set(setA)
+//     for (var elem of setB) {
+//       _difference.delete(elem)
+//     }
+//     return _difference
+//   }
+
+//   return ({
+//     equals: (...s: string[]) => {
+//       const enumSet = new Set(o.enums)
+//       const inputStrSet = new Set(s)
+//       // all inputs must be valid - any that hang out v the enums is a problem
+//       if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
+//         throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
+//       }
+//       return {
+//         [`${prefix}StringEquals${suffix}`]: {
+//           [`${svcName}:${dataField}`]: s
+//         }
+//       }
+//     },
+//     notEquals: (...s: string[]) => {
+//       const enumSet = new Set(o.enums)
+//       const inputStrSet = new Set(s)
+//       // all inputs must be valid - any that hang out v the enums is a problem
+//       if (o.enums && setDiff(inputStrSet, enumSet).size > 0) {
+//         throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
+//       }
+//       return {
+//         [`${prefix}StringNotEquals${suffix}`]: {
+//           [`${svcName}:${dataField}`]: s
+//         }
+//       }
+//     },
+//     like: (...s: string[]) => {
+//       if (o.enums) {
+//         if (Array.isArray(s)) {
+//           if (!s.every(v => (o.enums as string[]).includes(v))) {
+//             throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
+//           }
+//         } else {
+//           if (!o.enums.includes(s)) {
+//             throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
+//           }
+//         }
+//       }
+//       return {
+//         [`${prefix}StringLike${suffix}`]: {
+//           [`${svcName}:${dataField}`]: s
+//         }
+//       }
+//     },
+//     notLike: (s: string) => {
+//       if (o.enums && !o.enums.includes(s)) {
+//         throw new Error(`invalid option given: ${s} when was expecting: ${o.enums}`)
+//       }
+//       return {
+//         [`${prefix}StringNotLike${suffix}`]: {
+//           [`${svcName}:${dataField}`]: s
+//         }
+//       }
+//     }
+//   } as unknown) as IStringFuncConditions
+// }
 
 // debugging...
 // const cond = init()

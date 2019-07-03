@@ -8,6 +8,10 @@
     "example": "examples",
     "test": "tests"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/federalies/squals"
+  },
   "scripts": {
     "clearDist": "rm -rf dist/",
     "jest": "jest --env=node --colors --coverage",
@@ -32,33 +36,35 @@
   "author": "Eric D Moore",
   "license": "MIT",
   "dependencies": {
+    "@hapi/joi": "^15.1.0",
     "@sandfox/arn": "^2.1.0",
-    "acorn": "^6.1.1",
     "aws-sdk": "^2.441.0",
+    "deep-equal": "^1.0.1",
     "esm": "^3.2.4",
     "getopts": "^2.2.3",
-    "joi": "^14.3.1",
+    "graphql": "^14.4.1",
     "js-yaml": "^3.13.1",
-    "lodash-es": "^4.17.11",
     "nanoid": "^2.0.3",
     "random-word": "^2.0.0",
     "randoma": "^1.2.0",
-    "rus-diff": "^1.1.0",
     "s3-url": "^0.2.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.4.5",
     "@types/aws-sdk": "^2.7.0",
+    "@types/deep-equal": "^1.0.1",
+    "@types/graphql": "^14.2.2",
+    "@types/hapi__joi": "^15.0.2",
     "@types/jest": "^24.0.9",
     "@types/joi": "^14.3.3",
     "@types/js-yaml": "^3.12.1",
-    "@types/lodash": "^4.14.121",
-    "@types/lodash-es": "^4.17.2",
     "@types/nanoid": "^2.0.0",
     "@types/node": "^11.13.8",
     "@types/randoma": "^1.2.0",
-    "ajv": "^6.9.1",
-    "ajv-cli": "^3.0.0",
+    "@types/lodash": "^4.14.121",
+    "@types/lodash-es": "^4.17.2",
     "babel-eslint": "^10.0.1",
+    "babel-jest": "^24.8.0",
     "dotenv": "^6.2.0",
     "eslint": "^5.13.0",
     "eslint-config-standard": "^12.0.0",
@@ -71,8 +77,24 @@
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-standard": "^4.0.0",
     "jest": "^24.1.0",
+    "prettier": "^1.18.2",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.1.0",
     "typedoc": "^0.14.2"
+  },
+  "futureIdeas": {
+    "deps": {
+      "rus-diff": "^1.1.0"
+    }
+  },
+  "old": {
+    "deps": {
+      "acorn": "^6.1.1",
+      "lodash-es": "^4.17.11"
+    },
+    "dev": {
+      "ajv": "^6.9.1",
+      "ajv-cli": "^3.0.0"
+    }
   }
 }

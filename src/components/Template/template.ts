@@ -1,5 +1,7 @@
 // import { isEmpty, intersection } from 'lodash-es'
-
+import randomWord from 'random-word'
+import Randoma from 'randoma'
+import Joi from '@hapi/joi'
 import * as yaml from 'js-yaml'
 
 export class Template {
@@ -104,6 +106,20 @@ export const TagFilters = (tagList: Itags | Itags[]): ITagFilters => {
   return {
     TagFilters: tags(tagList)
   }
+}
+
+export const genComponentName = (seed: number | string = new Date().getTime()) => {
+  return `${randomWord()}${new Randoma({ seed }).integer()}`
+}
+export const baseSchemas = {
+  Ref: Joi.object({ Ref: Joi.string().required() }),
+  GetAtt: Joi.object({ 'Fn:GetAtt': [Joi.string().required(), Joi.string().required()] })
+}
+
+export abstract class squals {
+  static fromJSON: (i: string | object) => object // allows for class to permit data partials - and for validate to catch it
+  static validate: (o:object) => object // returns chainable obj OR throw
+  abstract toJSON: () => object[] // returns a natural list of related, exported objects
 }
 
 export interface Itemplate {

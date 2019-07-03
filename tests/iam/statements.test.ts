@@ -81,8 +81,8 @@ describe('IAM Statememt Objects', () => {
               {
                 Sid: 'myId1',
                 Effect: 'Allow',
-                Action: 's3:*',
                 Resource: '*',
+                Action: ['s3:*'],
                 Condition: {
                   NumericLessThan: { 's3:signatureage': 100 }
                 }
@@ -90,11 +90,16 @@ describe('IAM Statememt Objects', () => {
               {
                 Sid: 'id2',
                 Effect: 'Allow',
-                Action: 'elasticbeanstalk:DescribeAccountAttributes',
-                Resource: 'elasticbeanstalk.*',
+                Action: ['elasticbeanstalk:DescribeAccountAttributes'],
+                Resource: ['elasticbeanstalk.*'],
                 Condition: { NumericLessThan: { 's3:signatureage': 100 } }
               },
-              { Sid: 'id3', Effect: 'Deny', Action: '*', Resource: '*' }
+              {
+                Sid: 'id3',
+                Effect: 'Deny',
+                Action: '*',
+                Resource: '*'
+              }
             ]
           }
         }
