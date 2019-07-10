@@ -71,14 +71,16 @@ export class AppSyncSchema implements squals {
     }
     
   }
-  toJSON (): object[] {
+  toJSON (): JSON[] {
     AppSyncSchema.validate(this)
 
     return [
-      {[this.name]:{
-        Type:'AWS::AppSync::GraphQLSchema',
-        Properties: this.Properties
-      }}
+      {[this.name]:
+        {
+          Type:'AWS::AppSync::GraphQLSchema',
+          Properties: this.Properties
+        }
+      } as unknown as JSON
     ]
   }
   Ref():IRef{

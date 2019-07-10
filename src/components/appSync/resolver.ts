@@ -25,8 +25,8 @@ export class AppSyncResolver implements squals {
   }
   linkDataSource () {}
   static fromJSON (i: string | object) {}
-  toJSON (): object[] {
-    return []
+  toJSON (): JSON[] {
+    return [] as unknown as JSON[]
   }
   validate (): AppSyncResolver {
     const stringOrRefSchema = Joi.alternatives().try(Joi.string(), baseSchemas.Ref)

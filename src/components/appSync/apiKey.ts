@@ -86,20 +86,26 @@ export class AppSyncApiKey implements squals {
     return AppSyncApiKey.validate(o as AppSyncApiKey_in | AppSyncApiKey )
   }
 
-  toJSON (): object[] {
+  toJSON (): JSON[] {
     return [
       {
         [this.name]: {
           Type: 'AWS::AppSync::ApiKey',
           Properties: this.Properties
         }
-      } as IAppSyncApiKey_json
+      } as IAppSyncApiKey_json as unknown as JSON,
     ]
   }
 
-  Ref () {}
-  ApiKey () {}
-  Arn () {}
+  Ref ():IRef {
+    return {Ref: this.name }
+  }
+  ApiKey ():IGetAtt {
+    return {'Fn::GetAtt':[this.name,'ApiKey' ]}
+  }
+  Arn ():IGetAtt {
+    return {'Fn::GetAtt':[this.name, 'Arn']}
+  }
 }
 
 type AppSyncApiKey_in = AppSyncApiKey_in_json | AppSyncApiKey_inData

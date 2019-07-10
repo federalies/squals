@@ -108,14 +108,14 @@ export class AppSyncFuncConfig implements squals {
     if (typeof o === 'string') o = JSON.parse(o)
     return this.validate(o as { [name: string]: object })
   }
-  toJSON (): object[] {
+  toJSON (): JSON[] {
     return [
       {
         [this.name]: {
           Type: 'AWS::AppSync::FunctionConfiguration',
           Properties: this.Properties
         }
-      } as AppSyncFuncConfig_json
+      } as AppSyncFuncConfig_json as unknown as JSON
     ]
   }
   Ref (): IRef {

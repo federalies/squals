@@ -4,6 +4,16 @@ import Randoma from 'randoma'
 import Joi from '@hapi/joi'
 import * as yaml from 'js-yaml'
 
+
+
+
+/**
+ * ToDo
+ * The `toJSON()` function needs to deal with the
+ * dependency tree, and insert `DependsOn` keys where needed: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html
+ */
+
+
 export class Template {
   AWSTemplateFormatVersion: '2010-09-09'
   Resources: object
@@ -117,9 +127,12 @@ export const baseSchemas = {
 }
 
 export abstract class squals {
-  static fromJSON: (i: string | object) => object // allows for class to permit data partials - and for validate to catch it
-  static validate: (o:object) => object // returns chainable obj OR throw
-  abstract toJSON: () => object[] // returns a natural list of related, exported objects
+  static fromString: (i: string ) => object // allows for class to permit data partials - and for validate to catch it
+  static fromJSON: (i: JSON ) => object // allows for class to permit data partials - and for validate to catch it
+  static from: (i: string | JSON ) => object
+  static withRelated: ( ...i: JSON[] ) => object[]
+  static validate: (o:object) => object // returns chainable obj OR throw  
+  abstract toJSON: (includeRelated:boolean) => JSON[] // returns a natural list of related, exported objects
 }
 
 export interface Itemplate {
