@@ -83,19 +83,16 @@ const selectedTypes = [
 // in case Pupeteer happens...
 // let validLbl = Array.from(document.querySelectorAll('#main-col-body > div > dl > dd > p > em')).filter(n=> n.innerText.includes('Valid'))
 
-const propertyDefs = Object.keys(AWScfg.PropertyTypes).reduce(
-  (a, awsResourceKey) => {
-    if (selectedTypes.find(prefix => awsResourceKey.startsWith(prefix))) {
-      return {
-        ...a,
-        [awsResourceKey]: AWScfg.PropertyTypes[awsResourceKey]
-      }
-    } else {
-      return a
+const propertyDefs = Object.keys(AWScfg.PropertyTypes).reduce((a, awsResourceKey) => {
+  if (selectedTypes.find(prefix => awsResourceKey.startsWith(prefix))) {
+    return {
+      ...a,
+      [awsResourceKey]: AWScfg.PropertyTypes[awsResourceKey]
     }
-  },
-  {}
-)
+  } else {
+    return a
+  }
+}, {})
 
 // console.log({ propertyDefs })
 
@@ -139,14 +136,15 @@ const pluckPropertes = ([_orig, _buildOut], _typeConvert = typeConvert) => {
 }
 
 const pluckPropertesWithLookUp = ([_orig, _buildOut], lookUpFn) => {
-  const properties = Object.entries(
-    _orig[Object.keys(_orig)[0]].Properties
-  ).reduce((acc, [property, val]) => {
-    acc[property] = {
-      ...lookUpFn({ [property]: val, _resource: Object.keys(_orig)[0] })
-    }
-    return acc
-  }, {})
+  const properties = Object.entries(_orig[Object.keys(_orig)[0]].Properties).reduce(
+    (acc, [property, val]) => {
+      acc[property] = {
+        ...lookUpFn({ [property]: val, _resource: Object.keys(_orig)[0] })
+      }
+      return acc
+    },
+    {}
+  )
   return [_orig, { ..._buildOut, properties }]
 }
 
@@ -176,16 +174,13 @@ const base = _input => {
 const choseRight = ([, right]) => right
 
 const schemaTransforms = data => {
-  return [
-    choseRight,
-    pluckDefinitions,
-    pluckPropertes,
-    pluckRequired,
-    base
-  ].reduceRight((_data, f) => {
-    _data = f(_data)
-    return _data
-  }, data)
+  return [choseRight, pluckDefinitions, pluckPropertes, pluckRequired, base].reduceRight(
+    (_data, f) => {
+      _data = f(_data)
+      return _data
+    },
+    data
+  )
 }
 
 // eslint-disable-next-line

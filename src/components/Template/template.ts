@@ -1,18 +1,13 @@
 // import { isEmpty, intersection } from 'lodash-es'
 import randomWord from 'random-word'
 import Randoma from 'randoma'
-import Joi from '@hapi/joi'
 import * as yaml from 'js-yaml'
-
-
-
-
+import { struct } from 'superstruct'
 /**
  * ToDo
  * The `toJSON()` function needs to deal with the
  * dependency tree, and insert `DependsOn` keys where needed: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html
  */
-
 
 export class Template {
   AWSTemplateFormatVersion: '2010-09-09'
@@ -122,17 +117,17 @@ export const genComponentName = (seed: number | string = new Date().getTime()) =
   return `${randomWord()}${new Randoma({ seed }).integer()}`
 }
 export const baseSchemas = {
-  Ref: Joi.object({ Ref: Joi.string().required() }),
-  GetAtt: Joi.object({ 'Fn:GetAtt': [Joi.string().required(), Joi.string().required()] })
+  Ref: struct({ Ref: 'string' }),
+  GetAtt: struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
 }
 
 export abstract class squals {
-  static fromString: (i: string ) => object // allows for class to permit data partials - and for validate to catch it
-  static fromJSON: (i: JSON ) => object // allows for class to permit data partials - and for validate to catch it
-  static from: (i: string | JSON ) => object
-  static withRelated: ( ...i: JSON[] ) => object[]
-  static validate: (o:object) => object // returns chainable obj OR throw  
-  abstract toJSON: (includeRelated:boolean) => JSON[] // returns a natural list of related, exported objects
+  static fromString: (i: string) => object // allows for class to permit data partials - and for validate to catch it
+  static fromJSON: (i: object) => object // allows for class to permit data partials - and for validate to catch it
+  static from: (i: string | object) => object
+  static withRelated: (...i: object[]) => object[]
+  static validate: (o: object) => object // returns chainable obj OR throw
+  abstract toJSON: (includeRelated: boolean) => object[] // returns a natural list of related, exported objects
 }
 
 export interface Itemplate {

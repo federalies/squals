@@ -3,7 +3,7 @@
 // $1$2,
 
 export { Template } from './Template'
-export { S3Bucket, S3BucketPolicy } from './s3' // removed S3BucketPolicy @todo add back
+export { S3Bucket, S3BucketPolicy } from './s3'
 export { SqsQueue, SqsQueuePolicy } from './sqs'
 export { AWSCertificate } from './certificateManager'
 // export { SnsSubscription, SnsTopic, SnsTopicPolicy } from './sns.js'
@@ -30,5 +30,5 @@ export * from './lambda'
 export * from './route53'
 export * from './secretsManager'
 export * from './ses'
-export * from './apiGateway'
+export * from './apiGateway_v2'
 export * from './ec2'

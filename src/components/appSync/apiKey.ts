@@ -1,131 +1,168 @@
-import { IRef, IGetAtt, squals, genComponentName , baseSchemas} from '../Template'
+import { IRef, IGetAtt, squals, genComponentName, baseSchemas } from '../Template'
 import { AppSyncGraphQlApi } from './api'
-import Joi from '@hapi/joi'
+import { struct } from 'superstruct'
 
 export class AppSyncApiKey implements squals {
   name: string
   Type = 'AWS::AppSync::ApiKey'
   Properties: AppSyncApiKey_Properties
+  _linkedApi?: AppSyncGraphQlApi
 
-  constructor (k: AppSyncApiKey_in | AppSyncApiKey, api?: AppSyncGraphQlApi) {
-    if (k instanceof AppSyncApiKey) {
-      this.name = k.name
-      this.Properties = k.Properties
-    }else{
-      const {apiId} = k
-      if(apiId){
-        k=k as AppSyncApiKey_inData
-        this.name = genComponentName()
-        this.Properties = {
-          ApiId: k.apiId,
-          Description: k.desc,
-          Expires: k.exp
-        }
-      }else{
-        k=k as AppSyncApiKey_in_json
-        this.name = Object.keys(k)[0]
-        this.Properties = {
-            ApiId: k[this.name].apiId,
-            Description: k[this.name].desc,
-            Expires: k[this.name].exp
-          }
-      }
-    }
+  constructor (k?: AppSyncApiKey_in, api?: AppSyncGraphQlApi) {
+    this._linkedApi = api
+    this.name = k && k.name ? k.name : genComponentName()
+    this.Properties = { ApiId: api ? api.ApiId() : '' }
+    this.Properties.Description = k && k.desc ? k.desc : ''
   }
-  
-  static validate (s: AppSyncApiKey_in | AppSyncApiKey ): AppSyncApiKey {
-    const unions = {
-      strRefGet : [Joi.string(), baseSchemas.Ref, baseSchemas.GetAtt]
-    }
-    
-    if (s instanceof AppSyncApiKey) {
-      s = s as AppSyncApiKey
-      const err = Joi.object().keys({
-        name: Joi.string().min(2),
-        Type: 'AWS::AppSync::ApiKey',
-        Properties: Joi.object({
-          ApiId: Joi.alternatives().try(...unions.strRefGet).required(),
-          Description: Joi.string().optional(),
-          Expires: Joi.number().optional(),
-        })
-      }).validate(s)
-      return new AppSyncApiKey(s)
 
+  static from (i: string | object): AppSyncApiKey {
+    if (i instanceof AppSyncApiKey) {
+      const ret = new AppSyncApiKey()
+      ret.name = i.name
+      ret._linkedApi = i._linkedApi
+      ret.Properties = i.Properties
+      return ret
+    } else if (typeof i === 'string') {
+      return AppSyncApiKey.fromString(i)
+    } else if (
+      /* exported JSON? */
+      Object.keys(i).length === 1 &&
+      'Type' in (i as IAppSyncApiKey_json)[Object.keys(i)[0]]
+    ) {
+      const o = i as IAppSyncApiKey_json
+      const ret = new AppSyncApiKey()
+      ret.name = Object.keys(o)[0]
+      ret.Properties = o[ret.name].Properties
+      return ret
     } else {
-      const {apiId} = s
-      if(apiId){
-        s = s as AppSyncApiKey_inData
-        const err = Joi.object({
-          apiId: Joi.alternatives().try(...unions.strRefGet).required(),
-          desc: Joi.string().optional(),
-          exp: Joi.number().optional(),
-        }).validate(s)
-        return new AppSyncApiKey(s)
-
-      }else{
-        s = s as AppSyncApiKey_in_json
-        const _name = Object.keys(s)[0]
-        const errName = Joi.string().min(2).validate(_name)
-        const errBody = Joi.object().keys({
-          name: Joi.string().min(2),
-          Type: 'AWS::AppSync::ApiKey',
-          Properties: Joi.object({
-            ApiId: Joi.alternatives().try(...unions.strRefGet).required(),
-            Description: Joi.string().optional(),
-            Expires: Joi.number().optional(),
-          })
-        }).validate(s[_name])
-        return new AppSyncApiKey(s)
-
-      } 
+      const o = i as AppSyncApiKey_in
+      const ret = new AppSyncApiKey(o)
+      // need to validate?
+      return ret
+    }
+  }
+  static fromString (i: string): AppSyncApiKey {
+    return AppSyncApiKey.from(JSON.parse(i))
+  }
+  static fromJSON (o: object): AppSyncApiKey {
+    const valdInput = AppSyncApiKey.validateJSON(o as IAppSyncApiKey_json)
+    return new AppSyncApiKey()
+  }
+  private static fromSDK (i: object): AppSyncApiKey {
+    // make this public - after 0.1 launches
+    throw new Error('not implemented yet')
+  }
+  static validate (i: string | object): AppSyncApiKey {
+    // AppSyncApiKey_in | AppSyncApiKey
+    if (typeof i === 'string') {
+      return AppSyncApiKey.fromString(i)
+    } else if (i instanceof AppSyncApiKey) {
+      const ret = new AppSyncApiKey()
+      ret.name = ret.name
+      ret.Properties = ret.Properties
+      return ret
+    } else if (
+      Object.keys(i).length === 1 &&
+      'Type' in (i as IAppSyncApiKey_json)[Object.keys(i)[0]]
+    ) {
+      return AppSyncApiKey.validateJSON(i as IAppSyncApiKey_json)
+    } else {
+      return AppSyncApiKey.validateJS(i as AppSyncApiKey_in)
     }
   }
 
-  static fromJSON (o: string | object): AppSyncApiKey {
-    if (typeof o === 'string') o = JSON.parse(o)
-    return AppSyncApiKey.validate(o as AppSyncApiKey_in | AppSyncApiKey )
+  private static validateJS (i: AppSyncApiKey_in): AppSyncApiKey {
+    struct({
+      name: 'string?',
+      desc: 'string?',
+      exp: 'number?'
+    })(i)
+
+    const ret = new AppSyncApiKey()
+    ret.name = i.name || genComponentName()
+    ret.Properties = {
+      ApiId: '',
+      Description: i.desc,
+      Expires: i.exp
+    }
+    return ret
   }
 
-  toJSON (): JSON[] {
-    return [
-      {
-        [this.name]: {
-          Type: 'AWS::AppSync::ApiKey',
-          Properties: this.Properties
-        }
-      } as IAppSyncApiKey_json as unknown as JSON,
-    ]
+  private static validateJSON (i: IAppSyncApiKey_json): AppSyncApiKey {
+    struct(
+      struct.dict([
+        'string',
+        struct({
+          Type: struct.literal('AWS::AppSync::ApiKey'),
+          Properties: struct({
+            ApiId: struct.union([
+              'string',
+              struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) }),
+              struct({ Ref: 'string' })
+            ]),
+            Description: 'string?',
+            Expires: 'number?'
+          })
+        })
+      ])
+    )(i)
+
+    const ret = new AppSyncApiKey()
+    ret.name = Object.keys(i)[0]
+    ret.Properties = i[ret.name].Properties
+    return ret
   }
 
-  Ref ():IRef {
-    return {Ref: this.name }
+  api (i: string | IRef | IGetAtt) {
+    this.Properties.ApiId = i
+    return this
   }
-  ApiKey ():IGetAtt {
-    return {'Fn::GetAtt':[this.name,'ApiKey' ]}
+
+  description (d: string) {
+    this.Properties.Description = d
+    return this
   }
-  Arn ():IGetAtt {
-    return {'Fn::GetAtt':[this.name, 'Arn']}
+
+  expires (e: number) {
+    this.Properties.Expires = e
+    return this
+  }
+
+  toJSON (): object[] {
+    const retElem = {
+      [this.name]: {
+        Type: 'AWS::AppSync::ApiKey',
+        Properties: this.Properties
+      }
+    } as IAppSyncApiKey_json
+
+    return [AppSyncApiKey.validateJSON(retElem)]
+  }
+
+  Ref (): IRef {
+    return { Ref: this.name }
+  }
+  ApiKey (): IGetAtt {
+    return { 'Fn::GetAtt': [this.name, 'ApiKey'] }
+  }
+  Arn (): IGetAtt {
+    return { 'Fn::GetAtt': [this.name, 'Arn'] }
   }
 }
 
-type AppSyncApiKey_in = AppSyncApiKey_in_json | AppSyncApiKey_inData
-
-interface AppSyncApiKey_in_json {
-  [name:string]:AppSyncApiKey_inData
-}
-interface AppSyncApiKey_inData {
-  apiId: string | IRef | IGetAtt
+interface AppSyncApiKey_in {
+  name?: string
   desc?: string
   exp?: number
 }
 
 interface IAppSyncApiKey_json {
-  [name: string]:{
-    Type : 'AWS::AppSync::ApiKey'
+  [name: string]: {
+    Type: 'AWS::AppSync::ApiKey'
     Properties: AppSyncApiKey_Properties
   }
 }
-interface AppSyncApiKey_Properties  {
+interface AppSyncApiKey_Properties {
   ApiId: string | IRef | IGetAtt
   Description?: string
   Expires?: number

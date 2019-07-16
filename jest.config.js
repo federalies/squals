@@ -8,12 +8,23 @@ module.exports = {
   },
   testEnvironment: 'node',
   testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
+
   testPathIgnorePatterns: ['/lib/', '/node_modules/'],
-  moduleDirectories: ['node_modules'],
+  // moduleDirectories: ['node_modules'],
   // transformIgnorePatterns: ['/node_modules/lodash-es/'],
+
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverage: true,
-  coveragePathIgnorePatterns: ['/node_modules/']
+  coveragePathIgnorePatterns: ['/node_modules/'],
+
+  // A set of global variables that need to be available in all test environments
+  globals: {
+    'ts-jest': {
+      tsConfig: {
+        importHelpers: true
+      }
+    }
+  }
 }
 
 // const alternateConfig = {
@@ -71,9 +82,6 @@ module.exports = {
 
 // A path to a module which exports an async function that is triggered once after all test suites
 // globalTeardown: null,
-
-// A set of global variables that need to be available in all test environments
-// globals: {},
 
 // An array of directory names to be searched recursively up from the requiring module's location
 // moduleDirectories: [

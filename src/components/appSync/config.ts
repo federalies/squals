@@ -1,121 +1,155 @@
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName } from '../Template'
-import Joi from '@hapi/joi'
+import { AppSyncGraphQlApi } from './api'
+
+import { struct } from 'superstruct'
+import { flowRight } from 'lodash-es'
 
 export class AppSyncFuncConfig implements squals {
   name: string
   Type = 'AWS::AppSync::FunctionConfiguration'
-  Properties: {
-    Name: string | IRef
-    ApiId: string | IRef | IGetAtt
-    DataSourceName: string | IRef | IGetAtt
-    FunctionVersion: '2018-05-29'
-    Description?: string | IRef
-    RequestMappingTemplate?: string | IRef
-    RequestMappingTemplateS3Location?: string | IRef
-    ResponseMappingTemplate?: string | IRef
-    ResponseMappingTemplateS3Location?: string | IRef
-  }
+  Properties: AppSyncFuncConfig_props
 
-  constructor (data: AppSyncFuncConfig_injson | AppSyncFuncConfig) {
+  constructor (data: AppSyncFuncConfig_in | AppSyncFuncConfig, api?: AppSyncGraphQlApi) {
+    if (data instanceof AppSyncFuncConfig) {
+      const ret = AppSyncFuncConfig.from(data)
+      this.name = ret.name
+      this.Properties = ret.Properties
+    }
+
     if (data instanceof AppSyncFuncConfig) {
       this.name = data.name
       this.Properties = data.Properties
     } else {
       this.name = Object.keys(data)[0]
       this.Properties = {
-        ApiId: data[this.name].apiId,
-        Name: data[this.name].name,
-        DataSourceName: data[this.name].sourceName,
+        ApiId: '',
+        Name: data.name,
+        DataSourceName: data.sourceName,
         FunctionVersion: '2018-05-29'
       }
-      if (data[this.name].reqTempl) {
-        this.Properties.RequestMappingTemplate = data[this.name].reqTempl
+      if (data.reqTempl) {
+        this.Properties.RequestMappingTemplate = data.reqTempl
       }
-      if (data[this.name].reqTemplS3Loc) {
-        this.Properties.RequestMappingTemplate = data[this.name].reqTemplS3Loc
+      if (data.reqTemplS3Loc) {
+        this.Properties.RequestMappingTemplate = data.reqTemplS3Loc
       }
-      if (data[this.name].resTempl) {
-        this.Properties.RequestMappingTemplate = data[this.name].resTempl
+      if (data.resTempl) {
+        this.Properties.RequestMappingTemplate = data.resTempl
       }
-      if (data[this.name].resTemplS3Loc) {
-        this.Properties.RequestMappingTemplate = data[this.name].resTemplS3Loc
+      if (data.resTemplS3Loc) {
+        this.Properties.RequestMappingTemplate = data.resTemplS3Loc
       }
     }
   }
+  static from (i: string | object): AppSyncFuncConfig {
+    return typeof i === 'string'
+      ? AppSyncFuncConfig.fromString(i)
+      : !(i instanceof AppSyncFuncConfig)
+        ? AppSyncFuncConfig.validate(i as AppSyncFuncConfig_json)
+        : new AppSyncFuncConfig(i)
+  }
 
-  static validate (o: { [name: string]: object } | AppSyncFuncConfig): AppSyncFuncConfig {
-    // helpers shorthand vars
-    const strRefSchema = Joi.alternatives().try(Joi.string(), baseSchemas.Ref)
-    const strGetAttRefSchema = Joi.alternatives().try(
-      Joi.string(),
-      baseSchemas.GetAtt,
-      baseSchemas.Ref
+  static fromJS (i: object): AppSyncFuncConfig {
+    return AppSyncFuncConfig.validateJS(i as AppSyncFuncConfig_in)
+  }
+
+  static fromString (o: string): AppSyncFuncConfig {
+    return AppSyncFuncConfig.validate(JSON.parse(o))
+  }
+
+  static fromJSON (o: object): AppSyncFuncConfig {
+    return this.validateJSON(o as AppSyncFuncConfig_json)
+  }
+
+  private static fromSDK (o: object) {
+    return new Error('not implemented yet - will be public once implemented')
+  }
+
+  private static validateJS (o: AppSyncFuncConfig_in): AppSyncFuncConfig {
+    const ref = struct({ Ref: 'string' })
+    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
+    const optUnion = flowRight(
+      struct.optional,
+      struct.union
     )
-    // setup schemas
-    const nameSchema = Joi.string()
-      .min(2)
-      .required()
+    const optliteral = flowRight(
+      struct.optional,
+      struct.literal
+    )
+    struct({
+      name: strGetAttRef,
+      sourceName: strGetAttRef,
+      v: optliteral('2018-05-29'),
+      desc: optUnion(['string', ref]),
+      reqTempl: optUnion(['string', ref]),
+      reqTemplS3Loc: optUnion(['string', ref]),
+      resTempl: optUnion(['string', ref]),
+      resTemplS3Loc: struct.optional(struct.union(['string', ref]))
+    })(o)
 
-    // validate
-    let errName: Joi.ValidationError
-    let errBody: Joi.ValidationError
+    return new AppSyncFuncConfig(o)
+  }
 
-    if (o instanceof AppSyncFuncConfig) {
-      const propertySchema = Joi.object({
-        Name: strGetAttRefSchema.required(),
-        ApiId: strGetAttRefSchema.required(),
-        DataSourceName: strGetAttRefSchema.required(),
-        FunctionVersion: Joi.string()
-          .regex(new RegExp('2018-05-29'), 'Request-Mapping-Version')
-          .required(),
-        Description: strRefSchema.optional(),
-        RequestMappingTemplate: strRefSchema.optional(),
-        RequestMappingTemplateS3Location: strRefSchema.optional(),
-        ResponseMappingTemplate: strRefSchema.optional(),
-        ResponseMappingTemplateS3Location: strRefSchema.optional()
-      })
+  private static validateJSON (o: AppSyncFuncConfig_json): AppSyncFuncConfig {
+    const ref = struct({ Ref: 'string' })
+    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
 
-      errName = nameSchema.validate(o.name).error
-      errBody = propertySchema.validate(o.Properties).error
+    struct(
+      struct.dict([
+        'string', // component name
+        struct.interface({
+          Type: struct.literal('AWS::AppSync::FunctionConfiguration'),
+          Properties: struct({
+            Name: strGetAttRef,
+            ApiId: strGetAttRef,
+            DataSourceName: strGetAttRef,
+            FunctionVersion: struct.literal('2018-05-29'),
+            Description: struct.optional(struct.union(['string', ref])),
+            RequestMappingTemplate: struct.optional(struct.union(['string', ref])),
+            RequestMappingTemplateS3Location: struct.optional(struct.union(['string', ref])),
+            ResponseMappingTemplate: struct.optional(struct.union(['string', ref])),
+            ResponseMappingTemplateS3Location: struct.optional(struct.union(['string', ref]))
+          })
+          // `struct` does not yet support conjoint / conditional assertions
+          // @ref <https://github.com/ianstormtaylor/superstruct/issues/123>
+        })
+      ])
+    )(o)
+
+    const _name = Object.keys(o)[0]
+
+    const ret = new AppSyncFuncConfig({
+      name: _name,
+      sourceName: o[_name].Properties.DataSourceName,
+      desc: o[_name].Properties.Description,
+      reqTempl: o[_name].Properties.RequestMappingTemplate,
+      reqTemplS3Loc: o[_name].Properties.RequestMappingTemplateS3Location,
+      resTempl: o[_name].Properties.ResponseMappingTemplate,
+      resTemplS3Loc: o[_name].Properties.ResponseMappingTemplateS3Location
+    })
+    ret.Properties = o[_name].Properties
+    return ret
+  }
+
+  static validate (o: object | AppSyncFuncConfig): AppSyncFuncConfig {
+    const _name = Object.keys(o)[0]
+    const { Type, Properties } = (o as AppSyncFuncConfig_json)[_name]
+    if (Type && Properties) {
+      return AppSyncFuncConfig.validateJSON(o as AppSyncFuncConfig_json)
     } else {
-      o = (o as unknown) as AppSyncFuncConfig_injson
-      const _name = Object.keys(o)[0]
-
-      const propertyLowerCaseSchema = Joi.object({
-        name: strGetAttRefSchema.required(),
-        apiId: strGetAttRefSchema.required(),
-        sourceName: strGetAttRefSchema.required(),
-        v: Joi.string()
-          .regex(new RegExp('2018-05-29'), 'Request-Mapping-Version')
-          .required(),
-        desc: strRefSchema.optional(),
-        reqTempl: strRefSchema.optional(),
-        reqTemplS3Loc: strRefSchema.optional(),
-        resTempl: strRefSchema.optional(),
-        resTemplS3Loc: strRefSchema.optional()
-      })
-
-      errName = nameSchema.validate(_name).error
-      errBody = propertyLowerCaseSchema.validate(o[_name]).error
+      return AppSyncFuncConfig.validateJS(o as AppSyncFuncConfig_in)
     }
-
-    if (errName || errBody) {
-      throw new Error(`AppSyncFuncConfig could did not have a valid data structure `)
-    }
-    return new AppSyncFuncConfig(o as AppSyncFuncConfig_injson | AppSyncFuncConfig)
   }
-  static fromJSON (o: object | string): AppSyncFuncConfig {
-    if (typeof o === 'string') o = JSON.parse(o)
-    return this.validate(o as { [name: string]: object })
-  }
-  toJSON (): JSON[] {
+  toJSON (): object[] {
     return [
       {
         [this.name]: {
           Type: 'AWS::AppSync::FunctionConfiguration',
           Properties: this.Properties
         }
-      } as AppSyncFuncConfig_json as unknown as JSON
+      } as AppSyncFuncConfig_json
     ]
   }
   Ref (): IRef {
@@ -135,21 +169,18 @@ export class AppSyncFuncConfig implements squals {
   }
 }
 
-interface AppSyncFuncConfig_json {
+export interface AppSyncFuncConfig_json {
   [name: string]: {
     Type: 'AWS::AppSync::FunctionConfiguration'
-    Properties: AppSyncFuncConfig_out
+    Properties: AppSyncFuncConfig_props
   }
 }
-interface AppSyncFuncConfig_injson {
-  [compRefName: string]: AppSyncFuncConfig_in
-}
 
-interface AppSyncFuncConfig_in {
-  name: string | IRef
-  apiId: string | IRef | IGetAtt
+export interface AppSyncFuncConfig_in {
+  name: string | IRef | IGetAtt
+  // api handled by component
   sourceName: string | IRef | IGetAtt
-  v: '2018-05-29'
+  v?: '2018-05-29'
   desc?: string | IRef
   reqTempl?: string | IRef
   reqTemplS3Loc?: string | IRef
@@ -157,8 +188,8 @@ interface AppSyncFuncConfig_in {
   resTemplS3Loc?: string | IRef
 }
 
-interface AppSyncFuncConfig_out {
-  Name: string | IRef
+interface AppSyncFuncConfig_props {
+  Name: string | IRef | IGetAtt
   ApiId: string | IRef | IGetAtt
   DataSourceName: string | IRef | IGetAtt
   FunctionVersion: '2018-05-29'

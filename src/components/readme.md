@@ -14,10 +14,10 @@
 
   1. the min "hand drawn" js object; the rest can be built via the chain builder funcs
   2. its own kind
-  3. < className >.fromJSONs(string)
-  4. < className >.fromJSON(json object)
-  5. < className >.fromJS(verbose "hand drawn")
-  6. < className >.from( picks the right sub function)
+  3. < className >.fromJSON(json object)
+  4. < className >.fromString(string)
+  5. < className >.fromJS(verbose "hand drawn ") // perhaps this is merely the constructor
+  6. < className >.from(picks the right sub function)
   7. < className >.withRelated(JSON)
 
 3. Consider where input fields should also accept - `IGetAtt` | `IRef` basicaly anywhere a string or number might exist `:/`
@@ -67,3 +67,35 @@
 - Author templates using squals - but even Typescript sometimes lacks the ability to conjoint data dependencies.
 - Import (aka `fromJSON`) will need to validate someone elses "crazy template" before it can create an object
 ```
+
+## What is a Federa Application Component?
+
+1. It Declares its public/private cloud resources:
+
+  1. cloudformation
+
+  2. k8s/swarm?
+
+    1. Docker files?
+
+  3. k-native
+
+  4. etc
+
+2. It can opt-in to adding its data to the central graph or the REST API GATEWAY?
+
+3. It can provide a UI (SPA is recommended)
+
+4. It can perform evented computation;
+
+5. Changing the system properties generates a changeRequest - which causese the system to be rebuilt/compiled/type checked etc - so that you can not harm the system.
+
+## Pricing for Federa Applicaitons
+
+Developers setup prices:
+
+- to purchase
+- to upgrade
+- for higher service levels
+
+or make bundles in order to ease the purhase process.
