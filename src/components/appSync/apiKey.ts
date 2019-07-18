@@ -1,4 +1,4 @@
-import { IRef, IGetAtt, squals, genComponentName, baseSchemas } from '../Template'
+import { IRef, IGetAtt, squals, genComponentName, baseSchemas, validatorGeneric } from '../Template'
 import { AppSyncGraphQlApi } from './api'
 import { struct } from 'superstruct'
 
@@ -16,62 +16,26 @@ export class AppSyncApiKey implements squals {
   }
 
   static from (i: string | object): AppSyncApiKey {
-    if (i instanceof AppSyncApiKey) {
-      const ret = new AppSyncApiKey()
-      ret.name = i.name
-      ret._linkedApi = i._linkedApi
-      ret.Properties = i.Properties
-      return ret
-    } else if (typeof i === 'string') {
-      return AppSyncApiKey.fromString(i)
-    } else if (
-      /* exported JSON? */
-      Object.keys(i).length === 1 &&
-      'Type' in (i as IAppSyncApiKey_json)[Object.keys(i)[0]]
-    ) {
-      const o = i as IAppSyncApiKey_json
-      const ret = new AppSyncApiKey()
-      ret.name = Object.keys(o)[0]
-      ret.Properties = o[ret.name].Properties
-      return ret
-    } else {
-      const o = i as AppSyncApiKey_in
-      const ret = new AppSyncApiKey(o)
-      // need to validate?
-      return ret
-    }
+    return AppSyncApiKey.validate(i)
   }
   static fromString (i: string): AppSyncApiKey {
     return AppSyncApiKey.from(JSON.parse(i))
   }
+  static fromJS (i: object): AppSyncApiKey {
+    return AppSyncApiKey.validateJS(i as AppSyncApiKey_in)
+  }
   static fromJSON (o: object): AppSyncApiKey {
-    const valdInput = AppSyncApiKey.validateJSON(o as IAppSyncApiKey_json)
-    return new AppSyncApiKey()
+    return AppSyncApiKey.validateJSON(o as IAppSyncApiKey_json)
   }
   private static fromSDK (i: object): AppSyncApiKey {
     // make this public - after 0.1 launches
     throw new Error('not implemented yet')
   }
   static validate (i: string | object): AppSyncApiKey {
-    // AppSyncApiKey_in | AppSyncApiKey
-    if (typeof i === 'string') {
-      return AppSyncApiKey.fromString(i)
-    } else if (i instanceof AppSyncApiKey) {
-      const ret = new AppSyncApiKey()
-      ret.name = ret.name
-      ret.Properties = ret.Properties
-      return ret
-    } else if (
-      Object.keys(i).length === 1 &&
-      'Type' in (i as IAppSyncApiKey_json)[Object.keys(i)[0]]
-    ) {
-      return AppSyncApiKey.validateJSON(i as IAppSyncApiKey_json)
-    } else {
-      return AppSyncApiKey.validateJS(i as AppSyncApiKey_in)
-    }
+    return validatorGeneric<AppSyncApiKey>(i as squals, AppSyncApiKey)
   }
 
-  private static validateJS (i: AppSyncApiKey_in): AppSyncApiKey {
+  static validateJS (i: AppSyncApiKey_in): AppSyncApiKey {
     struct({
       name: 'string?',
       desc: 'string?',
@@ -88,7 +52,7 @@ export class AppSyncApiKey implements squals {
     return ret
   }
 
-  private static validateJSON (i: IAppSyncApiKey_json): AppSyncApiKey {
+  static validateJSON (i: IAppSyncApiKey_json): AppSyncApiKey {
     struct(
       struct.dict([
         'string',

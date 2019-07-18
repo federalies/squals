@@ -1,4 +1,5 @@
-import { IRef, squals, IGetAtt, genComponentName } from '../Template'
+import { IRef, squals, IGetAtt, genComponentName, validatorGeneric } from '../Template'
+import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 import { struct } from 'superstruct'
 
 export class AppSyncDataSource implements squals {
@@ -7,40 +8,25 @@ export class AppSyncDataSource implements squals {
   Properties: IDataSource_Props
   constructor (i: IDataSource_byHand) {
     this.name = typeof i.name === 'string' ? i.name : genComponentName()
-    this.Properties = { 
-      ApiId: '', 
-      Name: '', 
-      Type: 'NONE' 
+    this.Properties = {
+      ApiId: '',
+      Name: '',
+      Type: 'NONE'
     }
   }
   static fromString (i: string): AppSyncDataSource {
     return AppSyncDataSource.from(JSON.parse)
   }
-  static fromJS (i: IDataSource_byHand): AppSyncDataSource {
-    return AppSyncDataSource.validateJS(i)
+  static fromJS (i: object): AppSyncDataSource {
+    return AppSyncDataSource.validateJS(i as IDataSource_byHand)
   }
-  static fromJSON (i: IDataSource_json): AppSyncDataSource {
-    return AppSyncDataSource.validateJSON(i)
+  static fromJSON (i: object): AppSyncDataSource {
+    return AppSyncDataSource.validateJSON(i as IDataSource_json)
   }
   static from (i: string | object): AppSyncDataSource {
-    if (typeof i === 'string') {
-      return AppSyncDataSource.fromString(i)
-    } else if (i instanceof AppSyncDataSource) {
-      const ret = new AppSyncDataSource({ name: '', type: 'NONE' })
-      ret.name = i.name
-      ret.Properties = i.Properties
-      return ret
-    } else {
-      const _name = Object.keys(i)[0]
-      const { Type, Properties } = (i as IDataSource_json)[_name]
-      if (Type && Properties) {
-        return AppSyncDataSource.validateJSON(i as IDataSource_json)
-      } else {
-        return AppSyncDataSource.validateJS(i as IDataSource_byHand)
-      }
-    }
+    return AppSyncDataSource.validate(i)
   }
-  private static validateJS (i: IDataSource_byHand): AppSyncDataSource {
+  static validateJS (i: IDataSource_byHand): AppSyncDataSource {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -83,18 +69,29 @@ export class AppSyncDataSource implements squals {
           )
         })
       ),
-      rds: {
-        region: strGetAttRef,
-        secretStoreArn: strGetAttRef,
-        clusterId: strGetAttRef,
-        dbName: struct.optional(strGetAttRef),
-        schema: struct.optional(strGetAttRef)
-      }
+      rds: struct.optional(
+        struct({
+          region: strGetAttRef,
+          secretStoreArn: strGetAttRef,
+          clusterId: strGetAttRef,
+          dbName: struct.optional(strGetAttRef),
+          schema: struct.optional(strGetAttRef)
+        })
+      )
     })(i)
+
+    // input interdependencies
+    // basically makes something not optional - depending on a  differnet key
+    //
+    verifyIfThen(ifPathEq('type', 'HTTP'), has('http'))(i)
+    verifyIfThen(ifPathEq('type', 'AWS_LAMBDA'), has('lambdaArn'))(i)
+    verifyIfThen(ifPathEq('type', 'AMAZON_DYNAMODB'), has('dynamoDB'))(i)
+    verifyIfThen(ifPathEq('type', 'AMAZON_ELASTICSEARCH'), has('elasticsearch'))(i)
+    verifyIfThen(ifPathEq('type', 'RELATIONAL_DATABASE'), has('rds'))(i)
 
     return new AppSyncDataSource(i)
   }
-  private static validateJSON (i: IDataSource_json): AppSyncDataSource {
+  static validateJSON (i: IDataSource_json): AppSyncDataSource {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -157,18 +154,8 @@ export class AppSyncDataSource implements squals {
     ret.Properties = o[_name].Properties
     return ret
   }
-  static validate (i: object | AppSyncDataSource): AppSyncDataSource {
-    if (i instanceof AppSyncDataSource) {
-      return i
-    } else {
-      const _name = Object.keys(i)[0]
-      const { Type, Properties } = (i as IDataSource_json)[_name]
-      if (Type && Properties) {
-        return AppSyncDataSource.validateJSON(i as IDataSource_json)
-      } else {
-        return AppSyncDataSource.validateJS(i as IDataSource_byHand)
-      }
-    }
+  static validate (i: string | object): AppSyncDataSource {
+    return validatorGeneric<AppSyncDataSource>(i as squals, AppSyncDataSource)
   }
 
   toJSON (): object[] {

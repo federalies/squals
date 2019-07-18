@@ -1,65 +1,101 @@
-import { IRef, IGetAtt, squals, baseSchemas } from '../Template'
-
-import Joi from '@hapi/joi'
+import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
+import { AppSyncGraphQlApi } from './api'
+import { struct } from 'superstruct'
 
 export class AppSyncResolver implements squals {
   name: string
   Type = 'AWS::AppSync::Resolver'
-  Properties: {
-    ApiId: string | IRef | IGetAtt
-    FieldName: string | IRef
-    TypeName: string | IRef
-    Kind?: 'UNIT' | 'PIPELINE'
-    DataSourceName?: string | IRef
-    PipelineConfig?: {
-      Functions: (string | IRef)[]
-    }
-    RequestMappingTemplate?: string | IRef
-    RequestMappingTemplateS3Location?: string | IRef
-    ResponseMappingTemplate?: string | IRef
-    ResponseMappingTemplateS3Location?: string | IRef
+  Properties: AppSyncResolver_Props
+  constructor (i: AppSyncResolver_min, api?: AppSyncGraphQlApi) {
+    this.name = i.name || genComponentName()
+    this.Properties = { ApiId: i.api || '', FieldName: i.field, TypeName: i.type, Kind: 'UNIT' }
   }
-  constructor (i: AppSyncResolver_min | AppSyncResolver) {
-    this.name = ''
-    this.Properties = { ApiId: '', FieldName: '', Kind: 'UNIT', TypeName: '' }
+  static fromString (i: string): AppSyncResolver {
+    return AppSyncResolver.from(JSON.parse(i))
   }
-  linkDataSource () {}
-  static fromJSON (i: string | object) {}
-  toJSON (): JSON[] {
-    return [] as unknown as JSON[]
+  static fromJSON (i: object): AppSyncResolver {
+    return AppSyncResolver.validateJSON(i as AppSyncResolver_json)
   }
-  validate (): AppSyncResolver {
-    const stringOrRefSchema = Joi.alternatives().try(Joi.string(), baseSchemas.Ref)
-    const schematryStringGetAttRef = Joi.alternatives().try(
-      Joi.string(),
-      baseSchemas.GetAtt,
-      baseSchemas.Ref
-    )
+  static fromJS (i: object): AppSyncResolver {
+    return AppSyncResolver.validateJS(i as AppSyncResolver_min)
+  }
+  static from (i: string | object): AppSyncResolver {
+    return AppSyncResolver.validate(i)
+  }
+  static validateJSON (i: AppSyncResolver_json): AppSyncResolver {
+    const ref = struct({ Ref: 'string' })
+    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    const strRef = struct.union(['string', ref])
+    const strGetAttRef = struct.union(['string', getAtt, ref])
 
-    // besure to sync this with the class/type/interrface
-    const schema = Joi.object({
-      name: Joi.string().min(2),
-      Type: Joi.string().regex(new RegExp('AWS::AppSync::Resolver'), 'AppSyncResolver Type'),
-      Properties: Joi.object({
-        ApiId: schematryStringGetAttRef.required(),
-        FieldName: stringOrRefSchema.optional(),
-        TypeName: stringOrRefSchema.optional(),
-        Kind: Joi.string(), //  'UNIT' | 'PIPELINE'
-        DataSourceName: stringOrRefSchema.optional(),
-        PipelineConfig: Joi.object({
-          Functions: Joi.array().items(stringOrRefSchema)
-        }).optional(),
-        RequestMappingTemplate: stringOrRefSchema.optional(),
-        RequestMappingTemplateS3Location: stringOrRefSchema.optional(),
-        ResponseMappingTemplate: stringOrRefSchema.optional(),
-        ResponseMappingTemplateS3Location: stringOrRefSchema.optional()
-      })
+    struct(
+      struct.dict([
+        'string',
+        struct.interface({
+          Type: struct.literal('AWS::AppSync::Resolver'),
+          Properties: struct({
+            ApiId: strGetAttRef,
+            FieldName: strRef,
+            TypeName: strRef,
+            Kind: struct.optional(struct.enum(['UNIT', 'PIPELINE'])),
+            DataSourceName: struct.optional(strRef),
+            PipelineConfig: struct.optional({
+              Functions: struct([strRef])
+            }),
+            RequestMappingTemplate: struct.optional(strRef),
+            RequestMappingTemplateS3Location: struct.optional(strRef),
+            ResponseMappingTemplate: struct.optional(strRef),
+            ResponseMappingTemplateS3Location: struct.optional(strRef)
+          })
+        })
+      ])
+    )(i)
+
+    const name = Object.keys(i)[0]
+    const ret = new AppSyncResolver({
+      field: i[name].Properties.FieldName,
+      type: i[name].Properties.TypeName
     })
-    const err = schema.validate(this).error
-    if (err) {
-      throw new Error(`AppSyncResolver was not valid see: ${err}`)
-    }
-    return this
+    ret.Properties = i[name].Properties
+    ret.name = name
+    return ret
+  }
+  static validateJS (i: AppSyncResolver_min): AppSyncResolver {
+    const ref = struct({ Ref: 'string' })
+    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    const strRef = struct.union(['string', ref])
+    const strGetAttRef = struct.union(['string', getAtt, ref])
+    struct({
+      name: 'string?',
+      api: struct.optional(strGetAttRef),
+      field: strRef,
+      type: strRef,
+      kind: struct.optional(struct.enum(['UNIT', 'PIPELINE'])),
+      source: struct.optional(strRef),
+      pipelineFns: struct.optional(struct([strRef])),
+      reqTempl: struct.optional(strRef),
+      reqTemplS3Loc: struct.optional(strRef),
+      resTempl: struct.optional(strRef),
+      resTemplS3Loc: struct.optional(strRef)
+    })(i)
+    return new AppSyncResolver(i)
+  }
+  static validate (i: string | object): AppSyncResolver {
+    return validatorGeneric<AppSyncResolver>(i as squals, AppSyncResolver)
+  }
+  linkDataSource (): AppSyncResolver {
+    throw new Error()
+    return new AppSyncResolver({ field: '_', type: '_' })
+  }
+  toJSON (): object[] {
+    return [
+      {
+        [this.name]: {
+          Type: 'AWS::AppSync::Resolver',
+          Properties: this.Properties
+        }
+      } as AppSyncResolver_json
+    ]
   }
   Ref (): IRef {
     return { Ref: this.name }
@@ -76,7 +112,28 @@ export class AppSyncResolver implements squals {
 }
 
 interface AppSyncResolver_min {
-  ApiId: string | IRef
+  name?: string
+  api?: string | IRef | IGetAtt
+  field: string | IRef
+  type: string | IRef
+  kind?: 'UNIT' | 'PIPELINE'
+  source?: string | IRef
+  pipelineFns?: (string | IRef)[]
+  reqTempl?: string | IRef
+  reqTemplS3Loc?: string | IRef
+  resTempl?: string | IRef
+  resTemplS3Loc?: string | IRef
+}
+
+interface AppSyncResolver_json {
+  [name: string]: {
+    Type: 'AWS::AppSync::Resolver'
+    Properties: AppSyncResolver_Props
+  }
+}
+
+interface AppSyncResolver_Props {
+  ApiId: string | IRef | IGetAtt
   FieldName: string | IRef
   TypeName: string | IRef
   Kind?: 'UNIT' | 'PIPELINE'

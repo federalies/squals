@@ -1,0 +1,104 @@
+import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
+import { struct } from 'superstruct'
+
+// import { flowRight } from 'lodash-es'
+
+export class MyClass implements squals {
+  name: string
+  Type = '______________________________'
+  Properties: {}}
+
+  constructor (data: {} ) {
+      this.name = ''
+      this.Properties = {}
+  }
+  static from (i: string | object): MyClass {
+    return AppSyncFuncConfig.validate(i)
+  }
+
+  static fromJS (i: object): MyClass {
+    return AppSyncFuncConfig.validateJS(i as AppSyncFuncConfig_in)
+  }
+
+  static fromString (o: string): MyClass {
+    return AppSyncFuncConfig.validate(JSON.parse(o))
+  }
+
+  static fromJSON (o: object): MyClass {
+    return this.validateJSON(o as AppSyncFuncConfig_json)
+  }
+
+  private static fromSDK (o: object) {
+    return new Error('not implemented yet - will be public once implemented')
+  }
+
+  static validateJS (o: AppSyncFuncConfig_in): MyClass {
+    
+    const ref = struct({ Ref: 'string' })
+    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
+    const optUnion = flowRight(
+      struct.optional,
+      struct.union
+    )
+    const optliteral = flowRight(
+      struct.optional,
+      struct.literal
+    )
+    struct({
+      a: struct.union(['1','2'])
+    })(o)
+
+    return new MyClass(o)
+  }
+
+  static validateJSON (o: AppSyncFuncConfig_json): AppSyncFuncConfig {
+    const ref = struct({ Ref: 'string' })
+    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
+
+    struct(
+      struct.dict([
+        'string', // component name
+        struct.interface({
+          Type: struct.literal('_________'),
+          Properties: struct({
+            Name: strGetAttRef,
+            ApiId: strGetAttRef,
+            DataSourceName: strGetAttRef,
+            FunctionVersion: struct.literal('2018-05-29'),
+            Description: struct.optional(struct.union(['string', ref])),
+            RequestMappingTemplate: struct.optional(struct.union(['string', ref])),
+            RequestMappingTemplateS3Location: struct.optional(struct.union(['string', ref])),
+            ResponseMappingTemplate: struct.optional(struct.union(['string', ref])),
+            ResponseMappingTemplateS3Location: struct.optional(struct.union(['string', ref]))
+          })
+          // `struct` does not yet support conjoint / conditional assertions
+          // @ref <https://github.com/ianstormtaylor/superstruct/issues/123>
+        })
+      ])
+    )(o)
+
+    const _name = Object.keys(o)[0]
+
+    const ret = new MyClass({})
+    ret.Properties = o[_name].Properties
+    return ret
+  }
+
+  static validate (i: string | object): MyClass {
+    return validatorGeneric<MyClass>(i as squals, MyClass)
+  }
+  toJSON (): object[] {
+    return [
+      {
+        [this.name]: {
+          Type: '___________________________',
+          Properties: this.Properties
+        }
+      } as MyClass_json
+    ]
+  }
+  Ref (): IRef {
+    return { Ref: this.name }
+  }

@@ -1,4 +1,13 @@
-import { IRef, IGetAtt, squals, ITags, Itags, tags, baseSchemas } from '../Template'
+import {
+  IRef,
+  IGetAtt,
+  squals,
+  ITags,
+  Itags,
+  tags,
+  baseSchemas,
+  validatorGeneric
+} from '../Template'
 import {
   AppSyncResolver,
   AppSyncFuncConfig,
@@ -56,13 +65,11 @@ export class AppSyncGraphQlApi implements squals {
   }
 
   static from (i: string | object): AppSyncGraphQlApi {
-    const firstKey = Object.keys(i)[0]
-    const { Type, Properties } = (i as any)[firstKey]
-    return typeof i === 'string'
-      ? AppSyncGraphQlApi.fromString(i)
-      : Type && Properties
-        ? AppSyncGraphQlApi.fromJSON(i)
-        : new AppSyncGraphQlApi(AppSyncGraphQlApi.validateJS(i))
+    return AppSyncGraphQlApi.validate(i)
+  }
+
+  static fromJS (i: object): AppSyncGraphQlApi {
+    return AppSyncGraphQlApi.validateJS(i as IGraphQLapi)
   }
 
   static fromString (i: string): AppSyncGraphQlApi {
@@ -71,13 +78,7 @@ export class AppSyncGraphQlApi implements squals {
   }
 
   static fromJSON (i: object): AppSyncGraphQlApi {
-    const v = AppSyncGraphQlApi.validateJSON(i)
-    const componentName = Object.keys(v)[0]
-    const props = v[componentName].Properties
-    const ret = new AppSyncGraphQlApi({ name: componentName })
-    // wont have any _linked components since those are striped on export
-    ret.Properties = { ...ret.Properties, ...props }
-    return ret
+    return AppSyncGraphQlApi.validateJSON(i as IGraphQl_json)
   }
 
   private static fromSDK (i: any): AppSyncGraphQlApi {
@@ -85,7 +86,7 @@ export class AppSyncGraphQlApi implements squals {
     throw new Error('not implemented yet')
   }
 
-  private static validateJSON (i: object): IGraphQl_json {
+  static validateJSON (i: object): AppSyncGraphQlApi {
     // #region schema segments
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
@@ -148,10 +149,14 @@ export class AppSyncGraphQlApi implements squals {
 
     // validation failures throws errors
     // returns validated input on pass
-    return i as IGraphQl_json
+    const ret = new AppSyncGraphQlApi({ name: '' })
+    const o = i as IGraphQl_json
+    ret.name = Object.keys(o)[0]
+    ret.Properties = o[ret.name].Properties
+    return ret
   }
 
-  private static validateJS (i: object): IGraphQLapi {
+  static validateJS (i: object): AppSyncGraphQlApi {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -205,34 +210,13 @@ export class AppSyncGraphQlApi implements squals {
       })
     )(i)
 
-    // throws errors for validation failures
-    // returns true if no Error thrown
+    
 
-    return i as IGraphQLapi
+    return new AppSyncGraphQlApi(i as IGraphQLapi)
   }
 
-  static validate (i: AppSyncGraphQlApi | object): AppSyncGraphQlApi {
-    if (!(i instanceof AppSyncGraphQlApi)) {
-      if ('name' in i) {
-        i = i as IGraphQLapi
-        return new AppSyncGraphQlApi(AppSyncGraphQlApi.validateJS(i))
-      } else {
-        i = i as JSON // _json
-        AppSyncGraphQlApi.validateJSON(i)
-        // transform JSON to js
-        return new AppSyncGraphQlApi({ name: 'fix me' })
-      }
-    } else {
-      // type to key checks
-      const firstKey = Object.keys(i)[0]
-      const { Type, Properties } = (i as any)[firstKey]
-      if (Type && Properties) {
-        this.validateJSON(i)
-      } else {
-        this.validateJS(i)
-      }
-      return i
-    }
+  static validate (i: string | object): AppSyncGraphQlApi {
+    return validatorGeneric<AppSyncGraphQlApi>(i as squals, AppSyncGraphQlApi)
   }
 
   withRelated (...i: object[]): AppSyncGraphQlApi {
@@ -288,6 +272,10 @@ export class AppSyncGraphQlApi implements squals {
     return this
   }
 
+  openIdConnection (): AppSyncGraphQlApi {
+    return this
+  }
+
   moreAuthProviders (...p: IGraphQL_authProviders[]): AppSyncGraphQlApi {
     this.Properties.AdditionalAuthenticationProviders = p.map(v => {
       switch (v.authType) {
@@ -326,10 +314,6 @@ export class AppSyncGraphQlApi implements squals {
           }
       }
     })
-    return this
-  }
-
-  openIdConnection (): AppSyncGraphQlApi {
     return this
   }
 
@@ -428,6 +412,7 @@ interface IGraphQLapi {
   additional?: IGraphQL_authProviders[]
   tags?: Itags[]
 }
+
 interface IGraphQLapi_cognitoPool {
   id: string
   region: string

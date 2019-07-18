@@ -1,5 +1,12 @@
-import { IRef, IGetAtt, squals, baseSchemas, genComponentName } from '../Template'
+import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
 import { AppSyncGraphQlApi } from './api'
+import {
+  verifyOnlyOne,
+  verifyIfThen,
+  ifPathEq,
+  has,
+  verifyHasAtLeastOne
+} from '../../utils/validations/objectCheck'
 
 import { struct } from 'superstruct'
 import { flowRight } from 'lodash-es'
@@ -9,63 +16,43 @@ export class AppSyncFuncConfig implements squals {
   Type = 'AWS::AppSync::FunctionConfiguration'
   Properties: AppSyncFuncConfig_props
 
-  constructor (data: AppSyncFuncConfig_in | AppSyncFuncConfig, api?: AppSyncGraphQlApi) {
-    if (data instanceof AppSyncFuncConfig) {
-      const ret = AppSyncFuncConfig.from(data)
-      this.name = ret.name
-      this.Properties = ret.Properties
+  constructor (data: AppSyncFuncConfig_in, api?: AppSyncGraphQlApi) {
+    this.name = Object.keys(data)[0]
+    this.Properties = {
+      ApiId: api ? api.ApiId() : '',
+      Name: data.name,
+      DataSourceName: data.sourceName,
+      FunctionVersion: '2018-05-29'
     }
-
-    if (data instanceof AppSyncFuncConfig) {
-      this.name = data.name
-      this.Properties = data.Properties
-    } else {
-      this.name = Object.keys(data)[0]
-      this.Properties = {
-        ApiId: '',
-        Name: data.name,
-        DataSourceName: data.sourceName,
-        FunctionVersion: '2018-05-29'
-      }
-      if (data.reqTempl) {
-        this.Properties.RequestMappingTemplate = data.reqTempl
-      }
-      if (data.reqTemplS3Loc) {
-        this.Properties.RequestMappingTemplate = data.reqTemplS3Loc
-      }
-      if (data.resTempl) {
-        this.Properties.RequestMappingTemplate = data.resTempl
-      }
-      if (data.resTemplS3Loc) {
-        this.Properties.RequestMappingTemplate = data.resTemplS3Loc
-      }
+    if (data.reqTempl) {
+      this.Properties.RequestMappingTemplate = data.reqTempl
+    }
+    if (data.reqTemplS3Loc) {
+      this.Properties.RequestMappingTemplate = data.reqTemplS3Loc
+    }
+    if (data.resTempl) {
+      this.Properties.RequestMappingTemplate = data.resTempl
+    }
+    if (data.resTemplS3Loc) {
+      this.Properties.RequestMappingTemplate = data.resTemplS3Loc
     }
   }
   static from (i: string | object): AppSyncFuncConfig {
-    return typeof i === 'string'
-      ? AppSyncFuncConfig.fromString(i)
-      : !(i instanceof AppSyncFuncConfig)
-        ? AppSyncFuncConfig.validate(i as AppSyncFuncConfig_json)
-        : new AppSyncFuncConfig(i)
+    return AppSyncFuncConfig.validate(i)
   }
-
   static fromJS (i: object): AppSyncFuncConfig {
     return AppSyncFuncConfig.validateJS(i as AppSyncFuncConfig_in)
   }
-
   static fromString (o: string): AppSyncFuncConfig {
     return AppSyncFuncConfig.validate(JSON.parse(o))
   }
-
   static fromJSON (o: object): AppSyncFuncConfig {
     return this.validateJSON(o as AppSyncFuncConfig_json)
   }
-
   private static fromSDK (o: object) {
     return new Error('not implemented yet - will be public once implemented')
   }
-
-  private static validateJS (o: AppSyncFuncConfig_in): AppSyncFuncConfig {
+  static validateJS (o: AppSyncFuncConfig_in): AppSyncFuncConfig {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -77,6 +64,12 @@ export class AppSyncFuncConfig implements squals {
       struct.optional,
       struct.literal
     )
+
+    const verifyInterdeps = flowRight(
+      verifyHasAtLeastOne('resTempl', 'resTemplS3Loc'),
+      verifyHasAtLeastOne('reqTempl', 'reqTemplS3Loc')
+    )
+
     struct({
       name: strGetAttRef,
       sourceName: strGetAttRef,
@@ -88,10 +81,12 @@ export class AppSyncFuncConfig implements squals {
       resTemplS3Loc: struct.optional(struct.union(['string', ref]))
     })(o)
 
+    verifyInterdeps(o)
+
     return new AppSyncFuncConfig(o)
   }
 
-  private static validateJSON (o: AppSyncFuncConfig_json): AppSyncFuncConfig {
+  static validateJSON (o: AppSyncFuncConfig_json): AppSyncFuncConfig {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -133,14 +128,8 @@ export class AppSyncFuncConfig implements squals {
     return ret
   }
 
-  static validate (o: object | AppSyncFuncConfig): AppSyncFuncConfig {
-    const _name = Object.keys(o)[0]
-    const { Type, Properties } = (o as AppSyncFuncConfig_json)[_name]
-    if (Type && Properties) {
-      return AppSyncFuncConfig.validateJSON(o as AppSyncFuncConfig_json)
-    } else {
-      return AppSyncFuncConfig.validateJS(o as AppSyncFuncConfig_in)
-    }
+  static validate (i: string | object): AppSyncFuncConfig {
+    return validatorGeneric<AppSyncFuncConfig>(i as squals, AppSyncFuncConfig)
   }
   toJSON (): object[] {
     return [

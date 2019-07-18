@@ -118,16 +118,56 @@ export const genComponentName = (seed: number | string = new Date().getTime()) =
 }
 export const baseSchemas = {
   Ref: struct({ Ref: 'string' }),
-  GetAtt: struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+  GetAtt: struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) }),
+  StrRef: struct.union(['string', struct({ Ref: 'string' })]),
+  StrRefGetAtt: struct.union([
+    'string',
+    struct({ Ref: 'string' }),
+    struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+  ])
+}
+
+export function validatorGeneric<T> (input: string | squals, className: reflectSquals<T>) {
+  if (typeof input === 'string') {
+    return className.fromString(input)
+  } else if (input instanceof className) {
+    return className.validateJSON(input.toJSON()[0])
+  } else {
+    const name = Object.keys(input)[0]
+    const { Type, Properties } = (input as any)[name]
+    if (Type && Properties) {
+      return className.validateJSON(input)
+    } else {
+      return className.validateJS(input)
+    }
+  }
+}
+
+type reflectSquals<T> = {
+  new (...args: any[]): T
+  from: (i: string | object) => T
+  fromJS: (i: object) => T
+  fromJSON: (i: object) => T
+  fromString: (i: string) => T
+  validate: (i: object | string) => T
+  validateJS: (i: any) => T
+  validateJSON: (i: any) => T
+}
+export interface squalsClass extends Function {
+  fromString: (i: string) => squalsClass
+  validate: (i: object | string) => squalsClass
+  validateJS: (i: object) => squalsClass
+  validateJSON: (i: object) => squalsClass
 }
 
 export abstract class squals {
+  static new: () => object
   static fromString: (i: string) => object // allows for class to permit data partials - and for validate to catch it
   static fromJSON: (i: object) => object // allows for class to permit data partials - and for validate to catch it
   static from: (i: string | object) => object
   static withRelated: (...i: object[]) => object[]
-  static validate: (o: object) => object // returns chainable obj OR throw
-  abstract toJSON: (includeRelated: boolean) => object[] // returns a natural list of related, exported objects
+  static validate: (o: string | object) => object // returns chainable obj OR throw
+  abstract toJSON: (includeRelated?: boolean) => object[] // returns a natural list of related, exported objects
 }
 
 export interface Itemplate {

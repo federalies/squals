@@ -1,5 +1,5 @@
-import { IRef, IGetAtt, squals, baseSchemas } from '../Template'
-import Joi from '@hapi/joi'
+import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
+import { struct } from 'superstruct'
 import { buildSchema } from 'graphql'
 
 export class AppSyncSchema implements squals {
@@ -7,103 +7,89 @@ export class AppSyncSchema implements squals {
   Type = 'AWS::AppSync::GraphQLSchema'
   Properties: ISchema_out
 
-  constructor (i: ISchema_in | AppSyncSchema) {
-    this.name = ''
-    this.Properties = { ApiId: '' }
-  }
-
-  static fromJSON (o: string | object | ISchema_in): AppSyncSchema {
-    if(typeof o === 'string') o = JSON.parse(o)
-    return this.validate(o as ISchema_in)
-  }
-
-  static validate (s: ISchema_in | AppSyncSchema): AppSyncSchema {
-    // validate the ApiId is not ''
-    // validate the Defintion with buildSchema
-    const schemes ={
-      strRefGet : [Joi.string(),baseSchemas.Ref],
-      strRefGetAttBuffer : [Joi.string(), Joi.binary(), baseSchemas.GetAtt, baseSchemas.Ref, ]
+  constructor (i: ISchema_min) {
+    this.name = i.name || genComponentName()
+    this.Properties = { ApiId: i.apiId || '' }
+    if (i.def) {
     }
-
-    if (s instanceof AppSyncSchema) {
-      const schema = Joi.object({
-        name: Joi.string().min(2),
-        Type:'AWS::AppSync::GraphQLSchema',
-        Properties: Joi.object({
-          ApiId: Joi.alternatives().try(...schemes.strRefGet).required(),
-          Definition: Joi.alternatives().try(...schemes.strRefGetAttBuffer),
-          DefinitionS3Location: Joi.alternatives().try(...schemes.strRefGetAttBuffer),
-        }).xor('Definition', 'DefinitionS3Location')
-      })
-
-      const err = schema.validate(s).error
-      if(err) throw new Error(`Validation Error Occured in the AppSyncSchema Class`)
-      
-      return new AppSyncSchema(s)
-    
-    } else {
-      s = s as ISchema_in
-      const {apiId} = s
-      if(apiId){
-        s = s as ISchema_in_min
-
-        const err = Joi.object({
-          apiId: Joi.alternatives().try(...schemes.strRefGet).required(),
-          def: Joi.alternatives().try(...schemes.strRefGetAttBuffer).required()
-        }).validate(s).error
-
-        if(err) throw new Error(`Validation Error Occured in the AppSyncSchema Class`)
-        return new AppSyncSchema(s)
-      }else{
-
-        s = s as ISchema_in_JSON
-        const _name = Object.keys(s)[0]
-
-        const errName = Joi.string().min(2).validate(s).error
-        const errBody = Joi.object({
-          apiId: Joi.alternatives().try(...schemes.strRefGet).required(),
-          def: Joi.alternatives().try(...schemes.strRefGetAttBuffer).required()
-        }).validate(s).error
-  
-        if(errBody|| errName) throw new Error(`Validation Error Occured in the AppSyncSchema Class`)
-        return new AppSyncSchema(s)
-      }
-    }
-    
   }
-  toJSON (): JSON[] {
+  static fromString (i: string): AppSyncSchema {
+    return AppSyncSchema.validate(i)
+  }
+  static fromJSON (o: object): AppSyncSchema {
+    if (typeof o === 'string') o = JSON.parse(o)
+    return this.validate(o as ISchema_min)
+  }
+  static fromJS (i: object): AppSyncSchema {
+    return AppSyncSchema.validate(i)
+  }
+  static from (i: string | object | AppSyncSchema): AppSyncSchema {
+    return AppSyncSchema.validate(i)
+  }
+  static validateJS (i: ISchema_min): AppSyncSchema {
+    struct({
+      name: 'string?',
+      def: baseSchemas.StrRef,
+      apiId: struct.optional(baseSchemas.StrRef)
+    })(i)
+    return new AppSyncSchema(i)
+  }
+  static validateJSON (i: ISchema_json): AppSyncSchema {
+    struct(
+      struct.dict([
+        'string',
+        struct({
+          Type: struct.literal('AWS::AppSync::GraphQLSchema'),
+          Properties: struct({
+            ApiId: baseSchemas.StrRefGetAtt,
+            Definition: struct.optional(baseSchemas.StrRefGetAtt),
+            DefinitionS3Location: struct.optional(baseSchemas.StrRefGetAtt)
+          })
+        })
+      ])
+    )(i)
+    const name = Object.keys(i)[0]
+    const { ApiId, Definition, DefinitionS3Location } = i[name].Properties
+    // start an instnace with dummy data to be over-written
+    const ret = new AppSyncSchema({ name, apiId: ApiId, def: Definition || '' })
+    ret.name = name
+    ret.Properties = i[name].Properties
+    return ret
+  }
+  static validate (i: string | object): AppSyncSchema {
+    return validatorGeneric<AppSyncSchema>(i as squals, AppSyncSchema)
+  }
+  toJSON (): object[] {
     AppSyncSchema.validate(this)
-
     return [
-      {[this.name]:
-        {
-          Type:'AWS::AppSync::GraphQLSchema',
+      ({
+        [this.name]: {
+          Type: 'AWS::AppSync::GraphQLSchema',
           Properties: this.Properties
         }
-      } as unknown as JSON
+      } as unknown) as JSON
     ]
   }
-  Ref():IRef{
-    return {Ref: this.name}
+  Ref (): IRef {
+    return { Ref: this.name }
   }
 }
 
-type ISchema_in = ISchema_in_min | ISchema_in_JSON
-
-interface ISchema_in_min {
-  apiId: string | IRef
-  def: string | IRef | Buffer // s3://string
+interface ISchema_min {
+  name?: string
+  apiId?: string | IRef | IGetAtt
+  def: string | IRef | IGetAtt // Buffer | s3://string
 }
 
-interface ISchema_in_JSON {
+interface ISchema_json {
   [name: string]: {
-    apiId: string | IRef
-    def: string | IRef | Buffer // s3://string
+    Type: 'AWS::AppSync::GraphQLSchema'
+    Properties: ISchema_out
   }
 }
 
 interface ISchema_out {
   ApiId: string | IRef | IGetAtt
-  Definition?: string |  Buffer | IRef | IGetAtt
+  Definition?: string | IRef | IGetAtt
   DefinitionS3Location?: string | IRef | IGetAtt
 }
