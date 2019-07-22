@@ -1,6 +1,16 @@
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
+import {
+  verifyHasAtLeastOne,
+  verifySyntax,
+  verifyIfThen,
+  ifHas
+} from '../../utils/validations/objectCheck'
+
 import { struct } from 'superstruct'
 import { buildSchema } from 'graphql'
+import { flowRight } from 'lodash-es'
+
+// import { flowRight } from 'lodash-es'
 
 export class AppSyncSchema implements squals {
   name: string
@@ -10,7 +20,11 @@ export class AppSyncSchema implements squals {
   constructor (i: IAppSyncSchema_min) {
     this.name = i.name || genComponentName()
     this.Properties = { ApiId: i.apiId || '' }
-    if (i.def) {
+    if (i.def && typeof i.def === 'string') {
+      buildSchema(i.def)
+    }
+    if (i.loc && typeof i.def === 'string') {
+      // load up the schema and validate
     }
   }
   static fromString (i: string): AppSyncSchema {
@@ -29,11 +43,19 @@ export class AppSyncSchema implements squals {
   static validateJS (i: IAppSyncSchema_min): AppSyncSchema {
     struct({
       name: 'string?',
-      def: baseSchemas.StrRef,
-      apiId: struct.optional(baseSchemas.StrRef)
+      apiId: struct.optional(baseSchemas.StrRef),
+      def: struct.optional(baseSchemas.StrRefGetAtt),
+      loc: struct.optional(baseSchemas.StrRefGetAtt)
     })(i)
 
-    return new AppSyncSchema(i)
+    // add flowRight if needed
+    const verifyInterDeps = verifyIfThen(
+      ifHas('def'),
+      verifySyntax('def', buildSchema),
+      verifyHasAtLeastOne('def', 'loc')
+    )
+
+    return new AppSyncSchema(verifyInterDeps(i))
   }
   static validateJSON (i: ISchema_json): AppSyncSchema {
     struct(
@@ -49,10 +71,21 @@ export class AppSyncSchema implements squals {
         })
       ])
     )(i)
+
     const name = Object.keys(i)[0]
-    const { ApiId, Definition, DefinitionS3Location } = i[name].Properties
+    const verifyInterDeps = verifyHasAtLeastOne('Definition', 'DefinitionS3Location')
+
+    const { ApiId, Definition, DefinitionS3Location } = verifyInterDeps<ISchema_out>(
+      i[name].Properties
+    )
+
     // start an instnace with dummy data to be over-written
-    const ret = new AppSyncSchema({ name, apiId: ApiId, def: Definition || '' })
+    const ret = new AppSyncSchema({
+      name,
+      apiId: ApiId,
+      def: Definition,
+      loc: DefinitionS3Location
+    })
     ret.name = name
     ret.Properties = i[name].Properties
     return ret
@@ -79,7 +112,8 @@ export class AppSyncSchema implements squals {
 export interface IAppSyncSchema_min {
   name?: string
   apiId?: string | IRef | IGetAtt
-  def: string | IRef | IGetAtt // Buffer | s3://string
+  def?: string | IRef | IGetAtt
+  loc?: string | IRef | IGetAtt
 }
 
 interface ISchema_json {

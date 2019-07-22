@@ -2,6 +2,7 @@ import { IRef, squals, IGetAtt, genComponentName, validatorGeneric } from '../Te
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 import { struct } from 'superstruct'
 import { AppSyncGraphQlApi } from './api'
+import { flowRight } from 'lodash-es'
 
 export class AppSyncDataSource implements squals {
   name: string
@@ -85,13 +86,23 @@ export class AppSyncDataSource implements squals {
     // input interdependencies
     // basically makes something not optional - depending on a  differnet key
     //
-    verifyIfThen(ifPathEq('type', 'HTTP'), has('http'))(i)
-    verifyIfThen(ifPathEq('type', 'AWS_LAMBDA'), has('lambdaArn'))(i)
-    verifyIfThen(ifPathEq('type', 'AMAZON_DYNAMODB'), has('dynamoDB'))(i)
-    verifyIfThen(ifPathEq('type', 'AMAZON_ELASTICSEARCH'), has('elasticsearch'))(i)
-    verifyIfThen(ifPathEq('type', 'RELATIONAL_DATABASE'), has('rds'))(i)
+    const v1 = verifyIfThen(ifPathEq('type', 'HTTP'), has('http'))
+    const v2 = verifyIfThen(ifPathEq('type', 'AWS_LAMBDA'), has('lambdaArn'))
+    const v3 = verifyIfThen(ifPathEq('type', 'AMAZON_DYNAMODB'), has('dynamoDB'))
+    const v4 = verifyIfThen(ifPathEq('type', 'AMAZON_ELASTICSEARCH'), has('elasticsearch'))
+    const v5 = verifyIfThen(ifPathEq('type', 'RELATIONAL_DATABASE'), has('rds'))
 
-    return new AppSyncDataSource(i)
+    // can't get it to pass tsc
+    // ugh
+    // const verifyInterDeps = flowRight(
+    //   verifyIfThen(ifPathEq('type', 'HTTP'), has('http')),
+    //   verifyIfThen(ifPathEq('type', 'AWS_LAMBDA'), has('lambdaArn')),
+    //   verifyIfThen(ifPathEq('type', 'AMAZON_DYNAMODB'), has('dynamoDB')),
+    //   verifyIfThen(ifPathEq('type', 'AMAZON_ELASTICSEARCH'), has('elasticsearch')),
+    //   verifyIfThen(ifPathEq('type', 'RELATIONAL_DATABASE'), has('rds'))
+    // )
+
+    return new AppSyncDataSource(v5(v4(v3(v2(v1(i))))))
   }
   static validateJSON (i: IDataSource_json): AppSyncDataSource {
     const ref = struct({ Ref: 'string' })

@@ -1,18 +1,27 @@
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
 import { AppSyncGraphQlApi } from './api'
 import { struct } from 'superstruct'
+import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 
 export class AppSyncResolver implements squals {
   name: string
   Type = 'AWS::AppSync::Resolver'
   Properties: AppSyncResolver_Props
+
   constructor (i: IAppSyncResolver_min, api?: AppSyncGraphQlApi) {
     this.name = i.name || genComponentName()
-    this.Properties = { 
-      ApiId: api? api.ApiId() : i.api ? i.api : '< linkMe >',
-      FieldName: i.field, 
-      TypeName: i.type, 
-      Kind: 'UNIT' }
+    this.Properties = {
+      ApiId: api ? api.ApiId() : i.api ? i.api : '< StillNeedsToBeLinked >',
+      Kind: i.kind ? i.kind : 'UNIT',
+      FieldName: i.field,
+      TypeName: i.type
+    }
+    if (i.source) this.Properties.DataSourceName = i.source
+    if (i.pipelineFns) this.Properties.PipelineConfig = { Functions: i.pipelineFns }
+    if (i.reqTempl) this.Properties.RequestMappingTemplate = i.reqTempl
+    if (i.reqTemplS3Loc) this.Properties.RequestMappingTemplateS3Location = i.reqTemplS3Loc
+    if (i.resTempl) this.Properties.ResponseMappingTemplate = i.resTempl
+    if (i.resTemplS3Loc) this.Properties.ResponseMappingTemplateS3Location = i.resTemplS3Loc
   }
   static fromString (i: string): AppSyncResolver {
     return AppSyncResolver.from(JSON.parse(i))
@@ -31,7 +40,6 @@ export class AppSyncResolver implements squals {
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strRef = struct.union(['string', ref])
     const strGetAttRef = struct.union(['string', getAtt, ref])
-
     struct(
       struct.dict([
         'string',
@@ -54,12 +62,15 @@ export class AppSyncResolver implements squals {
         })
       ])
     )(i)
-
     const name = Object.keys(i)[0]
+    const interdeps = verifyIfThen(ifPathEq('Kind', 'PIPELINE'), has('PipelineConfig.Functions'))
+    // add interdeps as a flowRight function - and `verify(ifHas(requestTempl), verifySyntax(string, compileFunction))`
+    const props = interdeps(i[name].Properties)
     const ret = new AppSyncResolver({
-      field: i[name].Properties.FieldName,
-      type: i[name].Properties.TypeName
+      field: props.FieldName,
+      type: props.TypeName
     })
+
     ret.Properties = i[name].Properties
     ret.name = name
     return ret
@@ -82,7 +93,8 @@ export class AppSyncResolver implements squals {
       resTempl: struct.optional(strRef),
       resTemplS3Loc: struct.optional(strRef)
     })(i)
-    return new AppSyncResolver(i)
+    const interdep = verifyIfThen(ifPathEq('kind', 'pipeline'), has('pipelineFns'))
+    return new AppSyncResolver(interdep(i))
   }
   static validate (i: string | object): AppSyncResolver {
     return validatorGeneric<AppSyncResolver>(i as squals, AppSyncResolver)
@@ -91,6 +103,11 @@ export class AppSyncResolver implements squals {
     throw new Error()
     return new AppSyncResolver({ field: '_', type: '_' })
   }
+
+  componentName () {}
+  fieldName () {}
+  typeName () {}
+
   toJSON (): object[] {
     return [
       {
