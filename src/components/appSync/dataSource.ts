@@ -1,16 +1,18 @@
 import { IRef, squals, IGetAtt, genComponentName, validatorGeneric } from '../Template'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 import { struct } from 'superstruct'
+import { AppSyncGraphQlApi } from './api'
 
 export class AppSyncDataSource implements squals {
   name: string
   Type = 'AWS::AppSync::DataSource'
   Properties: IDataSource_Props
-  constructor (i: IDataSource_byHand) {
+
+  constructor (i: IAppSyncDataSource_min, api?: AppSyncGraphQlApi) {
     this.name = typeof i.name === 'string' ? i.name : genComponentName()
     this.Properties = {
-      ApiId: '',
-      Name: '',
+      ApiId: api ? api.ApiId() : i.api ? i.api : '< linkMe >',
+      Name: i.name,
       Type: 'NONE'
     }
   }
@@ -18,7 +20,7 @@ export class AppSyncDataSource implements squals {
     return AppSyncDataSource.from(JSON.parse)
   }
   static fromJS (i: object): AppSyncDataSource {
-    return AppSyncDataSource.validateJS(i as IDataSource_byHand)
+    return AppSyncDataSource.validateJS(i as IAppSyncDataSource_min)
   }
   static fromJSON (i: object): AppSyncDataSource {
     return AppSyncDataSource.validateJSON(i as IDataSource_json)
@@ -26,7 +28,7 @@ export class AppSyncDataSource implements squals {
   static from (i: string | object): AppSyncDataSource {
     return AppSyncDataSource.validate(i)
   }
-  static validateJS (i: IDataSource_byHand): AppSyncDataSource {
+  static validateJS (i: IAppSyncDataSource_min): AppSyncDataSource {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -102,8 +104,8 @@ export class AppSyncDataSource implements squals {
         struct.interface({
           Type: struct.literal('AWS::AppSync::DataSource'),
           Properties: struct({
-            Name: struct.union(['string', ref]),
-            ApiId: struct.union(['string', ref]),
+            Name: strGetAttRef,
+            ApiId: strGetAttRef,
             Description: struct.optional(struct.union(['string', ref])),
             ServiceRoleArn: struct.optional(struct.union(['string', ref])),
             LambdaConfig: struct.optional({ LambdaFunctionArn: 'string' }),
@@ -157,7 +159,6 @@ export class AppSyncDataSource implements squals {
   static validate (i: string | object): AppSyncDataSource {
     return validatorGeneric<AppSyncDataSource>(i as squals, AppSyncDataSource)
   }
-
   toJSON (): object[] {
     return ([] as unknown) as JSON[]
   }
@@ -174,8 +175,8 @@ interface IDataSource_json {
 }
 
 interface IDataSource_Props {
-  Name: string | IRef // constuctor
-  ApiId: string | IRef // inherit from the API?
+  Name: string | IGetAtt | IRef // constuctor
+  ApiId: string | IGetAtt | IRef // inherit from the API?
   Description?: string | IRef
   DynamoDBConfig?: {
     AwsRegion: string
@@ -217,9 +218,9 @@ interface IDataSource_Props {
     | 'RELATIONAL_DATABASE'
 }
 
-export interface IDataSource_byHand {
+export interface IAppSyncDataSource_min {
   name: string | IGetAtt | IRef
-  apiId?: string | IGetAtt | IRef
+  api?: string | IGetAtt | IRef
   desc?: string | IGetAtt | IRef
   roleArn?: string | IGetAtt | IRef
   lambdaArn?: string | IGetAtt | IRef

@@ -1,22 +1,19 @@
-import {
-  IRef,
-  IGetAtt,
-  squals,
-  ITags,
-  Itags,
-  tags,
-  baseSchemas,
-  validatorGeneric
-} from '../Template'
+import { IRef, IGetAtt, squals, ITags, Itags, tags, validatorGeneric } from '../Template'
 import {
   AppSyncResolver,
   AppSyncFuncConfig,
   AppSyncDataSource,
   AppSyncSchema,
-  IDataSource_byHand
+  AppSyncApiKey,
+  IAppSyncApiKey_min,
+  AppSyncFuncConfig_min,
+  IAppSyncDataSource_min,
+  IAppSyncResolver_min,
+  IAppSyncSchema_min
 } from '.'
-
+import { flowRight } from 'lodash-es'
 import { struct } from 'superstruct'
+import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 // import { AppSync } from 'aws-sdk'
 
 export class AppSyncGraphQlApi implements squals {
@@ -24,12 +21,12 @@ export class AppSyncGraphQlApi implements squals {
   Type = 'AWS::AppSync::GraphQLApi'
   Properties: IGraphQl_props
   _linked = {
+    keys: [] as AppSyncApiKey[],
     resovlers: [] as AppSyncResolver[],
     configs: [] as AppSyncFuncConfig[],
     sources: [] as AppSyncDataSource[],
     schemas: [] as AppSyncSchema[]
   }
-
   /**
    * Create new progamatic representations of a GraphQL Api.
    *
@@ -147,12 +144,26 @@ export class AppSyncGraphQlApi implements squals {
       ])
     )(i)
 
+    const verifyInterDeps = flowRight(
+      verifyIfThen(ifPathEq('AuthenticationType', 'OPENID_CONNECT'), has('OpenIDConnectConfig')),
+      verifyIfThen(
+        ifPathEq('AuthenticationType', 'AMAZON_COGNITO_USER_POOLS'),
+        has('UserPoolConfig')
+      )
+    )
+
     // validation failures throws errors
     // returns validated input on pass
     const ret = new AppSyncGraphQlApi({ name: '' })
     const o = i as IGraphQl_json
     ret.name = Object.keys(o)[0]
     ret.Properties = o[ret.name].Properties
+    verifyInterDeps(o[ret.name].Properties)
+
+    if(ret.Properties.AdditionalAuthenticationProviders){
+      ret.Properties.AdditionalAuthenticationProviders.map(prov => verifyInterDeps(prov))
+    }
+    
     return ret
   }
 
@@ -209,8 +220,6 @@ export class AppSyncGraphQlApi implements squals {
         )
       })
     )(i)
-
-    
 
     return new AppSyncGraphQlApi(i as IGraphQLapi)
   }
@@ -321,28 +330,49 @@ export class AppSyncGraphQlApi implements squals {
     return this
   }
 
-  linkDataSouces (...d: (IDataSource_byHand | AppSyncDataSource)[]) {
-    // set the API ID for each input object
+  linkDataSouces (...d: (IAppSyncDataSource_min | AppSyncDataSource)[]) {
+    this._linked.sources = d.map(dataSrc => {
+      const ds = dataSrc instanceof AppSyncDataSource ? dataSrc : new AppSyncDataSource(dataSrc)
+      ds.Properties.ApiId = this.ApiId()
+      return ds
+    })
     return this
   }
 
-  linkFunctionConfigs (...c: AppSyncFuncConfig[]): AppSyncGraphQlApi {
-    // set the API ID for each input object
+  linkFunctionConfigs (...c: (AppSyncFuncConfig_min | AppSyncFuncConfig)[]): AppSyncGraphQlApi {
+    this._linked.configs = c.map(funcConfg => {
+      const f =
+        funcConfg instanceof AppSyncFuncConfig ? funcConfg : new AppSyncFuncConfig(funcConfg)
+      f.Properties.ApiId = this.ApiId()
+      return f
+    })
     return this
   }
 
-  linkApiKeys (...i: IapiKey[]): AppSyncGraphQlApi {
-    // set the API ID for each input object
+  linkApiKeys (...i: (IAppSyncApiKey_min | AppSyncApiKey)[]): AppSyncGraphQlApi {
+    this._linked.keys = i.map(key => {
+      const k = key instanceof AppSyncApiKey ? key : new AppSyncApiKey(key)
+      k.Properties.ApiId = this.ApiId()
+      return k
+    })
     return this
   }
 
-  linkeResolvers (...r: AppSyncResolver[]): AppSyncGraphQlApi {
-    // set the API ID for each input object
+  linkeResolvers (...r: (IAppSyncResolver_min | AppSyncResolver)[]): AppSyncGraphQlApi {
+    this._linked.resovlers = r.map(reslv => {
+      const rez = reslv instanceof AppSyncResolver ? reslv : new AppSyncResolver(reslv)
+      rez.Properties.ApiId = this.ApiId()
+      return rez
+    })
     return this
   }
 
-  linkSchemas (...s: AppSyncSchema[]): AppSyncGraphQlApi {
-    // set the API ID for each input object
+  linkSchemas (...s: (IAppSyncSchema_min | AppSyncSchema)[]): AppSyncGraphQlApi {
+    this._linked.schemas = s.map(schema => {
+      const rez = schema instanceof AppSyncSchema ? schema : new AppSyncSchema(schema)
+      rez.Properties.ApiId = this.ApiId()
+      return rez
+    })
     return this
   }
 
@@ -351,7 +381,7 @@ export class AppSyncGraphQlApi implements squals {
     return this
   }
 
-  toJSON (withRelated: boolean = false): JSON[] {
+  toJSON (withRelated: boolean = false): object[] {
     return withRelated
       ? [
           ({
@@ -366,12 +396,12 @@ export class AppSyncGraphQlApi implements squals {
           ...((this._linked.schemas.map(v => v.toJSON()) as unknown) as JSON[])
       ]
       : [
-          ({
-            [this.name]: {
-              Type: 'AWS::AppSync::GraphQLApi',
-              Properties: this.Properties
-            }
-          } as unknown) as JSON
+        {
+          [this.name]: {
+            Type: 'AWS::AppSync::GraphQLApi',
+            Properties: this.Properties
+          }
+        }
       ]
   }
   Ref (): IRef {
@@ -387,16 +417,6 @@ export class AppSyncGraphQlApi implements squals {
     return { 'Fn::GetAtt': [this.name, 'GraphQLUrl'] }
   }
 }
-
-// #region linked_interfaces
-
-interface IapiKey {
-  id: string | IRef | IGetAtt
-  desc?: string
-  exp?: number
-}
-
-// #endregion linked_interfaces
 
 // #region internal_interfaces
 

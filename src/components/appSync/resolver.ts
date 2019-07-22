@@ -6,9 +6,13 @@ export class AppSyncResolver implements squals {
   name: string
   Type = 'AWS::AppSync::Resolver'
   Properties: AppSyncResolver_Props
-  constructor (i: AppSyncResolver_min, api?: AppSyncGraphQlApi) {
+  constructor (i: IAppSyncResolver_min, api?: AppSyncGraphQlApi) {
     this.name = i.name || genComponentName()
-    this.Properties = { ApiId: i.api || '', FieldName: i.field, TypeName: i.type, Kind: 'UNIT' }
+    this.Properties = { 
+      ApiId: api? api.ApiId() : i.api ? i.api : '< linkMe >',
+      FieldName: i.field, 
+      TypeName: i.type, 
+      Kind: 'UNIT' }
   }
   static fromString (i: string): AppSyncResolver {
     return AppSyncResolver.from(JSON.parse(i))
@@ -17,7 +21,7 @@ export class AppSyncResolver implements squals {
     return AppSyncResolver.validateJSON(i as AppSyncResolver_json)
   }
   static fromJS (i: object): AppSyncResolver {
-    return AppSyncResolver.validateJS(i as AppSyncResolver_min)
+    return AppSyncResolver.validateJS(i as IAppSyncResolver_min)
   }
   static from (i: string | object): AppSyncResolver {
     return AppSyncResolver.validate(i)
@@ -60,7 +64,7 @@ export class AppSyncResolver implements squals {
     ret.name = name
     return ret
   }
-  static validateJS (i: AppSyncResolver_min): AppSyncResolver {
+  static validateJS (i: IAppSyncResolver_min): AppSyncResolver {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strRef = struct.union(['string', ref])
@@ -111,7 +115,7 @@ export class AppSyncResolver implements squals {
   }
 }
 
-interface AppSyncResolver_min {
+export interface IAppSyncResolver_min {
   name?: string
   api?: string | IRef | IGetAtt
   field: string | IRef

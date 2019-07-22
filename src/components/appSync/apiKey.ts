@@ -6,12 +6,14 @@ export class AppSyncApiKey implements squals {
   name: string
   Type = 'AWS::AppSync::ApiKey'
   Properties: AppSyncApiKey_Properties
-  _linkedApi?: AppSyncGraphQlApi
+  // _linkedApi?: AppSyncGraphQlApi
 
-  constructor (k?: AppSyncApiKey_in, api?: AppSyncGraphQlApi) {
-    this._linkedApi = api
+  constructor (k?: IAppSyncApiKey_min, api?: AppSyncGraphQlApi) {
+    // this._linkedApi = api
     this.name = k && k.name ? k.name : genComponentName()
-    this.Properties = { ApiId: api ? api.ApiId() : '' }
+    this.Properties = {
+      ApiId: api ? api.ApiId() : k && k.api ? k.api : '< linkMe >'
+    }
     this.Properties.Description = k && k.desc ? k.desc : ''
   }
 
@@ -22,7 +24,7 @@ export class AppSyncApiKey implements squals {
     return AppSyncApiKey.from(JSON.parse(i))
   }
   static fromJS (i: object): AppSyncApiKey {
-    return AppSyncApiKey.validateJS(i as AppSyncApiKey_in)
+    return AppSyncApiKey.validateJS(i as IAppSyncApiKey_min)
   }
   static fromJSON (o: object): AppSyncApiKey {
     return AppSyncApiKey.validateJSON(o as IAppSyncApiKey_json)
@@ -35,7 +37,7 @@ export class AppSyncApiKey implements squals {
     return validatorGeneric<AppSyncApiKey>(i as squals, AppSyncApiKey)
   }
 
-  static validateJS (i: AppSyncApiKey_in): AppSyncApiKey {
+  static validateJS (i: IAppSyncApiKey_min): AppSyncApiKey {
     struct({
       name: 'string?',
       desc: 'string?',
@@ -114,8 +116,9 @@ export class AppSyncApiKey implements squals {
   }
 }
 
-interface AppSyncApiKey_in {
+export interface IAppSyncApiKey_min {
   name?: string
+  api?: string | IRef | IGetAtt
   desc?: string
   exp?: number
 }

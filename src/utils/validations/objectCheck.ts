@@ -1,5 +1,20 @@
 import assert from 'deep-equal'
 
+export const getPath = (keyPath: string, dataToCheck: any, delim = '.'): any | undefined => {
+  let temp = dataToCheck
+  if (keyPath.includes(delim)) {
+    keyPath.split(delim).forEach(key => {
+      if (Object.keys(temp).length > 0 && key in temp) {
+        temp = temp[key]
+      } else {
+        temp = undefined
+      }
+    })
+  } else {
+    return dataToCheck[keyPath]
+  }
+  return temp
+}
 export const setIntersection = (a: any[], b: any[]) => {
   // count Up the Overlap
   let empty: any[] = []
@@ -81,12 +96,6 @@ export const verifyHasAtLeastOne = (...keys: string[]) => (input: {}) =>
   verifyIntersection(input, 1, '>=', undefined, ...keys) // alias
 export const verifyHasAtLeastN = (n: number, ...keys: string[]) => (input: {}) =>
   verifyIntersection(input, n, '>=', undefined, ...keys) // alias
-
-export const verifyRequired = (
-  i: {},
-  fn: (intersectionKeyN: number, expectedN: number) => boolean,
-  ...keys: string[]
-) => verifyIntersection(i, keys.length, undefined, fn, ...keys) // alias
 // #endregion
 
 // #region verify conditionals
@@ -103,28 +112,12 @@ export const verifyIfThen = (
   return input
 }
 
-export const getPath = (keyPath: string, dataToCheck: any, delim = '.'): any | undefined => {
-  let temp = dataToCheck
-  if (keyPath.includes(delim)) {
-    keyPath.split(delim).forEach(key => {
-      if (Object.keys(temp).length > 0 && key in temp) {
-        temp = temp[key]
-      } else {
-        temp = undefined
-      }
-    })
-  } else {
-    return dataToCheck[keyPath]
-  }
-  return temp
-}
 export const ifHas = (keyPath: string, delim = '.') => (i: any): boolean => {
   return !!(getPath(keyPath, i, delim) && true)
 }
 export const ifPathEq = (keyPath: string, expected: any, delim = '.') => (i: any): boolean => {
   return assert(getPath(keyPath, i, delim), expected)
 }
-
 export const has = (keyPath: string, delim = '.') => (i: any): void => {
   if (!getPath(keyPath, i, delim)) {
     throw new Error(

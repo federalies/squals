@@ -17,7 +17,7 @@ describe.skip('simple static site', () => {
     expect(1).toEqual(1)
   })
 
-  test('Basic Static Site', () => {
+  test.skip('Basic Static Site', () => {
     const MyCDN = new CloudFrontCDN(webContent.WebsiteURL())
     DomainRecords.A(['', MyCDN.DomainName()])
 

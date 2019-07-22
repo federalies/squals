@@ -7,7 +7,7 @@ export class AppSyncSchema implements squals {
   Type = 'AWS::AppSync::GraphQLSchema'
   Properties: ISchema_out
 
-  constructor (i: ISchema_min) {
+  constructor (i: IAppSyncSchema_min) {
     this.name = i.name || genComponentName()
     this.Properties = { ApiId: i.apiId || '' }
     if (i.def) {
@@ -18,7 +18,7 @@ export class AppSyncSchema implements squals {
   }
   static fromJSON (o: object): AppSyncSchema {
     if (typeof o === 'string') o = JSON.parse(o)
-    return this.validate(o as ISchema_min)
+    return this.validate(o as IAppSyncSchema_min)
   }
   static fromJS (i: object): AppSyncSchema {
     return AppSyncSchema.validate(i)
@@ -26,12 +26,13 @@ export class AppSyncSchema implements squals {
   static from (i: string | object | AppSyncSchema): AppSyncSchema {
     return AppSyncSchema.validate(i)
   }
-  static validateJS (i: ISchema_min): AppSyncSchema {
+  static validateJS (i: IAppSyncSchema_min): AppSyncSchema {
     struct({
       name: 'string?',
       def: baseSchemas.StrRef,
       apiId: struct.optional(baseSchemas.StrRef)
     })(i)
+
     return new AppSyncSchema(i)
   }
   static validateJSON (i: ISchema_json): AppSyncSchema {
@@ -75,7 +76,7 @@ export class AppSyncSchema implements squals {
   }
 }
 
-interface ISchema_min {
+export interface IAppSyncSchema_min {
   name?: string
   apiId?: string | IRef | IGetAtt
   def: string | IRef | IGetAtt // Buffer | s3://string
