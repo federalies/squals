@@ -1,5 +1,5 @@
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
-import { AppSyncGraphQlApi } from './api'
+import { AppSyncApi } from './api'
 import { verifyHasAtLeastOne } from '../../utils/validations/objectCheck'
 
 import { struct } from 'superstruct'
@@ -10,10 +10,10 @@ export class AppSyncFuncConfig implements squals {
   Type = 'AWS::AppSync::FunctionConfiguration'
   Properties: AppSyncFuncConfig_props
 
-  constructor (data: AppSyncFuncConfig_min, api?: AppSyncGraphQlApi) {
+  constructor (data: IAppSyncFuncConfig_min, api?: AppSyncApi) {
     this.name = typeof data.name === 'string' ? data.name : genComponentName()
     this.Properties = {
-      ApiId: api ? api.ApiId() : '< linkMe />',
+      ApiId: api ? api.ApiId() : '< StillNeedsToBeLinked >',
       Name: data.name,
       DataSourceName: data.sourceName,
       FunctionVersion: '2018-05-29'
@@ -35,18 +35,18 @@ export class AppSyncFuncConfig implements squals {
     return AppSyncFuncConfig.validate(i)
   }
   static fromJS (i: object): AppSyncFuncConfig {
-    return AppSyncFuncConfig.validateJS(i as AppSyncFuncConfig_min)
+    return AppSyncFuncConfig.validateJS(i as IAppSyncFuncConfig_min)
   }
   static fromString (o: string): AppSyncFuncConfig {
     return AppSyncFuncConfig.validate(JSON.parse(o))
   }
   static fromJSON (o: object): AppSyncFuncConfig {
-    return this.validateJSON(o as AppSyncFuncConfig_json)
+    return this.validateJSON(o as IAppSyncFuncConfig_json)
   }
   private static fromSDK (o: object) {
     return new Error('not implemented yet - will be public once implemented')
   }
-  static validateJS (o: AppSyncFuncConfig_min): AppSyncFuncConfig {
+  static validateJS (o: IAppSyncFuncConfig_min): AppSyncFuncConfig {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -79,7 +79,7 @@ export class AppSyncFuncConfig implements squals {
 
     return new AppSyncFuncConfig(o)
   }
-  static validateJSON (o: AppSyncFuncConfig_json): AppSyncFuncConfig {
+  static validateJSON (o: IAppSyncFuncConfig_json): AppSyncFuncConfig {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -130,7 +130,7 @@ export class AppSyncFuncConfig implements squals {
           Type: 'AWS::AppSync::FunctionConfiguration',
           Properties: this.Properties
         }
-      } as AppSyncFuncConfig_json
+      } as IAppSyncFuncConfig_json
     ]
   }
   Ref (): IRef {
@@ -150,14 +150,14 @@ export class AppSyncFuncConfig implements squals {
   }
 }
 
-export interface AppSyncFuncConfig_json {
+export interface IAppSyncFuncConfig_json {
   [name: string]: {
     Type: 'AWS::AppSync::FunctionConfiguration'
     Properties: AppSyncFuncConfig_props
   }
 }
 
-export interface AppSyncFuncConfig_min {
+export interface IAppSyncFuncConfig_min {
   name: string | IRef | IGetAtt // double use
   // api handled by component
   sourceName: string | IRef | IGetAtt

@@ -1,5 +1,5 @@
 import { IRef, IGetAtt, squals, genComponentName, baseSchemas, validatorGeneric } from '../Template'
-import { AppSyncGraphQlApi } from './api'
+import { AppSyncApi } from './api'
 import { struct } from 'superstruct'
 
 export class AppSyncApiKey implements squals {
@@ -8,13 +8,14 @@ export class AppSyncApiKey implements squals {
   Properties: AppSyncApiKey_Properties
   // _linkedApi?: AppSyncGraphQlApi
 
-  constructor (k?: IAppSyncApiKey_min, api?: AppSyncGraphQlApi) {
+  constructor (k?: IAppSyncApiKey_min, api?: AppSyncApi) {
     // this._linkedApi = api
     this.name = k && k.name ? k.name : genComponentName()
     this.Properties = {
-      ApiId: api ? api.ApiId() : k && k.api ? k.api : '< linkMe >'
+      ApiId: api ? api.ApiId() : k && k.api ? k.api : '< StillNeedsToBeLinked >'
     }
-    this.Properties.Description = k && k.desc ? k.desc : ''
+    this.Properties.Description = k ? k.desc : undefined
+    this.Properties.Expires = k ? k.exp : undefined
   }
 
   static from (i: string | object): AppSyncApiKey {
@@ -29,8 +30,10 @@ export class AppSyncApiKey implements squals {
   static fromJSON (o: object): AppSyncApiKey {
     return AppSyncApiKey.validateJSON(o as IAppSyncApiKey_json)
   }
+  /* istanbul ignore next */
   private static fromSDK (i: object): AppSyncApiKey {
-    // make this public - after 0.1 launches
+    // make this public - after 0.1
+    /* istanbul ignore next */
     throw new Error('not implemented yet')
   }
   static validate (i: string | object): AppSyncApiKey {
@@ -38,16 +41,19 @@ export class AppSyncApiKey implements squals {
   }
 
   static validateJS (i: IAppSyncApiKey_min): AppSyncApiKey {
-    struct({
-      name: 'string?',
-      desc: 'string?',
-      exp: 'number?'
-    })(i)
+    struct(
+      struct.interface({
+        api: struct.optional(baseSchemas.StrRefGetAtt),
+        name: 'string?',
+        desc: 'string?',
+        exp: 'number?'
+      })
+    )(i)
 
     const ret = new AppSyncApiKey()
     ret.name = i.name || genComponentName()
     ret.Properties = {
-      ApiId: '',
+      ApiId: i.api ? i.api : '< StillNeedsToBeLinked >',
       Description: i.desc,
       Expires: i.exp
     }
@@ -58,14 +64,10 @@ export class AppSyncApiKey implements squals {
     struct(
       struct.dict([
         'string',
-        struct({
+        struct.interface({
           Type: struct.literal('AWS::AppSync::ApiKey'),
           Properties: struct({
-            ApiId: struct.union([
-              'string',
-              struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) }),
-              struct({ Ref: 'string' })
-            ]),
+            ApiId: baseSchemas.StrRefGetAtt,
             Description: 'string?',
             Expires: 'number?'
           })
@@ -94,7 +96,7 @@ export class AppSyncApiKey implements squals {
     return this
   }
 
-  toJSON (): object[] {
+  toJSON (): IAppSyncApiKey_json[] {
     const retElem = {
       [this.name]: {
         Type: 'AWS::AppSync::ApiKey',
@@ -102,7 +104,8 @@ export class AppSyncApiKey implements squals {
       }
     } as IAppSyncApiKey_json
 
-    return [AppSyncApiKey.validateJSON(retElem)]
+    AppSyncApiKey.validateJSON(retElem)
+    return [retElem]
   }
 
   Ref (): IRef {
@@ -123,13 +126,13 @@ export interface IAppSyncApiKey_min {
   exp?: number
 }
 
-interface IAppSyncApiKey_json {
+export interface IAppSyncApiKey_json {
   [name: string]: {
     Type: 'AWS::AppSync::ApiKey'
     Properties: AppSyncApiKey_Properties
   }
 }
-interface AppSyncApiKey_Properties {
+export interface AppSyncApiKey_Properties {
   ApiId: string | IRef | IGetAtt
   Description?: string
   Expires?: number

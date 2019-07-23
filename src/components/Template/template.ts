@@ -118,12 +118,12 @@ export const genComponentName = (seed: number | string = new Date().getTime()) =
 }
 export const baseSchemas = {
   Ref: struct({ Ref: 'string' }),
-  GetAtt: struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) }),
+  GetAtt: struct({ 'Fn::GetAtt': struct.tuple(['string', 'string']) }),
   StrRef: struct.union(['string', struct({ Ref: 'string' })]),
   StrRefGetAtt: struct.union([
     'string',
     struct({ Ref: 'string' }),
-    struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
+    struct({ 'Fn::GetAtt': struct.tuple(['string', 'string']) })
   ])
 }
 

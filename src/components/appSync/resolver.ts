@@ -1,5 +1,5 @@
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
-import { AppSyncGraphQlApi } from './api'
+import { AppSyncApi } from './api'
 import { struct } from 'superstruct'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 
@@ -8,7 +8,7 @@ export class AppSyncResolver implements squals {
   Type = 'AWS::AppSync::Resolver'
   Properties: AppSyncResolver_Props
 
-  constructor (i: IAppSyncResolver_min, api?: AppSyncGraphQlApi) {
+  constructor (i: IAppSyncResolver_min, api?: AppSyncApi) {
     this.name = i.name || genComponentName()
     this.Properties = {
       ApiId: api ? api.ApiId() : i.api ? i.api : '< StillNeedsToBeLinked >',

@@ -3,7 +3,8 @@ import {
   verifyHasAtLeastOne,
   verifySyntax,
   verifyIfThen,
-  ifHas
+  ifHas,
+  ifPathType
 } from '../../utils/validations/objectCheck'
 
 import { struct } from 'superstruct'
@@ -72,14 +73,17 @@ export class AppSyncSchema implements squals {
       ])
     )(i)
 
+    const verifyInterDeps = verifyIfThen(
+      ifPathType('Definition', 'string'),
+      verifySyntax('def', buildSchema),
+      verifyHasAtLeastOne('Definition', 'DefinitionS3Location')
+    )
     const name = Object.keys(i)[0]
-    const verifyInterDeps = verifyHasAtLeastOne('Definition', 'DefinitionS3Location')
-
     const { ApiId, Definition, DefinitionS3Location } = verifyInterDeps<ISchema_out>(
       i[name].Properties
     )
 
-    // start an instnace with dummy data to be over-written
+    // start an instnace with stubbed data, ready to be over-written
     const ret = new AppSyncSchema({
       name,
       apiId: ApiId,

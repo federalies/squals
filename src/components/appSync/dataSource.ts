@@ -1,7 +1,7 @@
 import { IRef, squals, IGetAtt, genComponentName, validatorGeneric } from '../Template'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 import { struct } from 'superstruct'
-import { AppSyncGraphQlApi } from './api'
+import { AppSyncApi } from './api'
 import { flowRight } from 'lodash-es'
 
 export class AppSyncDataSource implements squals {
@@ -9,10 +9,10 @@ export class AppSyncDataSource implements squals {
   Type = 'AWS::AppSync::DataSource'
   Properties: IDataSource_Props
 
-  constructor (i: IAppSyncDataSource_min, api?: AppSyncGraphQlApi) {
+  constructor (i: IAppSyncDataSource_min, api?: AppSyncApi) {
     this.name = typeof i.name === 'string' ? i.name : genComponentName()
     this.Properties = {
-      ApiId: api ? api.ApiId() : i.api ? i.api : '< linkMe >',
+      ApiId: api ? api.ApiId() : i.api ? i.api : '< StillNeedsToBeLinked >',
       Name: i.name,
       Type: 'NONE'
     }

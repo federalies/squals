@@ -117,9 +117,14 @@ export function verifyIfThen(
 export const ifHas = (keyPath: string, delim = '.') => <T>(i: T): boolean => {
   return !!(getPath(keyPath, i, delim) && true) as boolean
 }
+
 export const ifPathEq = (keyPath: string, expected: any, delim = '.') => <T>(i: T): boolean => {
   return assert(getPath(keyPath, i, delim), expected) as boolean
 }
+export const ifPathType = (keyPath: string, expected: any, delim = '.') => <T>(i: T): boolean => {
+  return typeof getPath(keyPath, i, delim) === expected
+}
+
 export const has = (keyPath: string, delim = '.') => <T>(i: T): any => {
   if (!getPath(keyPath, i, delim)) {
     throw new Error(
