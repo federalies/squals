@@ -1,5 +1,46 @@
 # Squals Components
 
+## Completed Cloud Components
+
+- [x] S3
+- [x] CloudFrontCDN
+- [x] Route53
+- [x] ACM Certificates
+- [x] IAM
+- [x] API Gateway
+- [x] AppSync
+- [x] Lambda
+- [] Code Commit
+- [] Code Deploy
+- [] Code Pipeline
+- [] Code Build
+- [] EventBridge
+- [] Cloudformation
+- [] Cloudwatch
+- [] Cloudwatch Logs
+- [] Budget
+- [] Fargate
+- [] Cognito
+- [] DynamoDB
+- [] ElastiCache
+- [] Elastic Beanstalk
+- [] SQS
+- [] SNS
+- [] SES
+- [] CloudSearch
+- [] Athena
+- [] Kinesis Firehose
+- [] Kinesis Streams
+- [] Rekognition
+- [] Polly
+- [] Athena
+- [] EC2
+- [] EMR
+- [] Secrets Manager
+- [] Step Functions
+- [] Sagemaker
+- [] AWS Glue
+
 ## Top Level Object (TLO) Requirements
 
 1. Integrated and Parseable Documentation for a `DocGen` system (using TypeDoc right now)

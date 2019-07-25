@@ -1,5 +1,6 @@
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
 import { AppSyncApi } from './api'
+import { AppSyncDataSource, IAppSyncDataSource_min } from '.'
 import { struct } from 'superstruct'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 
@@ -18,6 +19,7 @@ export class AppSyncResolver implements squals {
     }
     if (i.source) this.Properties.DataSourceName = i.source
     if (i.pipelineFns) this.Properties.PipelineConfig = { Functions: i.pipelineFns }
+    // @todo Apache Velocity templates are sitting in string formats unverfied
     if (i.reqTempl) this.Properties.RequestMappingTemplate = i.reqTempl
     if (i.reqTemplS3Loc) this.Properties.RequestMappingTemplateS3Location = i.reqTemplS3Loc
     if (i.resTempl) this.Properties.ResponseMappingTemplate = i.resTempl
@@ -99,14 +101,23 @@ export class AppSyncResolver implements squals {
   static validate (i: string | object): AppSyncResolver {
     return validatorGeneric<AppSyncResolver>(i as squals, AppSyncResolver)
   }
-  linkDataSource (): AppSyncResolver {
-    throw new Error()
-    return new AppSyncResolver({ field: '_', type: '_' })
+  linkDataSource (source: IAppSyncDataSource_min | AppSyncDataSource): AppSyncResolver {
+    throw new Error(`not implemented yet`)
+  }
+  componentName (s: string) {
+    this.name = s
+    return this
   }
 
-  componentName () {}
-  fieldName () {}
-  typeName () {}
+  fieldName (s: string | IRef) {
+    this.Properties.FieldName = s
+    return this
+  }
+
+  typeName (s: string | IRef) {
+    this.Properties.TypeName = s
+    return this
+  }
 
   toJSON (): object[] {
     return [

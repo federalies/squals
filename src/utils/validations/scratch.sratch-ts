@@ -1,0 +1,13 @@
+import { superstruct } from 'superstruct'
+
+const struct = {
+  ...superstruct({
+    types: {
+      emailDomain: (i: string): boolean => i.includes(`@domain.com`)
+    }
+  }),
+  multiple: (c: number) => (n: number): boolean => c % n === 0
+}
+
+console.log(struct.multiple(10))
+console.log(JSON.stringify(struct, null, 2))

@@ -28,24 +28,24 @@ I may need a different phrase other than "Shareable Infracture" because it is al
 
 search code base for
 
-`@\w+` `@todo` `@idea` `@help`
+`@todo` `@idea` `@help`
 
 # Component Priority
 
-- [] S3Bucket
-- [] CloudFrontCDN
-- [] Route53
-- [] ACM Certificates
-- [] IAM
-- [] Code Build
+- [x] S3Bucket
+- [x] CloudFrontCDN
+- [x] Route53
+- [x] ACM Certificates
+- [x] IAM
+- [x] API Gateway
+- [x] AppSync
 - [] Lambda
-- [] Fargate
-- [] API Gateway
-- [] AppSync
 - [] Code Deploy
 - [] Code Pipeline
+- [] Code Build
 - [] Budget
-- [] Azn Cognito
+- [] Fargate
+- [] Cognito
 - [] DynamoDB
 - [] ElastiCache
 - [] Beanstalk

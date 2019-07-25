@@ -1,5 +1,5 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
-import { Itags, ITags } from '../../Template'
+import { IRef, IGetAtt, Itags, ITags } from '../../Template'
 import { Tags } from './tags'
 import { versioningConfig } from './versioningConfiguration'
 import { accelerate } from './accelerateConfiguration'
@@ -335,13 +335,6 @@ export class S3Bucket {
      */
     return { 'Fn::GetAtt': [this.name, 'WebsiteURL'] }
   }
-}
-
-interface IRef {
-  Ref: string
-}
-interface IGetAtt {
-  'Fn::GetAtt': [string, string]
 }
 
 type IValidPublicAccessControls =

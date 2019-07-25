@@ -70,7 +70,7 @@ export class Template {
  * @example
  *  var cloudformationArr = tags([{key1:'value1'},{key2:'value2'}])
  */
-export const tags: (tagList: Itags | Itags[]) => ITags[] = function (tagList) {
+export const tags = (tagList: Itags | Itags[]): ITags[] => {
   const handleItem = (tagList: Itags) => {
     return Object.entries(tagList).reduce((p: ITags[], [k, v]) => {
       return [...p, { Key: k, Value: v }]
@@ -116,6 +116,7 @@ export const TagFilters = (tagList: Itags | Itags[]): ITagFilters => {
 export const genComponentName = (seed: number | string = new Date().getTime()) => {
   return `${randomWord()}${new Randoma({ seed }).integer()}`
 }
+
 export const baseSchemas = {
   Ref: struct({ Ref: 'string' }),
   GetAtt: struct({ 'Fn::GetAtt': struct.tuple(['string', 'string']) }),
@@ -127,7 +128,7 @@ export const baseSchemas = {
   ])
 }
 
-export function validatorGeneric<T> (input: string | squals, className: reflectSquals<T>) {
+export function validatorGeneric<T> (input: string | squals, className: squalsClassInterface<T>) {
   if (typeof input === 'string') {
     return className.fromString(input)
   } else if (input instanceof className) {
@@ -143,31 +144,39 @@ export function validatorGeneric<T> (input: string | squals, className: reflectS
   }
 }
 
-type reflectSquals<T> = {
+/**
+ *
+ * @type tells compliler that <T> is implementing the squals interface so that a class function can be passed in as a param
+ */
+type squalsClassInterface<T> = {
   new (...args: any[]): T
-  from: (i: string | object) => T
-  fromJS: (i: object) => T
-  fromJSON: (i: object) => T
   fromString: (i: string) => T
+  fromJSON: (i: object) => T
+  fromJS: (i: object) => T
+  from: (i: string | object) => T
   validate: (i: object | string) => T
   validateJS: (i: any) => T
   validateJSON: (i: any) => T
 }
-export interface squalsClass extends Function {
-  fromString: (i: string) => squalsClass
-  validate: (i: object | string) => squalsClass
-  validateJS: (i: object) => squalsClass
-  validateJSON: (i: object) => squalsClass
-}
 
+/**
+ * @description basic interface (abstract class) for all  cloud components
+ * @abstract
+ * @class
+ */
 export abstract class squals {
-  static new: () => object
-  static fromString: (i: string) => object // allows for class to permit data partials - and for validate to catch it
-  static fromJSON: (i: object) => object // allows for class to permit data partials - and for validate to catch it
-  static from: (i: string | object) => object
-  static withRelated: (...i: object[]) => object[]
-  static validate: (o: string | object) => object // returns chainable obj OR throw
-  abstract toJSON: (includeRelated?: boolean) => object[] // returns a natural list of related, exported objects
+  // chainable
+  static new: () => squals
+  static fromString: (i: string) => squals // allows for class to permit data partials - and for validate to catch it
+  static fromJSON: (i: object) => squals // same
+  static fromJS: (i: object) => squals // same
+  static from: (i: string | object) => squals
+  static validate: (o: string | object) => squals // returns chainable obj OR throws
+  static validateJS: (i: object) => squals
+  static validateJSON: (i: object) => squals
+  // exports
+  abstract toJSON: (includeRelated?: boolean) => object[]
+  // static withRelated: (...i: object[]) => object[]
 }
 
 export interface Itemplate {

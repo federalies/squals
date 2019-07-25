@@ -1,4 +1,5 @@
 import assert from 'deep-equal'
+import { Struct } from 'superstruct'
 
 export const getPath = (keyPath: string, dataToCheck: any, delim = '.'): any | undefined => {
   let temp = dataToCheck
@@ -114,13 +115,23 @@ export function verifyIfThen(
   }
 }
 
-export const ifHas = (keyPath: string, delim = '.') => <T>(i: T): boolean => {
+export const ifCondition = (keyPath: string, fnOp: (pathData: any) => boolean, delim = '.') => <T>(
+  i: T
+): boolean => {
+  return fnOp(getPath(keyPath, i, delim))
+}
+
+export const ifType = (keyPath: string, isType: string, delim = '.') => (i: unknown): boolean => {
+  return typeof getPath(keyPath, i, delim) === isType
+}
+export const ifHas = (keyPath: string, delim = '.') => (i: unknown): boolean => {
   return !!(getPath(keyPath, i, delim) && true) as boolean
 }
 
 export const ifPathEq = (keyPath: string, expected: any, delim = '.') => <T>(i: T): boolean => {
   return assert(getPath(keyPath, i, delim), expected) as boolean
 }
+
 export const ifPathType = (keyPath: string, expected: any, delim = '.') => <T>(i: T): boolean => {
   return typeof getPath(keyPath, i, delim) === expected
 }
@@ -131,8 +142,38 @@ export const has = (keyPath: string, delim = '.') => <T>(i: T): any => {
       `based on the prior condition, "${keyPath}" is expected in ${JSON.stringify(i, null, 2)}`
     )
   }
+  return i
 }
-export const pathEq = (keyPath: string, expected: any, delim = '.') => (i: any): any => {
+
+export const verifyStringStructData = (
+  keyPath: string,
+  transformFn: (i: string) => any,
+  s: Struct,
+  delim = '.'
+) => <T>(i: T) => {
+  return s(transformFn(getPath(keyPath, i, delim))) as T
+}
+export const multipleOf = (n: number) => <T>(input: T) => {
+  if (Number(input) % n !== 0) {
+    throw new Error(`Expecting memSize:MB to be multiple of 64 - got::${n}`)
+  }
+  return input
+}
+
+export const stringNotEqual = (keyPath: string, s: string, delim = '.') => <T>(input: T) => {
+  if (getPath(keyPath, input, delim) === s) {
+    throw new Error(
+      `input::${{
+        keyPath,
+        input,
+        result: getPath(keyPath, input, delim)
+      }} should not be equal to :: ${s}`
+    )
+  }
+  return input
+}
+
+export const pathEq = (keyPath: string, expected: any, delim = '.') => <T>(i: T): T => {
   if (!assert(getPath(keyPath, i, delim), expected)) {
     throw new Error(
       `based on the prior condition, parth::"${keyPath}" was expected to equal ${JSON.stringify(
@@ -142,40 +183,17 @@ export const pathEq = (keyPath: string, expected: any, delim = '.') => (i: any):
       )} - but instead there was: ${JSON.stringify(getPath(keyPath, i, delim), null, 2)}`
     )
   }
+  return i
 }
 
-export const verifySyntax = (pathToSource: string, compilationFunc: (s: string) => any) => (
-  input: any
-): any => {
+export const verifySyntax = (pathToSource: string, compilationFunc: (s: string) => any) => <T>(
+  input: T
+) => {
   const schema = compilationFunc(getPath(pathToSource, input))
   if (!schema) {
     throw new Error('the schema is invlalid')
   }
+  return input
 }
 
-// #endregion
-
-// #region lil inline tests
-// console.log(verifyAll({ a: 1, b: 2, c: 3 }, 'a', 'b', 'c'))
-// console.log(verifyAll({ a: 1, b: 2, c: 3 }, 'a', 'b'))
-// console.log(verifyHasTwo({ a: 1, b: 2, c: 3 }, 'a'))
-// console.log(verifyRequired({ a: 1, b: 2, c: 3 }, (a, e) => a === e, ...['a', 'b', 'c']))
-
-// getPath
-// console.log(getPath('a', { a: 1, b: { c: 3, d: 4 } }))
-// console.log(getPath('b.c', { a: 1, b: { c: 3, d: 4 } }))
-// console.log(getPath('b.d', { a: 1, b: { c: 3, d: { e: 5 } } }))
-// console.log(getPath('b.c.d', { a: 1, b: { c: 3, d: { e: 5 } } }))
-
-// conditionals
-// console.log(verifyIfThen(ifHas('a'), has('b'))({ a: 1, b: 2, c: 3 }))
-// console.log(verifyIfThen(ifHas('b.c'), has('b.d'))({ a: 1, b: { c: 3, d: 4 } }))
-// console.log(verifyIfThen(ifHas('b.f'), has('a'), has('b'))({ a: 1, b: { c: 3, d: 4 } }))
-// console.log(verifyIfThen(ifPathEq('a', 1), has('b'), has('b'))({ a: 2, b: 2, c: 3 }))
-// console.log(
-//   verifyIfThen(ifPathEq('a', 2), has('b'), pathEq('b.d', { e: 5 }))({
-//     a: 1,
-//     b: { c: 3, d: { e: 5 } }
-//   })
-// )
 // #endregion
