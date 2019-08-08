@@ -4,7 +4,7 @@
 
 export { Template } from './Template'
 export { S3Bucket, S3BucketPolicy } from './s3'
-export { SqsQueue, SqsQueuePolicy } from './sqs'
+export * from './sqs'
 export { AWSCertificate } from './certificateManager'
 // export { SnsSubscription, SnsTopic, SnsTopicPolicy } from './sns.js'
 // export { CodeCommitRepo } from './codeCommit.js'

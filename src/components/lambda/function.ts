@@ -7,6 +7,7 @@ import {
   genComponentName,
   validatorGeneric,
   baseSchemas,
+  IStrRefGetAtt,
   IGetAtt,
   IRef,
   ITags,
@@ -14,7 +15,7 @@ import {
   tags
 } from '../Template'
 import { urlToOptions, s3Obj as Is3Obj } from 's3-url'
-import { ILambda_Runtimes } from './Runtimes'
+import { ILambda_Runtimes, ILambda_RuntimesEnums } from './Runtimes'
 import { struct } from 'superstruct'
 import {
   verifyIfThen,
@@ -24,8 +25,7 @@ import {
   ifType
 } from '../../utils/validations/objectCheck'
 import { flowRight } from 'lodash-es'
-import { ReadStream } from 'tty'
-import * as AWS from 'aws-sdk'
+
 /**
  * @class LambdaFunction
  * @implements {squals}
@@ -105,7 +105,7 @@ export class LambdaFunction implements squals {
       handler: baseSchemas.StrRefGetAtt,
       role: baseSchemas.StrRefGetAtt,
       code: struct.union(['string', CodeLoc]),
-      runtime: struct.enum(Object.keys(ILambda_Runtimes)),
+      runtime: struct.enum(Object.keys(ILambda_RuntimesEnums)),
       desc: 'string?',
       memSize: 'number?',
       concurrent: 'number?',
@@ -146,7 +146,7 @@ export class LambdaFunction implements squals {
             FunctionName: baseSchemas.StrRefGetAtt,
             Handler: baseSchemas.StrRefGetAtt,
             Role: baseSchemas.StrRefGetAtt,
-            Runtime: struct.enum(Object.keys(ILambda_Runtimes)),
+            Runtime: struct.enum(Object.keys(ILambda_RuntimesEnums)),
             Code: struct.union([
               struct({ ZipFile: 'string' }),
               struct({ S3Bucket: 'string', S3Key: 'string', S3ObjectVersion: 'string?' })
@@ -192,7 +192,7 @@ export class LambdaFunction implements squals {
       handler: '',
       role: '',
       code: '',
-      runtime: ILambda_Runtimes['nodejs10.x']
+      runtime: 'nodejs10.x'
     })
     ret.name = _name
     ret.Properties = i[_name].Properties
@@ -336,25 +336,25 @@ export class LambdaFunction implements squals {
   }
 }
 
-interface ILambdaFunc_min {
-  name: string | IGetAtt | IRef
-  handler: string | IGetAtt | IRef
-  role: string | IGetAtt | IRef
+export interface ILambdaFunc_min {
+  name: IStrRefGetAtt
+  handler: IStrRefGetAtt
+  role: IStrRefGetAtt
   code: string | { bucket: string; key: string; version?: string }
-  runtime: ILambda_Runtimes
+  runtime: ILambda_Runtimes | ILambda_RuntimesEnums
   // --
   desc?: string
-  kmsArn?: string | IGetAtt | IRef
-  layers?: (string | IGetAtt | IRef)[]
+  kmsArn?: IStrRefGetAtt
+  layers?: IStrRefGetAtt[]
   memSize?: number
   concurrent?: number
   timeout?: number
-  deadLetter?: string | IGetAtt | IRef // (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
+  deadLetter?: IStrRefGetAtt // (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
   environment?: Itags
   tracingConfig?: 'Active' | 'PassThrough'
   vpc?: {
-    secGrpIds: (string | IGetAtt | IRef)[]
-    subnets: (string | IGetAtt | IRef)[]
+    secGrpIds: IStrRefGetAtt[]
+    subnets: IStrRefGetAtt[]
   }
   tags?: Itags
 }
@@ -366,10 +366,10 @@ export interface ILambdaFunc_json {
   }
 }
 
-interface ILambdaFunc_Props {
-  FunctionName: string | IGetAtt | IRef
-  Handler: string | IGetAtt | IRef
-  Role: string | IGetAtt | IRef
+export interface ILambdaFunc_Props {
+  FunctionName: IStrRefGetAtt
+  Handler: IStrRefGetAtt
+  Role: IStrRefGetAtt
   Runtime: ILambda_Runtimes
   Code:
     | {
@@ -380,14 +380,14 @@ interface ILambdaFunc_Props {
     | { ZipFile: string }
 
   Description?: string
-  KmsKeyArn?: string | IGetAtt | IRef
-  Layers?: (string | IGetAtt | IRef)[]
+  KmsKeyArn?: IStrRefGetAtt
+  Layers?: IStrRefGetAtt[]
   MemorySize?: number
   ReservedConcurrentExecutions?: number
   Timeout?: number
 
   DeadLetterConfig?: {
-    TargetArn?: string | IGetAtt | IRef // (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
+    TargetArn?: IStrRefGetAtt // (arn:(aws[a-zA-Z-]*)?:[a-z0-9-.]+:.*)|()
   }
   Environment?: {
     Variables?: { [key: string]: string }
@@ -396,8 +396,8 @@ interface ILambdaFunc_Props {
     Mode: 'Active' | 'PassThrough'
   }
   VpcConfig?: {
-    SecurityGroupIds: (string | IGetAtt | IRef)[]
-    SubnetIds: (string | IGetAtt | IRef)[]
+    SecurityGroupIds: IStrRefGetAtt[]
+    SubnetIds: IStrRefGetAtt[]
   }
   Tags?: ITags[]
 }

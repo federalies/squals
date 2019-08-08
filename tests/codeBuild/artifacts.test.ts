@@ -32,7 +32,6 @@ describe('Mapped Typed Helpers', () => {
     // expect(firstVal(input)).toEqual({ one: 1, two: 2, three: 3 })
   })
 })
-
 describe('CodeBuild::ArtifactConfig', () => {
   test('empty input', () => {
     expect(artifactsConfig()).toEqual({ Artifacts: { Type: 'NO_ARTIFACTS' } })
@@ -146,7 +145,6 @@ describe('CodeBuild::ArtifactConfig', () => {
     expect(a).toEqual(e)
   })
 })
-
 describe('Error Throwing Behaviors', () => {
   test('throws erorr if you call the lower level artifactItem with a list of objects', () => {
     const input: any = [
@@ -181,8 +179,7 @@ describe('Error Throwing Behaviors', () => {
     expect(a).toThrow()
   })
 })
-
-describe.skip('CodeBuild::Artifacts ', () => {
+describe('CodeBuild::Artifacts ', () => {
   test('empty input', () => {
     const a = artifacts()
     expect(a).toEqual({ Type: 'NO_ARTIFACTS' })
@@ -239,7 +236,7 @@ describe.skip('CodeBuild::Artifacts ', () => {
     expect(a).toEqual(exp)
   })
 })
-describe.skip('CodeBuild::ArtifactItem ', () => {
+describe('CodeBuild::ArtifactItem ', () => {
   test('defaults', () => {
     const a = artifactItem()
     expect(a).toEqual({ Type: 'NO_ARTIFACTS' })
@@ -329,8 +326,7 @@ describe.skip('CodeBuild::ArtifactItem ', () => {
   })
 
   test('from empty string object - with artifactID ', () => {
-    const a = artifactItem({ '': { id: 'myArtifactId' } })
-
+    const a = artifactItem({ none: { id: 'myArtifactId' } })
     const exp: ICodeBuildArtifactData = {
       Type: 'NO_ARTIFACTS',
       ArtifactIdentifier: 'myArtifactId'

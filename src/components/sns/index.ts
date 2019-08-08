@@ -1,3 +1,3 @@
-export class SnsSubscription {}
-export class SnsTopic {}
-export class SnsTopicPolicy {}
+export * from './subscription'
+export * from './topic'
+export * from './topicPolicy'

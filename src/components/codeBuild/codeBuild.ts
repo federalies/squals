@@ -12,64 +12,10 @@ import {
 import Randoma from 'randoma'
 import randomWord from 'random-word'
 
-// export const firstKey = (data: object): string => {
-//   return Object.keys(data)[0]
-// }
-// export const firstVal = (data: object): object => {
-//   return Object.values(data)[0]
-// }
-
 export class CodeBuildProject {
   name: string
-  Type: 'AWS::CodeBuild::Project'
-  Properties: {
-    Artifacts: ICodeBuildArtifactData
-    ServiceRole: string | IGetAtt | IRef
-    Source: ICodeBuildSource
-    Environment: ICodeBuildEnvironmentData
-
-    Name?: string // [0,255]
-    Description?: string // [0,255]
-
-    BadgeEnabled?: boolean
-
-    EncryptionKey?: string
-
-    QueuedTimeoutInMinutes?: number // [5, 480]
-    TimeoutInMinutes?: number
-
-    SecondaryArtifacts?: ICodeBuildArtifactData[] // max len === 12
-
-    SecondarySources?: ICodeBuildSource[] // // max len === 12
-
-    Cache?: {
-      Type: 'LOCAL' | 'NO_CACHE' | 'S3'
-      Location?: string // s3bucket/prefix ignored for LOCAL and NO_CACHE
-      Modes?: ILocalCacheMode[] // use only with local
-    }
-    LogsConfig?: {
-      CloudWatchLogs?: {
-        Status: 'ENABLED' | 'DISABLED'
-        GroupName?: string
-        StreamName?: string
-      }
-      S3Logs?: {
-        Status: 'ENABLED' | 'DISABLED'
-        EncryptionDisabled?: boolean
-        Location?: string
-      }
-    }
-    Triggers?: {
-      Webhook?: boolean
-      FilterGroups?: IFilterGroup[]
-    }
-    VpcConfig?: {
-      VpcId: string
-      SecurityGroupIds: string[]
-      Subnets: string[]
-    }
-    Tags?: ITags[] // max len === 50
-  }
+  Type = 'AWS::CodeBuild::Project'
+  Properties: ICodeBuildProject_props
 
   static triggerEventNameTransform (event: string): string {
     switch (event) {
@@ -87,7 +33,6 @@ export class CodeBuildProject {
         throw new Error('invalid top level key for the event object')
     }
   }
-
   static triggerFilterGroupConfig (
     input: IcodeBuildTriggerTypes | IcodeBuildTriggerTypes[]
   ): { FilterGroups: IFilterGroup[] } {
@@ -114,15 +59,14 @@ export class CodeBuildProject {
 
     return { FilterGroups: ret }
   }
-
   constructor (props: IcodeBuild | string | IGetAtt | IRef) {
-    this.Type = 'AWS::CodeBuild::Project'
-
     let defaultName = `${randomWord()}${new Randoma({
       seed: new Date().getTime()
     }).integer()}`
+
     this.name = defaultName
     // input is string
+
     if (typeof props === 'string') {
       this.Properties = {
         BadgeEnabled: true,
@@ -147,7 +91,7 @@ export class CodeBuildProject {
 
         this.Properties = {
           BadgeEnabled: !('enabledBadge' in props) ? true : props.enabledBadge,
-          ServiceRole: props.serviceRoleArn,
+          ServiceRole: props.roleArn,
           ...sourceConfig(props.sources),
           ...artifactsConfig(props.artifacts),
           ...envConfig(props.env)
@@ -224,13 +168,6 @@ export class CodeBuildProject {
       }
     }
   }
-  Ref (): IRef {
-    return { Ref: this.name }
-  }
-  Arn (): IGetAtt {
-    return { 'Fn::GetAtt': [this.name, 'Arn'] }
-  }
-
   artifacts (input?: Iartifact | Iartifact[] | null): CodeBuildProject {
     if (input === null) {
       // not removable
@@ -389,9 +326,66 @@ export class CodeBuildProject {
     }
     return this
   }
-  toJSON (): object {
-    const { name, ...obj } = this
-    return { [name]: obj }
+  toJSON (): ICodeBuildProject_json {
+    return {
+      [this.name]: { Type: this.Type, Properties: this.Properties }
+    } as ICodeBuildProject_json
+  }
+  Ref (): IRef {
+    return { Ref: this.name }
+  }
+  Arn (): IGetAtt {
+    return { 'Fn::GetAtt': [this.name, 'Arn'] }
+  }
+}
+
+// #region interfaces
+
+interface ICodeBuildProject_json {
+  [name: string]: {
+    Type: 'AWS::CodeBuild::Project'
+    Properties: ICodeBuildProject_props
+  }
+}
+interface ICodeBuildProject_props {
+  Artifacts: ICodeBuildArtifactData
+  ServiceRole: string | IGetAtt | IRef
+  Source: ICodeBuildSource
+  Environment: ICodeBuildEnvironmentData
+  Name?: string // [0,255]
+  Description?: string // [0,255]
+  BadgeEnabled?: boolean
+  EncryptionKey?: string
+  QueuedTimeoutInMinutes?: number // [5, 480]
+  TimeoutInMinutes?: number
+  SecondaryArtifacts?: ICodeBuildArtifactData[] // max len === 12
+  SecondarySources?: ICodeBuildSource[] // // max len === 12
+  Tags?: ITags[] // max len === 50
+  Cache?: {
+    Type: 'LOCAL' | 'NO_CACHE' | 'S3'
+    Location?: string // s3bucket/prefix ignored for LOCAL and NO_CACHE
+    Modes?: ILocalCacheMode[] // use only with local
+  }
+  LogsConfig?: {
+    CloudWatchLogs?: {
+      Status: 'ENABLED' | 'DISABLED'
+      GroupName?: string
+      StreamName?: string
+    }
+    S3Logs?: {
+      Status: 'ENABLED' | 'DISABLED'
+      EncryptionDisabled?: boolean
+      Location?: string
+    }
+  }
+  Triggers?: {
+    Webhook?: boolean
+    FilterGroups?: IFilterGroup[]
+  }
+  VpcConfig?: {
+    VpcId: string
+    SecurityGroupIds: string[]
+    Subnets: string[]
   }
 }
 
@@ -401,12 +395,9 @@ export interface IFilterGroup {
   Pattern: string // regex pattern or comma separated
   ExcludeMatchedPattern?: boolean
 }
-
-// type EventTypes = 'PUSH' | 'PULL_REQUEST_CREATED' | 'PULL_REQUEST_UPDATED'
-
 export interface IcodeBuild {
   // irreducable
-  serviceRoleArn: string | IGetAtt | IRef
+  roleArn: string | IGetAtt | IRef
 
   // defaultables
   sources?: IcodeBuildsource // empty-> NO_SOURCE
@@ -426,7 +417,6 @@ export interface IcodeBuild {
   triggers?: IcodeBuildTriggerTypes | IcodeBuildTriggerTypes[]
   tags?: Itags | Itags[]
 }
-
 export interface IcodeBuildVpc {
   id: string
   secGrpIds: string | string[]
@@ -481,3 +471,5 @@ type eventPatterns_lower =
   | 'pull_request_created'
   | 'pull_request_updated'
   | 'pull_request_reopened'
+
+// #endregion interfaces

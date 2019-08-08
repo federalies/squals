@@ -1,1 +1,1 @@
-export class DynamoTable {}
+export * from './table'

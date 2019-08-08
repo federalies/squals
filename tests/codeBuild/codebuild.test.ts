@@ -76,7 +76,7 @@ describe('CodeBuild::BuildSpec', () => {
     })
   })
   test('Use minimum input making CodeBuild Proj', () => {
-    const input: IcodeBuild = { serviceRoleArn: 'mySvcRoleArnString' }
+    const input: IcodeBuild = { roleArn: 'mySvcRoleArnString' }
     const a = new CodeBuildProject(input)
     const e = {
       ServiceRole: 'mySvcRoleArnString',
@@ -115,7 +115,7 @@ describe('CodeBuild::BuildSpec', () => {
           encOff: true
         }
       },
-      serviceRoleArn: 'mySvcRoleArnString',
+      roleArn: 'mySvcRoleArnString',
       cache: ['LOCAL_SOURCE_CACHE', 'LOCAL_DOCKER_LAYER_CACHE'],
       description: 'my long winded description of this codeBuild project',
       enabledBadge: true,

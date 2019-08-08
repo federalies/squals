@@ -31,7 +31,7 @@ export class AppSyncApi implements squals {
    * Create new progamatic representations of a GraphQL Api.
    *
    */
-  constructor (i: IGraphQLapi) {
+  constructor (i: IGraphQLapi_min) {
     this.name = i.name
     this.Properties = { Name: i.name, AuthenticationType: i.authType || 'API_KEY' }
     if (i.logs) {
@@ -66,7 +66,7 @@ export class AppSyncApi implements squals {
   }
 
   static fromJS (i: object): AppSyncApi {
-    return AppSyncApi.validateJS(i as IGraphQLapi)
+    return AppSyncApi.validateJS(i as IGraphQLapi_min)
   }
 
   static fromString (i: string): AppSyncApi {
@@ -78,6 +78,7 @@ export class AppSyncApi implements squals {
     return AppSyncApi.validateJSON(i as IAppSyncApi_json)
   }
 
+  /* istanbul ignore next */
   private static fromSDK (i: any): AppSyncApi {
     // make public post implementation
     throw new Error('not implemented yet')
@@ -221,7 +222,7 @@ export class AppSyncApi implements squals {
       })
     )(i)
 
-    return new AppSyncApi(i as IGraphQLapi)
+    return new AppSyncApi(i as IGraphQLapi_min)
   }
 
   static validate (i: string | object): AppSyncApi {
@@ -418,7 +419,7 @@ export class AppSyncApi implements squals {
 
 // #region internal_interfaces
 
-interface IGraphQLapi {
+interface IGraphQLapi_min {
   name: string // doubles with internal use to
   authType?: 'API_KEY' | 'AWS_IAM' | 'OPENID_CONNECT' | 'AMAZON_COGNITO_USER_POOLS'
   logs?: {
@@ -462,13 +463,6 @@ interface IGraphQL_authProviders_cognito {
   pool: IGraphQLapi_cognitoPool
 }
 
-export interface IAppSyncApi_json {
-  [name: string]: {
-    Type: 'AWS::AppSync::GraphQLApi'
-    Properties: IAppSyncApi_props
-  }
-}
-
 export interface IAppSyncApi_props {
   Name: string | IRef | IGetAtt
   AuthenticationType: 'API_KEY' | 'AWS_IAM' | 'OPENID_CONNECT' | 'AMAZON_COGNITO_USER_POOLS'
@@ -503,5 +497,12 @@ interface IGraphQL_OpenIDConnect {
   ClientId?: string | IRef | IGetAtt
   IatTTL?: number | IRef | IGetAtt
   Issuer?: string | IRef | IGetAtt
+}
+
+export interface IAppSyncApi_json {
+  [name: string]: {
+    Type: 'AWS::AppSync::GraphQLApi'
+    Properties: IAppSyncApi_props
+  }
 }
 // #endregion internal_interfaces

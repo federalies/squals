@@ -1,3 +1,25 @@
+/**
+ * Assuming Type = 'S3'
+ * If
+ * `Location` = `myBucket`
+ * `path` = `MyArtifacts`,
+ * namespaceType = `BUILD_ID`,
+ * name = `MyArtifact.zip`
+ *
+ * then
+ * the output artifact =  `myBucket\MyArtifacts/<build-ID>/MyArtifact.zip`
+ *
+ * --OR--
+ *
+ * If
+ * `path` = `/`,
+ * namespaceType = `BUILD_ID`,
+ * name = `MyArtifact.zip`
+ *
+ * then
+ * the output artifact =  `MyArtifacts/<build-ID>`
+ */
+
 import s3Url from 's3-url'
 import path from 'path'
 
@@ -58,7 +80,7 @@ export const artifacts = (
 
 /**
  *
- * @description generate an artifact.
+ * @description generates an artifact.
  * @param input
  * @example
  * var fromUndefIn = artifactItem()
@@ -90,7 +112,7 @@ export const artifactItem = (input?: Iartifact): ICodeBuildArtifactData => {
         return handleS3UriObj(input as Iartifcat_s3uri)
       } else {
         throw new Error(
-          `was expcting : string | {s3:{...}} | {pipeline:{...}} | {'':{...}} | {<s3://bucket/path/key>:{...}} |`
+          `was expcting : string | {s3:{...}} | {pipeline:{...}} | {none:{...}} | {<s3://bucket/path/key>:{...}} |`
         )
       }
     }
@@ -186,8 +208,6 @@ export const handleNoArtifact = (input: Iartifcat_namedNoArtifact) => {
   return ret
 }
 
-export type indexableStrOrNumber<T> = { [key: string]: T }[] | { [key: string]: T }
-
 export const firstKey = function<T> (input: T): string {
   if (Array.isArray(input)) {
     return Object.keys(input[0])[0]
@@ -196,23 +216,9 @@ export const firstKey = function<T> (input: T): string {
   }
 }
 
-// export const firstVal = function<T> (input: indexableStrOrNumber<T>): T {
-//   if (Array.isArray(input)) {
-//     // const f:T =
-//     return Object.values(input[0])[0]
-//   } else {
-//     return Object.values(input)[0]
-//   }
-// }
-// export const first = function<T> (input: indexableStrOrNumber<T>): { [key: string]: T } {
-//   if (Array.isArray(input)) {
-//     return input[0]
-//   } else {
-//     const k: string = Object.keys(input)[0]
-//     const v = input[k]
-//     return { [k]: v }
-//   }
-// }
+// #region interfaces
+
+// type indexableStrOrNumber<T> = { [key: string]: T }[] | { [key: string]: T }
 
 export interface ICodeBuildArtifact {
   Artifacts?: ICodeBuildArtifactData
@@ -277,24 +283,4 @@ export interface ICodeBuildArtifact_s3 extends ICodeBuildArtifact_noneS3 {
   EncryptionDisabled?: boolean
 }
 
-/**
- * Assuming Type = 'S3'
- * If
- * `Location` = `myBucket`
- * `path` = `MyArtifacts`,
- * namespaceType = `BUILD_ID`,
- * name = `MyArtifact.zip`
- *
- * then
- * the output artifact =  `myBucket\MyArtifacts/<build-ID>/MyArtifact.zip`
- *
- * --OR--
- *
- * If
- * `path` = `/`,
- * namespaceType = `BUILD_ID`,
- * name = `MyArtifact.zip`
- *
- * then
- * the output artifact =  `MyArtifacts/<build-ID>`
- */
+// #endregion interfaces

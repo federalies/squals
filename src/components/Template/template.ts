@@ -1,13 +1,14 @@
+/**
+ * @todo @research Should template gen funcs make network calls? - if so, How can they quarintined?
+ * @todo make FederOS optin - so that squals can be used by other companies who just want to make
+ * dependency tree, and insert `DependsOn` keys where needed: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html
+ */
+
 // import { isEmpty, intersection } from 'lodash-es'
 import randomWord from 'random-word'
 import Randoma from 'randoma'
 import * as yaml from 'js-yaml'
-import { struct } from 'superstruct'
-/**
- * ToDo
- * The `toJSON()` function needs to deal with the
- * dependency tree, and insert `DependsOn` keys where needed: https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-attribute-dependson.html
- */
+import { StructError, struct as _struct, superstruct } from 'superstruct'
 
 export class Template {
   AWSTemplateFormatVersion: '2010-09-09'
@@ -118,21 +119,53 @@ export const genComponentName = (seed: number | string = new Date().getTime()) =
 }
 
 export const baseSchemas = {
-  Ref: struct({ Ref: 'string' }),
-  GetAtt: struct({ 'Fn::GetAtt': struct.tuple(['string', 'string']) }),
-  StrRef: struct.union(['string', struct({ Ref: 'string' })]),
-  StrRefGetAtt: struct.union([
+  Ref: _struct({ Ref: 'string' }),
+  GetAtt: _struct({ 'Fn::GetAtt': _struct.tuple(['string', 'string']) }),
+  StrRef: _struct.union(['string', _struct({ Ref: 'string' })]),
+  StrRefGetAtt: _struct.union([
     'string',
-    struct({ Ref: 'string' }),
-    struct({ 'Fn::GetAtt': struct.tuple(['string', 'string']) })
+    _struct({ Ref: 'string' }),
+    _struct({ 'Fn::GetAtt': _struct.tuple(['string', 'string']) })
   ])
 }
 
-export function validatorGeneric<T> (input: string | squals, className: squalsClassInterface<T>) {
+export const struct = superstruct({
+  types: {
+    Ref: i => {
+      const Ref = _struct({ Ref: 'string' })
+      const r = Ref.validate(i)
+      return r instanceof StructError ? r.format() : true
+    },
+    GetAtt: i => {
+      const IGetAtt = _struct({ 'Fn::GetAtt': _struct.tuple(['string', 'string']) })
+      const r = IGetAtt.validate(i)
+      return r instanceof StructError ? r.format() : true
+    },
+    StrRef: i => {
+      const StrRef = _struct.union(['string', _struct({ Ref: 'string' })])
+      const r = StrRef.validate(i)
+      return r instanceof StructError ? r.format() : true
+    },
+    StrRefGetAtt: i => {
+      const IStrRefGetAtt = _struct(
+        _struct.union([
+          'string',
+          _struct({ Ref: 'string' }),
+          _struct({ 'Fn::GetAtt': _struct.tuple(['string', 'string']) })
+        ])
+      )
+      const r = IStrRefGetAtt.validate(i)
+      return r instanceof StructError ? r.format() : true
+    }
+  }
+})
+
+export function validatorGeneric<T> (input: string | object, className: squalsClassInterface<T>) {
   if (typeof input === 'string') {
     return className.fromString(input)
   } else if (input instanceof className) {
-    return className.validateJSON(input.toJSON()[0])
+    const ret = className.validateJSON((input as squals).toJSON())
+    return Array.isArray(ret) ? ret[0] : ret
   } else {
     const name = Object.keys(input)[0]
     const { Type, Properties } = (input as any)[name]
@@ -175,7 +208,7 @@ export abstract class squals {
   static validateJS: (i: object) => squals
   static validateJSON: (i: object) => squals
   // exports
-  abstract toJSON: (includeRelated?: boolean) => object[]
+  abstract toJSON: (includeRelated?: boolean) => object | object[]
   // static withRelated: (...i: object[]) => object[]
 }
 
@@ -218,3 +251,5 @@ export interface ITags {
   Key: string
   Value: string
 }
+
+export type IStrRefGetAtt = string | IRef | IGetAtt

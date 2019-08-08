@@ -1,6 +1,8 @@
-export class CognitoIDPool {}
-export class CognitoUserPool {}
-export class CognitoUserPoolCient {}
-export class CognitoUserPoolGroup {}
-export class CognitoIDPoolRoleAttachment {}
-export class CognitoUserPoolUserToGroupAttachment {}
+export * from './userPool'
+export * from './userPoolClient'
+export * from './userPoolGroup'
+export * from './userPoolUser'
+export * from './userPoolUserToGroupAttachment'
+
+export * from './identityPool'
+export * from './identityPoolRoleAttachment'

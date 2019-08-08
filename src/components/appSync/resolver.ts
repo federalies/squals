@@ -1,7 +1,15 @@
-import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
+import {
+  IRef,
+  IGetAtt,
+  IStrRefGetAtt,
+  squals,
+  baseSchemas,
+  struct,
+  genComponentName,
+  validatorGeneric
+} from '../Template'
 import { AppSyncApi } from './api'
 import { AppSyncDataSource, IAppSyncDataSource_min } from '.'
-import { struct } from 'superstruct'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 
 export class AppSyncResolver implements squals {
@@ -38,28 +46,24 @@ export class AppSyncResolver implements squals {
     return AppSyncResolver.validate(i)
   }
   static validateJSON (i: AppSyncResolver_json): AppSyncResolver {
-    const ref = struct({ Ref: 'string' })
-    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
-    const strRef = struct.union(['string', ref])
-    const strGetAttRef = struct.union(['string', getAtt, ref])
     struct(
       struct.dict([
         'string',
         struct.interface({
           Type: struct.literal('AWS::AppSync::Resolver'),
           Properties: struct({
-            ApiId: strGetAttRef,
-            FieldName: strRef,
-            TypeName: strRef,
+            ApiId: 'StrRefGetAtt',
+            FieldName: 'StrRef',
+            TypeName: 'StrRef',
             Kind: struct.optional(struct.enum(['UNIT', 'PIPELINE'])),
-            DataSourceName: struct.optional(strRef),
+            DataSourceName: 'StrRefGetAtt?',
             PipelineConfig: struct.optional({
-              Functions: struct([strRef])
+              Functions: struct(['StrRef'])
             }),
-            RequestMappingTemplate: struct.optional(strRef),
-            RequestMappingTemplateS3Location: struct.optional(strRef),
-            ResponseMappingTemplate: struct.optional(strRef),
-            ResponseMappingTemplateS3Location: struct.optional(strRef)
+            RequestMappingTemplate: 'StrRef?',
+            RequestMappingTemplateS3Location: 'StrRef?',
+            ResponseMappingTemplate: 'StrRef?',
+            ResponseMappingTemplateS3Location: 'StrRef?'
           })
         })
       ])
@@ -143,18 +147,19 @@ export class AppSyncResolver implements squals {
   }
 }
 
+// #region interfaces
 export interface IAppSyncResolver_min {
   name?: string
-  api?: string | IRef | IGetAtt
-  field: string | IRef
-  type: string | IRef
+  api?: IStrRefGetAtt
+  field: IStrRefGetAtt
+  type: IStrRefGetAtt
   kind?: 'UNIT' | 'PIPELINE'
-  source?: string | IRef
-  pipelineFns?: (string | IRef)[]
-  reqTempl?: string | IRef
-  reqTemplS3Loc?: string | IRef
-  resTempl?: string | IRef
-  resTemplS3Loc?: string | IRef
+  source?: IStrRefGetAtt
+  pipelineFns?: IStrRefGetAtt[]
+  reqTempl?: IStrRefGetAtt
+  reqTemplS3Loc?: IStrRefGetAtt
+  resTempl?: IStrRefGetAtt
+  resTemplS3Loc?: IStrRefGetAtt
 }
 
 interface AppSyncResolver_json {
@@ -165,16 +170,18 @@ interface AppSyncResolver_json {
 }
 
 interface AppSyncResolver_Props {
-  ApiId: string | IRef | IGetAtt
-  FieldName: string | IRef
-  TypeName: string | IRef
+  ApiId: IStrRefGetAtt
+  FieldName: IStrRefGetAtt
+  TypeName: IStrRefGetAtt
   Kind?: 'UNIT' | 'PIPELINE'
-  DataSourceName?: string | IRef
+  DataSourceName?: IStrRefGetAtt
   PipelineConfig?: {
-    Functions: (string | IRef)[]
+    Functions: IStrRefGetAtt[]
   }
-  RequestMappingTemplate?: string | IRef
-  RequestMappingTemplateS3Location?: string | IRef
-  ResponseMappingTemplate?: string | IRef
-  ResponseMappingTemplateS3Location?: string | IRef
+  RequestMappingTemplate?: IStrRefGetAtt
+  RequestMappingTemplateS3Location?: IStrRefGetAtt
+  ResponseMappingTemplate?: IStrRefGetAtt
+  ResponseMappingTemplateS3Location?: IStrRefGetAtt
 }
+
+// #endregion interfaces

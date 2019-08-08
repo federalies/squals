@@ -1,4 +1,12 @@
-import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
+import {
+  IRef,
+  IGetAtt,
+  squals,
+  baseSchemas,
+  genComponentName,
+  validatorGeneric,
+  struct
+} from '../Template'
 import {
   verifyHasAtLeastOne,
   verifySyntax,
@@ -7,11 +15,7 @@ import {
   ifPathType
 } from '../../utils/validations/objectCheck'
 
-import { struct } from 'superstruct'
 import { buildSchema } from 'graphql'
-import { flowRight } from 'lodash-es'
-
-// import { flowRight } from 'lodash-es'
 
 export class AppSyncSchema implements squals {
   name: string

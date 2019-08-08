@@ -2,44 +2,74 @@
 
 ## Completed Cloud Components
 
-- [x] S3
-- [x] CloudFrontCDN
-- [x] Route53
-- [x] ACM Certificates
-- [x] IAM
-- [x] API Gateway
-- [x] AppSync
-- [x] Lambda
-- [] Code Commit
-- [] Code Deploy
-- [] Code Pipeline
-- [] Code Build
-- [] EventBridge
-- [] Cloudformation
-- [] Cloudwatch
-- [] Cloudwatch Logs
-- [] Budget
-- [] Fargate
-- [] Cognito
-- [] DynamoDB
-- [] ElastiCache
-- [] Elastic Beanstalk
-- [] SQS
-- [] SNS
-- [] SES
-- [] CloudSearch
-- [] Athena
-- [] Kinesis Firehose
-- [] Kinesis Streams
-- [] Rekognition
-- [] Polly
-- [] Athena
-- [] EC2
-- [] EMR
-- [] Secrets Manager
-- [] Step Functions
-- [] Sagemaker
-- [] AWS Glue
+1. [x] S3
+2. [x] CloudFrontCDN
+3. [x] Route53
+4. [x] ACM Certificates
+5. [x] IAM
+6. [x] API Gateway
+7. [x] Code Build
+8. [x] AppSync
+9. [x] Lambda
+10. [] Code Commit
+11. [] Code Deploy
+12. [] Code Pipeline
+13. [] Cloudformation
+14. [] Cognito
+15. [] AWS Glue
+16. [] SQS
+17. [] SNS
+18. [] SES
+19. [] Kinesis Firehose
+20. [] SecretsManager
+21. [] StepFunctions
+22. [] CloudSearch
+23. [] Athena
+24. [] EventBridge
+25. [] DynamoDB
+26. [] RDS
+27. [] Rekognition
+28. [] Polly (voice->speech)
+29. [] Macie
+30. [] Textract (Text Extract)
+31. [] Comprehend (NLP)
+32. [] Forecast
+33. [] Personalize
+34. [] Lex (chat bot tools)
+35. [] Translate (lang->lang)
+36. [] Transcribe (speech->voice)
+37. [] Sagemaker
+38. [] ElastiCache_Redis
+39. [] ElastiCache_Memcache
+40. [] NeptuneDB
+41. [] AuroraDB
+42. [] TimeStreamDB
+43. [] Cloudwatch
+44. [] Cloudwatch Logs
+45. [] Budget
+46. [] Fargate
+47. [] ECS
+48. [] EKS
+49. [] Elastic Beanstalk
+50. [] Kinesis Streams
+51. [] EMR
+
+# Suggested Outputs
+
+Seems like a CLI/squals.config.ts should
+
+- Output the Gen'd Template(s)[aws|gcloud|azure|other]
+
+  - `aws-cloudformation_20191129.json`
+  - `gcloud-templatemanager_20191129.json|yml`
+
+  - With optionality to save that to my own cloudlocale of choice
+
+    - `s3://bucket/path/key.json`
+
+- Output a `buildspec.yml` file if applicable
+
+  `buildspec.yml`
 
 ## Top Level Object (TLO) Requirements
 
