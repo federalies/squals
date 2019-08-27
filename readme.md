@@ -7,6 +7,7 @@
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_small)
 
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_shield)
 
 **Squals** is an idiomatic cloudformation generator that makes it incredibly easy to share your setups via `npm`, `gist` or similair service.
 
@@ -55,3 +56,7 @@ __
 _Q2_: Did you know this problem is about N years too late?
 
 _A2_: Sure Cloudformation (and similar declarative configs) have been around a bit, but they still are hard to use, and keep out plenty of smart people who just suffer from not enough time in the day syndrome to get around to `CFMN templates`
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_large)
