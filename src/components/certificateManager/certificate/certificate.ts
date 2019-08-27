@@ -94,12 +94,12 @@ export class AWSCertificate {
 
     return _this
   }
-  tags (inTags: Itags | Itags[]): AWSCertificate {
+  tags (...inTags: Itags[]): AWSCertificate {
     const _this = this
 
     _this.Properties = {
       ...this.Properties,
-      ...Tags(inTags)
+      ...Tags(...inTags)
     }
 
     return _this

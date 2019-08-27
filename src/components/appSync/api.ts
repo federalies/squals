@@ -1,4 +1,4 @@
-import { IRef, IGetAtt, squals, ITags, Itags, tags, validatorGeneric } from '../Template'
+import { IRef, IGetAtt, squals, struct, ITags, Itags, tags, validatorGeneric } from '../Template'
 import {
   AppSyncResolver,
   AppSyncFuncConfig,
@@ -11,8 +11,7 @@ import {
   IAppSyncResolver_min,
   IAppSyncSchema_min
 } from '.'
-import { flowRight } from 'lodash-es'
-import { struct } from 'superstruct'
+import { cloneDeep, flowRight } from 'lodash-es'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 // import { AppSync } from 'aws-sdk'
 
@@ -57,7 +56,11 @@ export class AppSyncApi implements squals {
       }
     }
     if (i.additional) {
-      this.Properties.AdditionalAuthenticationProviders = []
+      const a = this.moreAuthProviders(...i.additional)
+      this.Properties.AdditionalAuthenticationProviders = a.Properties.AdditionalAuthenticationProviders
+    }
+    if (i.tags) {
+      this.Properties.Tags = tags(...i.tags)
     }
   }
 
@@ -70,8 +73,7 @@ export class AppSyncApi implements squals {
   }
 
   static fromString (i: string): AppSyncApi {
-    const inputObj = JSON.parse(i)
-    return AppSyncApi.from(inputObj)
+    return AppSyncApi.from(JSON.parse(i))
   }
 
   static fromJSON (i: object): AppSyncApi {
@@ -86,9 +88,6 @@ export class AppSyncApi implements squals {
 
   static validateJSON (i: object): AppSyncApi {
     // #region schema segments
-    const ref = struct({ Ref: 'string' })
-    const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
-    const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
 
     const cognitoPool = struct({
       AppIdClientRegex: 'string',
@@ -110,16 +109,24 @@ export class AppSyncApi implements squals {
       Issuer: 'string'
     })
 
-    const additionalProviderItem = struct({
-      AuthenticationType: struct.enum([
-        'API_KEY',
-        'AWS_IAM',
-        'OPENID_CONNECT',
-        'AMAZON_COGNITO_USER_POOLS'
-      ]),
-      OpenIDConnectConfig: struct.optional(openID),
-      UserPoolConfig: struct.optional(cognitoPool)
+    const additionalProviderList = struct.list([
+      struct({
+        AuthenticationType: struct.enum([
+          'API_KEY',
+          'AWS_IAM',
+          'OPENID_CONNECT',
+          'AMAZON_COGNITO_USER_POOLS'
+        ]),
+        OpenIDConnectConfig: struct.optional(openID),
+        UserPoolConfig: struct.optional(cognitoPool)
+      })
+    ])
+
+    const logConfig = struct({
+      CloudWatchLogsRoleArn: 'StrRefGetAtt',
+      FieldLogLevel: struct.union(['GetAtt', 'Ref', struct.enum(['NONE', 'ERROR', 'ALL'])])
     })
+
     // #endregion schema segments
 
     struct(
@@ -128,35 +135,35 @@ export class AppSyncApi implements squals {
         struct({
           Type: struct.literal('AWS::AppSync::GraphQLApi'),
           Properties: struct({
-            Name: strGetAttRef,
+            Name: 'StrRefGetAtt',
             AuthenticationType: struct.enum([
               'API_KEY',
               'AWS_IAM',
               'OPENID_CONNECT',
               'AMAZON_COGNITO_USER_POOLS'
             ]),
-            AdditionalAuthenticationProviders: struct([additionalProviderItem]),
-            LogConfig: struct.optional(struct({ a: 1 })),
+            AdditionalAuthenticationProviders: struct.optional(additionalProviderList),
+            LogConfig: struct.optional(logConfig),
             OpenIDConnectConfig: struct.optional(openID),
-            Tags: struct.optional([struct.dict(['string', 'string'])]),
+            Tags: struct.optional(struct([struct.dict(['string', 'string'])])),
             UserPoolConfig: struct.optional(userPool)
           })
         })
       ])
     )(i)
 
-    const verifyInterDeps = flowRight(
+    const verifyInterDeps = flowRight([
       verifyIfThen(ifPathEq('AuthenticationType', 'OPENID_CONNECT'), has('OpenIDConnectConfig')),
       verifyIfThen(
         ifPathEq('AuthenticationType', 'AMAZON_COGNITO_USER_POOLS'),
         has('UserPoolConfig')
       )
-    )
+    ])
 
     // validation failures throws errors
     // returns validated input on pass
-    const ret = new AppSyncApi({ name: '' })
     const o = i as IAppSyncApi_json
+    const ret = new AppSyncApi({ name: '' })
     ret.name = Object.keys(o)[0]
     ret.Properties = o[ret.name].Properties
     verifyInterDeps(o[ret.name].Properties)
@@ -164,7 +171,6 @@ export class AppSyncApi implements squals {
     if (ret.Properties.AdditionalAuthenticationProviders) {
       ret.Properties.AdditionalAuthenticationProviders.map(prov => verifyInterDeps(prov))
     }
-
     return ret
   }
 
@@ -229,8 +235,16 @@ export class AppSyncApi implements squals {
     return validatorGeneric<AppSyncApi>(i as squals, AppSyncApi)
   }
 
-  withRelated (...i: object[]): AppSyncApi {
-    throw new Error('not implemented yet')
+  /**
+   * @todo Add this to the squals interface and to the `CharlieHatfield` code gne project
+   */
+  clone (): AppSyncApi {
+    return AppSyncApi.validateJSON(this.toJSON())
+  }
+
+  _name (s: string): AppSyncApi {
+    this.name = s
+    return this
   }
 
   logConfig (i: {
@@ -245,7 +259,7 @@ export class AppSyncApi implements squals {
   }
 
   defaultAuthUses (
-    authDescr?: 'API_KEY' | 'AWS_IAM',
+    authDescr?: 'API_KEY' | 'AWS_IAM' | null,
     authConfig?: IGraphQLapi_openId | IGraphQLapi_userPool
   ): AppSyncApi {
     if (authConfig) {
@@ -271,9 +285,13 @@ export class AppSyncApi implements squals {
     } else {
       if (authDescr) {
         // strings
+        this.Properties.OpenIDConnectConfig = undefined
+        this.Properties.UserPoolConfig = undefined
         this.Properties.AuthenticationType = authDescr
       } else {
         // default
+        this.Properties.OpenIDConnectConfig = undefined
+        this.Properties.UserPoolConfig = undefined
         this.Properties.AuthenticationType = 'API_KEY'
       }
     }
@@ -285,7 +303,7 @@ export class AppSyncApi implements squals {
   }
 
   moreAuthProviders (...p: IGraphQL_authProviders[]): AppSyncApi {
-    this.Properties.AdditionalAuthenticationProviders = p.map(v => {
+    const authType = (v: IGraphQL_authProviders) => {
       switch (v.authType) {
         case 'AMAZON_COGNITO_USER_POOLS':
           return {
@@ -321,17 +339,30 @@ export class AppSyncApi implements squals {
             OpenIDConnectConfig: undefined
           }
       }
-    })
+    }
+
+    const aap = this.Properties.AdditionalAuthenticationProviders
+    if (aap) {
+      this.Properties.AdditionalAuthenticationProviders = [...aap, ...p.map(v => authType(v))]
+    } else {
+      this.Properties.AdditionalAuthenticationProviders = [ ...p.map(v => authType(v))]
+    }
     return this
   }
 
-  userPoolConfig (): AppSyncApi {
+  userPoolConfig (pool: IGraphQLapi_userPool): AppSyncApi {
+    this.Properties.UserPoolConfig = {
+      UserPoolId: pool.id,
+      AppIdClientRegex: pool.clientIdRegex,
+      AwsRegion: pool.region,
+      DefaultAction: pool.defaultAction || 'ALLOW'
+    }
     return this
   }
 
   linkDataSouces (...d: (IAppSyncDataSource_min | AppSyncDataSource)[]) {
     this._linked.sources = d.map(dataSrc => {
-      const ds = dataSrc instanceof AppSyncDataSource ? dataSrc : new AppSyncDataSource(dataSrc)
+      const ds = dataSrc instanceof AppSyncDataSource ? cloneDeep(dataSrc) : new AppSyncDataSource(dataSrc)
       ds.Properties.ApiId = this.ApiId()
       return ds
     })
@@ -341,7 +372,7 @@ export class AppSyncApi implements squals {
   linkFunctionConfigs (...c: (IAppSyncFuncConfig_min | AppSyncFuncConfig)[]): AppSyncApi {
     this._linked.configs = c.map(funcConfg => {
       const f =
-        funcConfg instanceof AppSyncFuncConfig ? funcConfg : new AppSyncFuncConfig(funcConfg)
+        funcConfg instanceof AppSyncFuncConfig ? cloneDeep(funcConfg) : new AppSyncFuncConfig(funcConfg)
       f.Properties.ApiId = this.ApiId()
       return f
     })
@@ -350,7 +381,7 @@ export class AppSyncApi implements squals {
 
   linkApiKeys (...i: (IAppSyncApiKey_min | AppSyncApiKey)[]): AppSyncApi {
     this._linked.keys = i.map(key => {
-      const k = key instanceof AppSyncApiKey ? key : new AppSyncApiKey(key)
+      const k = key instanceof AppSyncApiKey ? cloneDeep(key) : new AppSyncApiKey(key)
       k.Properties.ApiId = this.ApiId()
       return k
     })
@@ -359,7 +390,7 @@ export class AppSyncApi implements squals {
 
   linkeResolvers (...r: (IAppSyncResolver_min | AppSyncResolver)[]): AppSyncApi {
     this._linked.resovlers = r.map(reslv => {
-      const rez = reslv instanceof AppSyncResolver ? reslv : new AppSyncResolver(reslv)
+      const rez = reslv instanceof AppSyncResolver ? cloneDeep(reslv) : new AppSyncResolver(reslv)
       rez.Properties.ApiId = this.ApiId()
       return rez
     })
@@ -368,7 +399,7 @@ export class AppSyncApi implements squals {
 
   linkSchemas (...s: (IAppSyncSchema_min | AppSyncSchema)[]): AppSyncApi {
     this._linked.schemas = s.map(schema => {
-      const rez = schema instanceof AppSyncSchema ? schema : new AppSyncSchema(schema)
+      const rez = schema instanceof AppSyncSchema ? cloneDeep(schema) : new AppSyncSchema(schema)
       rez.Properties.ApiId = this.ApiId()
       return rez
     })
@@ -376,32 +407,34 @@ export class AppSyncApi implements squals {
   }
 
   tags (...t: Itags[]): AppSyncApi {
-    this.Properties.Tags = tags(t)
+    if (this.Properties.Tags) {
+      this.Properties.Tags = [...this.Properties.Tags, ...tags(...t)]
+    } else {
+      this.Properties.Tags = tags(...t)
+    }
     return this
   }
-
-  toJSON (withRelated: boolean = false): object[] {
-    return withRelated
-      ? [
-          ({
-            [this.name]: {
-              Type: 'AWS::AppSync::GraphQLApi',
-              Properties: this.Properties
-            }
-          } as unknown) as JSON,
-          ...((this._linked.resovlers.map(v => v.toJSON()) as unknown) as JSON[]),
-          ...((this._linked.configs.map(v => v.toJSON()) as unknown) as JSON[]),
-          ...((this._linked.sources.map(v => v.toJSON()) as unknown) as JSON[]),
-          ...((this._linked.schemas.map(v => v.toJSON()) as unknown) as JSON[])
-      ]
-      : [
-        {
-          [this.name]: {
-            Type: 'AWS::AppSync::GraphQLApi',
-            Properties: this.Properties
-          }
-        }
-      ]
+  /**
+   * @todo add to squals
+   * @todo add to `CharlieHatfield`
+   */
+  toJsonCollection () :object[] {
+    return [
+      this.toJSON(),
+      ...this._linked.keys.map(i=> i.toJSON()),
+      ...this._linked.configs.map(i=> i.toJSON()),
+      ...this._linked.resovlers.map(i=> i.toJSON()),
+      ...this._linked.schemas.map(i=> i.toJSON()),
+      ...this._linked.sources.map(i=> i.toJSON()),
+    ]
+  }
+  toJSON (): IAppSyncApi_json {
+    return {
+      [this.name]: {
+        Type: 'AWS::AppSync::GraphQLApi',
+        Properties: this.Properties
+      }
+    }
   }
   Ref (): IRef {
     return { Ref: this.name }

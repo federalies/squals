@@ -83,13 +83,12 @@ Seems like a CLI/squals.config.ts should
 
 2. Constructors take in:
 
-  1. the min "hand drawn" js object; the rest can be built via the chain builder funcs
-  2. its own kind
-  3. < className >.fromJSON(json object)
-  4. < className >.fromString(string)
-  5. < className >.fromJS(verbose "hand drawn ") // perhaps this is merely the constructor
-  6. < className >.from(picks the right sub function)
-  7. < className >.withRelated(JSON)
+  ```
+  - the min "hand drawn" js object; which is a ergonmic but full representation of the cloudformation OUTPUT
+  - the rest can be built via the chain builder funcs
+  - its own kind ??? (this makes things much more complicated, is it really necessary)
+  - implements the `squals` interface
+  ```
 
 3. Consider where input fields should also accept - `IGetAtt` | `IRef` basicaly anywhere a string or number might exist `:/`
 

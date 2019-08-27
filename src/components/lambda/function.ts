@@ -304,7 +304,7 @@ export class LambdaFunction implements squals {
     return this
   }
   tags (...t: Itags[]) {
-    this.Properties.Tags = tags(t)
+    this.Properties.Tags = tags(...t)
     return this
   }
   vpc (i: { secGrpIds: (string | IGetAtt | IRef)[]; subnets: (string | IGetAtt | IRef)[] }) {

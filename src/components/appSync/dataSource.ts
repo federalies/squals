@@ -170,8 +170,17 @@ export class AppSyncDataSource implements squals {
   static validate (i: string | object): AppSyncDataSource {
     return validatorGeneric<AppSyncDataSource>(i as squals, AppSyncDataSource)
   }
-  toJSON (): object[] {
-    return ([] as unknown) as JSON[]
+  _name (n: string) {
+    this.name = n
+    return this
+  }
+  toJSON (): IDataSource_json {
+    return {
+      [this.name]: {
+        Type: 'AWS::AppSync::DataSource',
+        Properties: this.Properties
+      }
+    }
   }
   Ref () {}
   DataSourceArn () {}

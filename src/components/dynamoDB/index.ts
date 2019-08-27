@@ -1,1 +1,2 @@
-export * from './table'
+export class Dynamo {}
+// export * from './table'

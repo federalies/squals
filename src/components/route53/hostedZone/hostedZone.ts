@@ -38,7 +38,7 @@ export class Route53HostedZone {
       this.Properties = { Name: props.domain } // input = domain name
       // optionals
       if (props.comment) this.Properties.HostedZoneConfig = { Comment: props.comment }
-      if (props.tags) this.Properties.HostedZoneTags = tags(props.tags)
+      if (props.tags) this.Properties.HostedZoneTags = tags(...props.tags)
       if (props.vpcs) {
         this.Properties.VPCs = Object.entries(props.vpcs).map(([VPCId, VPCRegion]) => ({
           VPCId,
@@ -78,7 +78,7 @@ export interface IdomainHostedZone {
   name?: string
   domain: string
   comment?: string
-  tags?: Itags | Itags[]
+  tags?: Itags[]
   loggingArn?: string
   vpcs?: { [id: string]: string } // {idA: regionA, idB: regionB }
 }

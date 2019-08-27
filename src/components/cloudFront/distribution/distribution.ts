@@ -1,7 +1,7 @@
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import randomWord from 'random-word'
 import Randoma from 'randoma'
-import { ITags, IGetAtt, IRef, Itags, Tags } from '../../Template'
+import { ITags, IGetAtt, IRef, Itags, tags, Tags } from '../../Template'
 import { ICdnOriginItem, IcdnOriginInput, originsConfig, originsArrayConfig } from './origins'
 import {
   ICdnCacheDefaultBehavior,
@@ -48,21 +48,21 @@ export class CloudFrontCDN {
     }
   }
 
-  constructor (props: icdnDistributiounInput) {
+  constructor (i: icdnDistributiounInput) {
     this.Type = 'AWS::CloudFront::Distribution'
 
     let defaultName = `${randomWord()}${new Randoma({
       seed: new Date().getTime()
     }).integer()}`
 
-    let { name } = { name: defaultName, ...props }
+    let { name } = { name: defaultName, ...i }
     this.name = name
 
-    if ('Fn::GetAtt' in props) {
+    if ('Fn::GetAtt' in i) {
       this.Properties = {
         ...Tags(),
         DistributionConfig: {
-          ...originsConfig(props),
+          ...originsConfig(i),
           ...cacheDefaultBehaviorConfig(),
           Enabled: true,
           Comment: 'made via fedarelies : squals',
@@ -75,24 +75,24 @@ export class CloudFrontCDN {
     } else {
       // setup squals defaults
       this.Properties = {
-        ...Tags(props.tags),
+        ...(i.tags ? {Tags:tags(i.tags)} : {}),
         DistributionConfig: {
-          ...originsConfig(props.origins),
+          ...originsConfig(i.origins),
           ...cacheDefaultBehaviorConfig(),
-          ...cacheBehaviorsConfig(props.behaviors),
-          ...restrictionsConfig(props.restrictions),
-          ...cutomErrorRespConfig(props.errResp),
-          ...loggingConfig(props.logging),
-          ...viewerCertConfig(props.viewerCertificate),
-          ...this.addAliases(props.aliases),
-          Enabled: typeof props.enabled === 'boolean' ? props.enabled : true,
+          ...cacheBehaviorsConfig(i.behaviors),
+          ...restrictionsConfig(i.restrictions),
+          ...cutomErrorRespConfig(i.errResp),
+          ...loggingConfig(i.logging),
+          ...viewerCertConfig(i.viewerCertificate),
+          ...this.addAliases(i.aliases),
+          Enabled: typeof i.enabled === 'boolean' ? i.enabled : true,
           Comment:
-            typeof props.comments === 'string' ? props.comments : 'made via fedarelies : squals',
-          IPV6Enabled: typeof props.isIpv6 === 'boolean' ? props.isIpv6 : true,
-          PriceClass: typeof props.priceClass === 'string' ? props.priceClass : validPriceClass.all,
-          HttpVersion: typeof props.httpVersion === 'string' ? props.httpVersion : 'http2',
+            typeof i.comments === 'string' ? i.comments : 'made via fedarelies : squals',
+          IPV6Enabled: typeof i.isIpv6 === 'boolean' ? i.isIpv6 : true,
+          PriceClass: typeof i.priceClass === 'string' ? i.priceClass : validPriceClass.all,
+          HttpVersion: typeof i.httpVersion === 'string' ? i.httpVersion : 'http2',
           DefaultRootObject:
-            typeof props.defaultRootObject === 'string' ? props.defaultRootObject : '/index.html'
+            typeof i.defaultRootObject === 'string' ? i.defaultRootObject : '/index.html'
         }
       }
     }
@@ -350,5 +350,5 @@ interface icdnDistributionData {
   defaultRootObject?: string
   httpVersion?: 'http1.1' | 'http2'
   priceClass?: validPriceClass | validPriceClassStrings
-  tags?: Itags | Itags[]
+  tags?: Itags
 }

@@ -1,5 +1,5 @@
 import s3uri from 's3-url'
-import { ITags, IGetAtt, Itags, IRef, Tags } from '../Template'
+import { ITags, IGetAtt, Itags, IRef, Tags, tags } from '../Template'
 import { ICodeBuildArtifactData, Iartifact, artifactsConfig } from './artifacts'
 import { ICodeBuildSource, IcodeBuildsource, sourceConfig } from './source'
 import {
@@ -326,6 +326,10 @@ export class CodeBuildProject {
     }
     return this
   }
+  tags (...i: Itags[]) {
+    this.Properties.Tags = tags(...i)
+    return this
+  }
   toJSON (): ICodeBuildProject_json {
     return {
       [this.name]: { Type: this.Type, Properties: this.Properties }
@@ -415,7 +419,7 @@ export interface IcodeBuild {
   cache?: IcodeBuildcache
   vpc?: IcodeBuildVpc
   triggers?: IcodeBuildTriggerTypes | IcodeBuildTriggerTypes[]
-  tags?: Itags | Itags[]
+  tags?: Itags
 }
 export interface IcodeBuildVpc {
   id: string

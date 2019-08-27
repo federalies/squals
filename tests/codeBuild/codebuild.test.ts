@@ -132,7 +132,7 @@ describe('CodeBuild::BuildSpec', () => {
           gitCloneDepth: 2
         }
       },
-      tags: [{ my: 'Tag' }, { other: 'Tag2' }],
+      tags: { my: 'Tag', other: 'Tag2' },
       triggers: [
         { event: { pattern: 'push' } },
         { head: { pattern: 'branch/name' } },

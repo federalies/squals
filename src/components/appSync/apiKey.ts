@@ -80,6 +80,10 @@ export class AppSyncApiKey implements squals {
     ret.Properties = i[ret.name].Properties
     return ret
   }
+  _name (n: string) {
+    this.name = n
+    return this
+  }
 
   api (i: string | IRef | IGetAtt) {
     this.Properties.ApiId = i
@@ -96,16 +100,13 @@ export class AppSyncApiKey implements squals {
     return this
   }
 
-  toJSON (): IAppSyncApiKey_json[] {
-    const retElem = {
+  toJSON (): IAppSyncApiKey_json {
+    return {
       [this.name]: {
         Type: 'AWS::AppSync::ApiKey',
         Properties: this.Properties
       }
     } as IAppSyncApiKey_json
-
-    AppSyncApiKey.validateJSON(retElem)
-    return [retElem]
   }
 
   Ref (): IRef {

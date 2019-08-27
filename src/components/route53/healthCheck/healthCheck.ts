@@ -1,5 +1,7 @@
+import { genComponentName, IRef } from '../../Template'
+
 export class Route53HealthCheck {
-  name?: string
+  name: string
   Type?: 'AWS::Route53::HealthCheck'
   Properties?: {
     HealthCheckConfig: {
@@ -31,5 +33,10 @@ export class Route53HealthCheck {
     ]
   }
 
-  // constructor(){}
+  constructor (i: { [k: string]: string }) {
+    this.name = genComponentName(i.name)
+  }
+  Ref (): IRef {
+    return { Ref: this.name }
+  }
 }

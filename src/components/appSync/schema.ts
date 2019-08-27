@@ -20,16 +20,20 @@ import { buildSchema } from 'graphql'
 export class AppSyncSchema implements squals {
   name: string
   Type = 'AWS::AppSync::GraphQLSchema'
-  Properties: ISchema_out
+  Properties: ISAppSyncSchema_props
 
   constructor (i: IAppSyncSchema_min) {
     this.name = i.name || genComponentName()
     this.Properties = { ApiId: i.apiId || '' }
-    if (i.def && typeof i.def === 'string') {
-      buildSchema(i.def)
+    if ('def' in i && typeof i.def === 'string') {
+      this.Properties.Definition = i.def
     }
-    if (i.loc && typeof i.def === 'string') {
+    if ('loc' in i && typeof i.loc === 'string') {
       // load up the schema and validate
+      i
+    }
+    if (i.apiId) {
+      this.Properties.ApiId = i.apiId
     }
   }
   static fromString (i: string): AppSyncSchema {
@@ -37,7 +41,7 @@ export class AppSyncSchema implements squals {
   }
   static fromJSON (o: object): AppSyncSchema {
     if (typeof o === 'string') o = JSON.parse(o)
-    return this.validate(o as IAppSyncSchema_min)
+    return AppSyncSchema.validate(o as IAppSyncSchema_min)
   }
   static fromJS (i: object): AppSyncSchema {
     return AppSyncSchema.validate(i)
@@ -62,7 +66,7 @@ export class AppSyncSchema implements squals {
 
     return new AppSyncSchema(verifyInterDeps(i))
   }
-  static validateJSON (i: ISchema_json): AppSyncSchema {
+  static validateJSON (i: IAppSyncSchema_json): AppSyncSchema {
     struct(
       struct.dict([
         'string',
@@ -83,17 +87,23 @@ export class AppSyncSchema implements squals {
       verifyHasAtLeastOne('Definition', 'DefinitionS3Location')
     )
     const name = Object.keys(i)[0]
-    const { ApiId, Definition, DefinitionS3Location } = verifyInterDeps<ISchema_out>(
+    const { ApiId, Definition, DefinitionS3Location } = verifyInterDeps<ISAppSyncSchema_props>(
       i[name].Properties
     )
 
     // start an instnace with stubbed data, ready to be over-written
-    const ret = new AppSyncSchema({
-      name,
-      apiId: ApiId,
-      def: Definition,
-      loc: DefinitionS3Location
-    })
+    const ret = Definition
+      ? new AppSyncSchema({
+        name,
+        apiId: ApiId,
+        def: Definition
+      })
+      : new AppSyncSchema({
+        name,
+        apiId: ApiId,
+        loc: DefinitionS3Location
+      } as IAppSyncSchema_min_loc)
+
     ret.name = name
     ret.Properties = i[name].Properties
     return ret
@@ -101,37 +111,44 @@ export class AppSyncSchema implements squals {
   static validate (i: string | object): AppSyncSchema {
     return validatorGeneric<AppSyncSchema>(i as squals, AppSyncSchema)
   }
-  toJSON (): object[] {
-    AppSyncSchema.validate(this)
-    return [
-      ({
-        [this.name]: {
-          Type: 'AWS::AppSync::GraphQLSchema',
-          Properties: this.Properties
-        }
-      } as unknown) as JSON
-    ]
+  _name (n: string) {
+    this.name = n
+    return this
+  }
+
+  toJSON (): IAppSyncSchema_json {
+    return {
+      [this.name]: {
+        Type: 'AWS::AppSync::GraphQLSchema',
+        Properties: this.Properties
+      }
+    }
   }
   Ref (): IRef {
     return { Ref: this.name }
   }
 }
 
-export interface IAppSyncSchema_min {
+export type IAppSyncSchema_min = IAppSyncSchema_min_def | IAppSyncSchema_min_loc
+export interface IAppSyncSchema_min_def {
   name?: string
+  def: string | IRef | IGetAtt
   apiId?: string | IRef | IGetAtt
-  def?: string | IRef | IGetAtt
-  loc?: string | IRef | IGetAtt
+}
+export interface IAppSyncSchema_min_loc {
+  name?: string
+  loc: string | IRef | IGetAtt
+  apiId?: string | IRef | IGetAtt
 }
 
-interface ISchema_json {
+interface IAppSyncSchema_json {
   [name: string]: {
     Type: 'AWS::AppSync::GraphQLSchema'
-    Properties: ISchema_out
+    Properties: ISAppSyncSchema_props
   }
 }
 
-interface ISchema_out {
+interface ISAppSyncSchema_props {
   ApiId: string | IRef | IGetAtt
   Definition?: string | IRef | IGetAtt
   DefinitionS3Location?: string | IRef | IGetAtt

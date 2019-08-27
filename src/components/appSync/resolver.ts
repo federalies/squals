@@ -105,33 +105,29 @@ export class AppSyncResolver implements squals {
   static validate (i: string | object): AppSyncResolver {
     return validatorGeneric<AppSyncResolver>(i as squals, AppSyncResolver)
   }
+  _name (n: string) {
+    this.name = n
+    return this
+  }
   linkDataSource (source: IAppSyncDataSource_min | AppSyncDataSource): AppSyncResolver {
     throw new Error(`not implemented yet`)
   }
-  componentName (s: string) {
-    this.name = s
-    return this
-  }
-
   fieldName (s: string | IRef) {
     this.Properties.FieldName = s
     return this
   }
-
   typeName (s: string | IRef) {
     this.Properties.TypeName = s
     return this
   }
 
-  toJSON (): object[] {
-    return [
-      {
-        [this.name]: {
-          Type: 'AWS::AppSync::Resolver',
-          Properties: this.Properties
-        }
-      } as AppSyncResolver_json
-    ]
+  toJSON (): AppSyncResolver_json {
+    return {
+      [this.name]: {
+        Type: 'AWS::AppSync::Resolver',
+        Properties: this.Properties
+      }
+    }
   }
   Ref (): IRef {
     return { Ref: this.name }

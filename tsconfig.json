@@ -9,7 +9,7 @@
     "jsx": "preserve" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
     "declaration": true /* Generates corresponding '.d.ts' file. */,
     "declarationMap": true /* Generates a sourcemap for each corresponding '.d.ts' file. */,
-    // "sourceMap": true,                     /* Generates corresponding '.map' file. */
+    "sourceMap": true /* Generates corresponding '.map' file. */,
     // "outFile": "./",                       /* Concatenate and emit output to single file. */
     "outDir": "./dist" /* Redirect output structure to the directory. */,
     // "rootDir": "." /* Specify the root directory of input files. Use to control the output directory structure with --outDir. */,
@@ -67,9 +67,15 @@
     // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
   },
   "compileOnSave": true,
-  // "include": ["./src/**/*"],
-  "include": ["src/**/*", "./tests/**/*", "src/components/elastiCache/.js"],
-  "exclude": ["lib", "dist", "*.json", "_scratch"],
+  "include": ["src/**/*", "./tests/**/*"],
+  "exclude": [
+    "lib",
+    "dist",
+    "*.json",
+    "_scratch",
+    "src/codeGen",
+    "tests/_recipies"
+  ],
   "typedocOptions": {
     "mode": "file",
     "out": "typeDocs"

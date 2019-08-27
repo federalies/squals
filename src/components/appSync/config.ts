@@ -43,6 +43,7 @@ export class AppSyncFuncConfig implements squals {
   static fromJSON (o: object): AppSyncFuncConfig {
     return this.validateJSON(o as IAppSyncFuncConfig_json)
   }
+  /* istanbul ignore next */
   private static fromSDK (o: object) {
     return new Error('not implemented yet - will be public once implemented')
   }
@@ -123,15 +124,53 @@ export class AppSyncFuncConfig implements squals {
   static validate (i: string | object): AppSyncFuncConfig {
     return validatorGeneric<AppSyncFuncConfig>(i as squals, AppSyncFuncConfig)
   }
-  toJSON (): object[] {
-    return [
-      {
-        [this.name]: {
-          Type: 'AWS::AppSync::FunctionConfiguration',
-          Properties: this.Properties
-        }
-      } as IAppSyncFuncConfig_json
-    ]
+  source (s: string) {
+    this.Properties.DataSourceName = s
+    return this
+  }
+  description (d: string) {
+    this.Properties.Description =d
+    return this
+  }
+  reqTemplate (i: string | IRef) {
+    if (typeof i === 'string') {
+      if (i.startsWith('s3://')) {
+        this.Properties.RequestMappingTemplateS3Location = i
+        return this
+      } else {
+        this.Properties.RequestMappingTemplate = i
+        return this
+      }
+    } else {
+      this.Properties.RequestMappingTemplate = i
+      return this
+    }
+  }
+  resTemplate (i: string | IRef) {
+    if (typeof i === 'string') {
+      if (i.startsWith('s3://')) {
+        this.Properties.ResponseMappingTemplateS3Location = i
+        return this
+      } else {
+        this.Properties.ResponseMappingTemplate = i
+        return this
+      }
+    } else {
+      this.Properties.ResponseMappingTemplate = i
+      return this
+    }
+  }
+  _name (n: string) {
+    this.name = n
+    return this
+  }
+  toJSON (): IAppSyncFuncConfig_json {
+    return {
+      [this.name]: {
+        Type: 'AWS::AppSync::FunctionConfiguration',
+        Properties: this.Properties
+      }
+    }
   }
   Ref (): IRef {
     return { Ref: this.name }

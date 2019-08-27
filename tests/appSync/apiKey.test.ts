@@ -8,7 +8,7 @@ import { IGetAtt } from '../../src/components/Template'
 
 describe('AppSync ApiKey', () => {
   test('Defaults', () => {
-    const a = new AppSyncApiKey().toJSON()[0] as IAppSyncApiKey_json
+    const a = new AppSyncApiKey().toJSON() as IAppSyncApiKey_json
     const _name = Object.keys(a)[0]
     expect(_name).toBeDefined()
     expect(a[_name].Type).toBe('AWS::AppSync::ApiKey')
@@ -25,7 +25,7 @@ describe('AppSync ApiKey', () => {
       exp: 1000
     }
 
-    const a = AppSyncApiKey.from(input).toJSON()[0]
+    const a = AppSyncApiKey.from(input).toJSON()
     const e = {
       MyComponentName: {
         Type: 'AWS::AppSync::ApiKey',
@@ -37,7 +37,7 @@ describe('AppSync ApiKey', () => {
       }
     } as IAppSyncApiKey_json
     expect(a).toEqual(e)
-    expect(AppSyncApiKey.fromJS(input).toJSON()[0]).toEqual(e)
+    expect(AppSyncApiKey.fromJS(input).toJSON()).toEqual(e)
   })
 
   test('from valid JSON', () => {
@@ -51,9 +51,9 @@ describe('AppSync ApiKey', () => {
         }
       }
     } as IAppSyncApiKey_json
-    const a = AppSyncApiKey.from(e).toJSON()[0]
+    const a = AppSyncApiKey.from(e).toJSON()
     expect(a).toEqual(e)
-    expect(AppSyncApiKey.fromJSON(e).toJSON()[0]).toEqual(e)
+    expect(AppSyncApiKey.fromJSON(e).toJSON()).toEqual(e)
   })
 
   test('from valid string', () => {
@@ -68,7 +68,7 @@ describe('AppSync ApiKey', () => {
       }
     } as IAppSyncApiKey_json
     const s = JSON.stringify(o)
-    const a = AppSyncApiKey.from(s).toJSON()[0]
+    const a = AppSyncApiKey.from(s).toJSON()
     expect(a).toEqual(o)
   })
 
@@ -109,7 +109,7 @@ describe('AppSync ApiKey', () => {
       .api('someApi')
       .description('my Description')
       .expires(1000)
-      .toJSON()[0]
+      .toJSON()
     const _name = Object.keys(a)[0]
     expect(a[_name].Properties).toEqual({
       ApiId: 'someApi',
@@ -138,7 +138,7 @@ describe('AppSync ApiKey', () => {
         }
       }
     } as IAppSyncApiKey_json
-    expect(a.toJSON()[0]).toEqual(e)
+    expect(a.toJSON()).toEqual(e)
     expect(a.Ref()).toEqual({ Ref: 'FederaliGraphQL' })
     expect(a.ApiKey()).toEqual({ 'Fn::GetAtt': ['FederaliGraphQL', 'ApiKey'] })
     expect(a.Arn()).toEqual({ 'Fn::GetAtt': ['FederaliGraphQL', 'Arn'] })
@@ -166,18 +166,18 @@ describe('AppSync ApiKey', () => {
     }
 
     let a = new AppSyncApiKey(input, api)
-    expect(a.toJSON()[0]).toEqual(e)
+    expect(a.toJSON()).toEqual(e)
 
     input.api = api.ApiId()
     a = new AppSyncApiKey(input)
-    expect(a.toJSON()[0]).toEqual(e)
+    expect(a.toJSON()).toEqual(e)
   })
 
   test('passing validations', () => {
     const api = new AppSyncApi({ name: 'FederaGraphQlApi' })
 
-    const a1 = AppSyncApiKey.validateJS({ api: api.ApiId(), desc: 'desc', exp: 1000 }).toJSON()[0]
-    const a2 = AppSyncApiKey.validateJS({ desc: 'desc', exp: 1000 }).toJSON()[0]
+    const a1 = AppSyncApiKey.validateJS({ api: api.ApiId(), desc: 'desc', exp: 1000 }).toJSON()
+    const a2 = AppSyncApiKey.validateJS({ desc: 'desc', exp: 1000 }).toJSON()
     const b = AppSyncApiKey.validateJSON({
       Hi: {
         Type: 'AWS::AppSync::ApiKey',
@@ -186,7 +186,7 @@ describe('AppSync ApiKey', () => {
           Description: 'desc'
         }
       }
-    }).toJSON()[0]
+    }).toJSON()
     const a_name = Object.keys(a1)[0]
     const a2_name = Object.keys(a2)[0]
     const b_name = Object.keys(b)[0]

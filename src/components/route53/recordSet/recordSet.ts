@@ -6,10 +6,19 @@ import {
   validRecordSetStrings,
   validAbbrevUnitedStateStrings
 } from '../enums'
-import { IRef, IGetAtt } from '../../Template'
-import Randoma from 'randoma'
-import randomWord from 'random-word'
-// import Joi, { JoiObject } from 'joi'
+
+import {
+  squals,
+  struct,
+  baseSchemas,
+  validatorGeneric,
+  genComponentName,
+  IStrRefGetAtt,
+  IGetAtt,
+  ITags,
+  Itags,
+  IRef
+} from '../../Template'
 
 /**
  * @descrition asdasd
@@ -38,15 +47,14 @@ export class Route53Record {
     TTL?: string
     Weight?: number
   }
+
   constructor (props: IdnsSimple) {
     this.Type = 'AWS::Route53::RecordSet'
-    let defaultName = `${randomWord()}${new Randoma({
-      seed: new Date().getTime()
-    }).integer()}`
-    this.name = { name: defaultName, ...props }.name
+    this.name = genComponentName(props.name)
     const { Type, Name, TTL, ResourceRecords } = normalizeInputs(props)
     this.Properties = { Type, Name, ResourceRecords, TTL }
   }
+
   toJSON (): object {
     return {
       [this.name]: {
@@ -131,47 +139,6 @@ export const handleMXRecords = (
   }
 }
 
-// const resourceOnChangeBehaviorsConfig = () => {
-//   return {
-//     Name: StackChangeBehaviors.replacement,
-//     Type: StackChangeBehaviors.noInteruption,
-//     Region: StackChangeBehaviors.noInteruption,
-//     AliasTarget: StackChangeBehaviors.noInteruption,
-//     GeoLocation: StackChangeBehaviors.noInteruption,
-//     Comment: StackChangeBehaviors.noInteruption,
-//     Failover: StackChangeBehaviors.noInteruption,
-//     HealthCheckId: StackChangeBehaviors.noInteruption,
-//     HostedZoneId: StackChangeBehaviors.noInteruption,
-//     HostedZoneName: StackChangeBehaviors.noInteruption,
-//     MultiValueAnswer: StackChangeBehaviors.noInteruption,
-//     ResourceRecords: StackChangeBehaviors.noInteruption,
-//     SetIdentifier: StackChangeBehaviors.noInteruption,
-//     TTL: StackChangeBehaviors.noInteruption,
-//     Weight: StackChangeBehaviors.noInteruption
-//   }
-// }
-
-// const geoLocationConfig = () => {}
-
-// export const aliasIFNeeded = (
-//   DNSName: string,
-//   healthCheck: boolean = true,
-//   networkLoadbalancer: boolean = false
-// ) => {
-//   const isAliasable = ['apigateway', 'elasticbeanstalk', 'elasticloadbalancing', 's3-website']
-//     .map((svcName: string) => {
-//       return new RegExp(`(.)+\.[${svcName}]+\.[-\w]+\.amazonaws.com`)
-//     })
-//     .some((pattern: RegExp) => {
-//       return pattern.test(DNSName)
-//     })
-//   if (isAliasable) {
-//     const a = validRoute53HostId['apigateway.ap-northeast-1.amazonaws.com']
-//   } else {
-//     throw new Error('this DNS is not aliasable')
-//   }
-// }
-
 export interface IdnsRecord_MX extends IdnsRecord {
   priority: number
 }
@@ -226,10 +193,10 @@ export interface IdnsRecord {
   loc: string
   ttl?: number
   // ___
-  healthCheckid?: string | IRef
-  zoneId?: string | IRef
-  zoneName?: string
-  comment?: string
+  healthCheckid?: IStrRefGetAtt
+  zoneId?: IStrRefGetAtt
+  zoneName?: IStrRefGetAtt
+  comment?: IStrRefGetAtt
   name?: string
 }
 
@@ -241,12 +208,14 @@ export type IezDnsRecord =
   | IdnsReorcd_Latency
 // | IdnsReorcd_Weighted
 
-export type IdnsSimple =
+export type IdnsSimple = { name?: string } & IdnsSimple_union
+
+export type IdnsSimple_union =
   | { a: IezDnsInput } // location , value , ttl
   | { aaaa: IezDnsInput }
   | { caa: IezDnsInput }
   | { cname: IezDnsInput }
-  | { mx: IdnsRecord_MX | [string, string, number, number?] } // location , value includes, priority, ttl=300,
+  | { mx: IdnsRecord_MX | [IStrRefGetAtt, IStrRefGetAtt, number, number?] } // location , value, priority, ttl=300,
   | { naptr: IezDnsInput }
   | { ns: IezDnsInput }
   | { ptr: IezDnsInput }

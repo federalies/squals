@@ -1,1 +1,2 @@
-export * from './sqs'
+export class SQSCLass {}
+// export * from './sqs'
