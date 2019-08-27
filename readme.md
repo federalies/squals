@@ -4,10 +4,9 @@
 
 > (a squall) : the advancing edge of a thunderstorm, accompanied with high winds
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_small)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_shield)
 
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_shield)
 
 **Squals** is an idiomatic cloudformation generator that makes it incredibly easy to share your setups via `npm`, `gist` or similair service.
 
@@ -59,4 +58,4 @@ _A2_: Sure Cloudformation (and similar declarative configs) have been around a b
 
 
 ## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_large)
+[MIT](./LICENSE)
