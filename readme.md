@@ -1,6 +1,10 @@
+> WIP & WARNING THERE BE DRAGONS AHEAD
+
 # SQUALS
 
 > (a squall) : the advancing edge of a thunderstorm, accompanied with high winds
+
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Ffederalies%2Fsquals.svg?type=small)](https://app.fossa.com/projects/git%2Bgithub.com%2Ffederalies%2Fsquals?ref=badge_small)
 
 [![squals logo](/assets/readme-art.svg)](http://squals.federali.es)
 
