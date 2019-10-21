@@ -1,4 +1,4 @@
-import * as c from '../../../src/components/certificateManager'
+import * as c from '../../src/components/certificateManager'
 
 describe('certificate mgr intenral ƒ.helpers', () => {
   describe('type guards', () => {

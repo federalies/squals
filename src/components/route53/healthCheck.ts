@@ -1,4 +1,4 @@
-import { genComponentName, IRef } from '../../Template'
+import { genComponentName, IRef } from '../Template'
 
 export class Route53HealthCheck {
   name: string
@@ -33,10 +33,10 @@ export class Route53HealthCheck {
     ]
   }
 
-  constructor (i: { [k: string]: string }) {
+  constructor(i: { [k: string]: string }) {
     this.name = genComponentName(i.name)
   }
-  Ref (): IRef {
+  Ref(): IRef {
     return { Ref: this.name }
   }
 }

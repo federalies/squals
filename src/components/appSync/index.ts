@@ -1,3 +1,7 @@
+/**
+ * @module AppSync
+ */
+
 export * from './api'
 export * from './apiKey'
 export * from './config'

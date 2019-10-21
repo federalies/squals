@@ -1,4 +1,6 @@
-// import { CloudFrontCDN } from './distribution'
+/**
+ * @module CloudFrontCDN
+ */
 
 /**
  * Title.

@@ -1,4 +1,6 @@
-import joi from 'joi'
+/**
+ * @module CloudFrontCDN
+ */
 
 /**
  * Title.

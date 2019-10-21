@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 /* eslint no-unused-vars: ["error", { "args": "none" }] */
 import randomWord from 'random-word'
 import Randoma from 'randoma'
@@ -48,7 +52,7 @@ export class CloudFrontCDN {
     }
   }
 
-  constructor (i: icdnDistributiounInput) {
+  constructor(i: icdnDistributiounInput) {
     this.Type = 'AWS::CloudFront::Distribution'
 
     let defaultName = `${randomWord()}${new Randoma({
@@ -75,7 +79,7 @@ export class CloudFrontCDN {
     } else {
       // setup squals defaults
       this.Properties = {
-        ...(i.tags ? {Tags:tags(i.tags)} : {}),
+        ...(i.tags ? { Tags: tags(i.tags) } : {}),
         DistributionConfig: {
           ...originsConfig(i.origins),
           ...cacheDefaultBehaviorConfig(),
@@ -86,8 +90,7 @@ export class CloudFrontCDN {
           ...viewerCertConfig(i.viewerCertificate),
           ...this.addAliases(i.aliases),
           Enabled: typeof i.enabled === 'boolean' ? i.enabled : true,
-          Comment:
-            typeof i.comments === 'string' ? i.comments : 'made via fedarelies : squals',
+          Comment: typeof i.comments === 'string' ? i.comments : 'made via fedarelies : squals',
           IPV6Enabled: typeof i.isIpv6 === 'boolean' ? i.isIpv6 : true,
           PriceClass: typeof i.priceClass === 'string' ? i.priceClass : validPriceClass.all,
           HttpVersion: typeof i.httpVersion === 'string' ? i.httpVersion : 'http2',
@@ -101,7 +104,7 @@ export class CloudFrontCDN {
   /**
    * @description stateful orgin additive?
    */
-  origins (origins: IcdnOriginInput): CloudFrontCDN {
+  origins(origins: IcdnOriginInput): CloudFrontCDN {
     const _this = this
     const _listofAllOriginsbutNoIds: ICdnOriginItem[] = [
       ...this.Properties.DistributionConfig.Origins,
@@ -123,7 +126,7 @@ export class CloudFrontCDN {
    * @example
    * var l =
    */
-  logging (logConfig: IcdnLoggingInput): CloudFrontCDN {
+  logging(logConfig: IcdnLoggingInput): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -138,7 +141,7 @@ export class CloudFrontCDN {
    *
    * @param errRespCfg
    */
-  errorResponses (errRespCfg: any): CloudFrontCDN {
+  errorResponses(errRespCfg: any): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -153,7 +156,7 @@ export class CloudFrontCDN {
    *
    * @param cert
    */
-  viewerCertificate (cert?: IcdnViewerCert): CloudFrontCDN {
+  viewerCertificate(cert?: IcdnViewerCert): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -168,7 +171,7 @@ export class CloudFrontCDN {
    *
    * @param restriction
    */
-  restrictions (restriction: IcacheRestrictions): CloudFrontCDN {
+  restrictions(restriction: IcacheRestrictions): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -183,7 +186,7 @@ export class CloudFrontCDN {
    *
    * @param replacementBehaviors
    */
-  behaviors (replacementBehaviors: IcdnCaheBehavior | IcdnCaheBehavior[]): CloudFrontCDN {
+  behaviors(replacementBehaviors: IcdnCaheBehavior | IcdnCaheBehavior[]): CloudFrontCDN {
     const _this = this
 
     _this.Properties = {
@@ -204,7 +207,7 @@ export class CloudFrontCDN {
    * var diffCDNObj = myCDN.comments('This Is the new comment String value')š
    * console.log(myCDN === diffCDNObj) // false
    */
-  comments (comment: string): CloudFrontCDN {
+  comments(comment: string): CloudFrontCDN {
     const _this = this
 
     _this.Properties = {
@@ -220,7 +223,7 @@ export class CloudFrontCDN {
    *
    * @param aliases
    */
-  aliases (aliases: string | string[]): CloudFrontCDN {
+  aliases(aliases: string | string[]): CloudFrontCDN {
     const _this = this
 
     _this.Properties = {
@@ -232,7 +235,7 @@ export class CloudFrontCDN {
 
     return _this
   }
-  addAliases (aliases?: string | string[]): { Aliases: string[] } | object {
+  addAliases(aliases?: string | string[]): { Aliases: string[] } | object {
     if (Array.isArray(aliases)) {
       return { Aliases: [...(this.Properties.DistributionConfig.Aliases as string[]), ...aliases] }
     } else if (aliases) {
@@ -242,7 +245,7 @@ export class CloudFrontCDN {
     }
   }
 
-  webAcl (webACLId?: string): CloudFrontCDN {
+  webAcl(webACLId?: string): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -252,7 +255,7 @@ export class CloudFrontCDN {
     }
     return _this
   }
-  usehttp2 (http2: boolean = true): CloudFrontCDN {
+  usehttp2(http2: boolean = true): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -262,7 +265,7 @@ export class CloudFrontCDN {
     }
     return _this
   }
-  priceClass (input: validPriceClass | validPriceClassStrings = 'PriceClass_All'): CloudFrontCDN {
+  priceClass(input: validPriceClass | validPriceClassStrings = 'PriceClass_All'): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -272,7 +275,7 @@ export class CloudFrontCDN {
     }
     return _this
   }
-  defaultObject (defaultObj: string): CloudFrontCDN {
+  defaultObject(defaultObj: string): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -282,7 +285,7 @@ export class CloudFrontCDN {
     }
     return _this
   }
-  useIpV6 (useV6: boolean = true): CloudFrontCDN {
+  useIpV6(useV6: boolean = true): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -292,7 +295,7 @@ export class CloudFrontCDN {
     }
     return _this
   }
-  enabled (isEnabled: boolean = true): CloudFrontCDN {
+  enabled(isEnabled: boolean = true): CloudFrontCDN {
     const _this = this
     _this.Properties = {
       DistributionConfig: {
@@ -303,7 +306,7 @@ export class CloudFrontCDN {
     return _this
   }
 
-  toJSON (): object {
+  toJSON(): object {
     return {
       [this.name]: {
         Type: this.Type,
@@ -312,11 +315,11 @@ export class CloudFrontCDN {
     }
   }
 
-  Ref (): IRef {
+  Ref(): IRef {
     return { Ref: this.name }
   }
 
-  DomainName (): IGetAtt {
+  DomainName(): IGetAtt {
     /**
      * Returns the Amazon Resource Name (ARN) of the specified bucket.
      * Example: arn:aws:s3:::mybucket

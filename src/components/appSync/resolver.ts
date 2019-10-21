@@ -1,3 +1,7 @@
+/**
+ * @module AppSync
+ */
+
 import {
   IRef,
   IGetAtt,
@@ -17,7 +21,7 @@ export class AppSyncResolver implements squals {
   Type = 'AWS::AppSync::Resolver'
   Properties: AppSyncResolver_Props
 
-  constructor (i: IAppSyncResolver_min, api?: AppSyncApi) {
+  constructor(i: IAppSyncResolver_min, api?: AppSyncApi) {
     this.name = i.name || genComponentName()
     this.Properties = {
       ApiId: api ? api.ApiId() : i.api ? i.api : '< StillNeedsToBeLinked >',
@@ -33,19 +37,19 @@ export class AppSyncResolver implements squals {
     if (i.resTempl) this.Properties.ResponseMappingTemplate = i.resTempl
     if (i.resTemplS3Loc) this.Properties.ResponseMappingTemplateS3Location = i.resTemplS3Loc
   }
-  static fromString (i: string): AppSyncResolver {
+  static fromString(i: string): AppSyncResolver {
     return AppSyncResolver.from(JSON.parse(i))
   }
-  static fromJSON (i: object): AppSyncResolver {
+  static fromJSON(i: object): AppSyncResolver {
     return AppSyncResolver.validateJSON(i as AppSyncResolver_json)
   }
-  static fromJS (i: object): AppSyncResolver {
+  static fromJS(i: object): AppSyncResolver {
     return AppSyncResolver.validateJS(i as IAppSyncResolver_min)
   }
-  static from (i: string | object): AppSyncResolver {
+  static from(i: string | object): AppSyncResolver {
     return AppSyncResolver.validate(i)
   }
-  static validateJSON (i: AppSyncResolver_json): AppSyncResolver {
+  static validateJSON(i: AppSyncResolver_json): AppSyncResolver {
     struct(
       struct.dict([
         'string',
@@ -81,7 +85,7 @@ export class AppSyncResolver implements squals {
     ret.name = name
     return ret
   }
-  static validateJS (i: IAppSyncResolver_min): AppSyncResolver {
+  static validateJS(i: IAppSyncResolver_min): AppSyncResolver {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strRef = struct.union(['string', ref])
@@ -102,26 +106,26 @@ export class AppSyncResolver implements squals {
     const interdep = verifyIfThen(ifPathEq('kind', 'pipeline'), has('pipelineFns'))
     return new AppSyncResolver(interdep(i))
   }
-  static validate (i: string | object): AppSyncResolver {
+  static validate(i: string | object): AppSyncResolver {
     return validatorGeneric<AppSyncResolver>(i as squals, AppSyncResolver)
   }
-  _name (n: string) {
+  _name(n: string) {
     this.name = n
     return this
   }
-  linkDataSource (source: IAppSyncDataSource_min | AppSyncDataSource): AppSyncResolver {
+  linkDataSource(source: IAppSyncDataSource_min | AppSyncDataSource): AppSyncResolver {
     throw new Error(`not implemented yet`)
   }
-  fieldName (s: string | IRef) {
+  fieldName(s: string | IRef) {
     this.Properties.FieldName = s
     return this
   }
-  typeName (s: string | IRef) {
+  typeName(s: string | IRef) {
     this.Properties.TypeName = s
     return this
   }
 
-  toJSON (): AppSyncResolver_json {
+  toJSON(): AppSyncResolver_json {
     return {
       [this.name]: {
         Type: 'AWS::AppSync::Resolver',
@@ -129,16 +133,16 @@ export class AppSyncResolver implements squals {
       }
     }
   }
-  Ref (): IRef {
+  Ref(): IRef {
     return { Ref: this.name }
   }
-  FieldName (): IGetAtt {
+  FieldName(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'FieldName'] }
   }
-  ResolverArn (): IGetAtt {
+  ResolverArn(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'ResolverName'] }
   }
-  TypeName (): IGetAtt {
+  TypeName(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'TypeName'] }
   }
 }

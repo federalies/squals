@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 import { IRef, IGetAtt } from '../../Template'
 import Url from 'url'
 

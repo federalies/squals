@@ -1,4 +1,8 @@
 /**
+ * @module CloudFrontCDN
+ */
+
+/**
  * Setup Location Restrictions.
  *
  * @param _input

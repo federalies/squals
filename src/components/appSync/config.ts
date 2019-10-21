@@ -1,3 +1,7 @@
+/**
+ * @module AppSync
+ */
+
 import { IRef, IGetAtt, squals, baseSchemas, genComponentName, validatorGeneric } from '../Template'
 import { AppSyncApi } from './api'
 import { verifyHasAtLeastOne } from '../../utils/validations/objectCheck'
@@ -10,7 +14,7 @@ export class AppSyncFuncConfig implements squals {
   Type = 'AWS::AppSync::FunctionConfiguration'
   Properties: AppSyncFuncConfig_props
 
-  constructor (data: IAppSyncFuncConfig_min, api?: AppSyncApi) {
+  constructor(data: IAppSyncFuncConfig_min, api?: AppSyncApi) {
     this.name = typeof data.name === 'string' ? data.name : genComponentName()
     this.Properties = {
       ApiId: api ? api.ApiId() : '< StillNeedsToBeLinked >',
@@ -31,23 +35,23 @@ export class AppSyncFuncConfig implements squals {
       this.Properties.RequestMappingTemplate = data.resTemplS3Loc
     }
   }
-  static from (i: string | object): AppSyncFuncConfig {
+  static from(i: string | object): AppSyncFuncConfig {
     return AppSyncFuncConfig.validate(i)
   }
-  static fromJS (i: object): AppSyncFuncConfig {
+  static fromJS(i: object): AppSyncFuncConfig {
     return AppSyncFuncConfig.validateJS(i as IAppSyncFuncConfig_min)
   }
-  static fromString (o: string): AppSyncFuncConfig {
+  static fromString(o: string): AppSyncFuncConfig {
     return AppSyncFuncConfig.validate(JSON.parse(o))
   }
-  static fromJSON (o: object): AppSyncFuncConfig {
+  static fromJSON(o: object): AppSyncFuncConfig {
     return this.validateJSON(o as IAppSyncFuncConfig_json)
   }
   /* istanbul ignore next */
-  private static fromSDK (o: object) {
+  private static fromSDK(o: object) {
     return new Error('not implemented yet - will be public once implemented')
   }
-  static validateJS (o: IAppSyncFuncConfig_min): AppSyncFuncConfig {
+  static validateJS(o: IAppSyncFuncConfig_min): AppSyncFuncConfig {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -80,7 +84,7 @@ export class AppSyncFuncConfig implements squals {
 
     return new AppSyncFuncConfig(o)
   }
-  static validateJSON (o: IAppSyncFuncConfig_json): AppSyncFuncConfig {
+  static validateJSON(o: IAppSyncFuncConfig_json): AppSyncFuncConfig {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -121,18 +125,18 @@ export class AppSyncFuncConfig implements squals {
     ret.Properties = o[_name].Properties
     return ret
   }
-  static validate (i: string | object): AppSyncFuncConfig {
+  static validate(i: string | object): AppSyncFuncConfig {
     return validatorGeneric<AppSyncFuncConfig>(i as squals, AppSyncFuncConfig)
   }
-  source (s: string) {
+  source(s: string) {
     this.Properties.DataSourceName = s
     return this
   }
-  description (d: string) {
-    this.Properties.Description =d
+  description(d: string) {
+    this.Properties.Description = d
     return this
   }
-  reqTemplate (i: string | IRef) {
+  reqTemplate(i: string | IRef) {
     if (typeof i === 'string') {
       if (i.startsWith('s3://')) {
         this.Properties.RequestMappingTemplateS3Location = i
@@ -146,7 +150,7 @@ export class AppSyncFuncConfig implements squals {
       return this
     }
   }
-  resTemplate (i: string | IRef) {
+  resTemplate(i: string | IRef) {
     if (typeof i === 'string') {
       if (i.startsWith('s3://')) {
         this.Properties.ResponseMappingTemplateS3Location = i
@@ -160,11 +164,11 @@ export class AppSyncFuncConfig implements squals {
       return this
     }
   }
-  _name (n: string) {
+  _name(n: string) {
     this.name = n
     return this
   }
-  toJSON (): IAppSyncFuncConfig_json {
+  toJSON(): IAppSyncFuncConfig_json {
     return {
       [this.name]: {
         Type: 'AWS::AppSync::FunctionConfiguration',
@@ -172,19 +176,19 @@ export class AppSyncFuncConfig implements squals {
       }
     }
   }
-  Ref (): IRef {
+  Ref(): IRef {
     return { Ref: this.name }
   }
-  DataSourceName (): IGetAtt {
+  DataSourceName(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'DataSourceName'] }
   }
-  FunctionArn (): IGetAtt {
+  FunctionArn(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'FunctionArn'] }
   }
-  FunctionId (): IGetAtt {
+  FunctionId(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'FunctionId'] }
   }
-  Name (): IGetAtt {
+  Name(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'Name'] }
   }
 }

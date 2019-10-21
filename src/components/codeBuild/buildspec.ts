@@ -21,7 +21,7 @@ export class BuildSpec {
     'secondary-artifacts'?: IbuildSpecArtifactSecondaryMap
   }
 
-  constructor () {}
+  constructor() {}
 
   /**
    *
@@ -31,13 +31,13 @@ export class BuildSpec {
    * @example
    * const bspec = new BuildSpec().Install('npm i')
    */
-  Install (
+  Install(
     commands: stringish,
     opts: {
-    andfinally?: stringish
-    runAs?: string
-    runTimes?: { [lang: string]: number }
-    clearState?: boolean
+      andfinally?: stringish
+      runAs?: string
+      runTimes?: { [lang: string]: number }
+      clearState?: boolean
     } = {
       clearState: false
     }
@@ -95,12 +95,12 @@ export class BuildSpec {
    * @example
    * const bspec = new BuildSpec().PreBuild('npm test')
    */
-  PreBuild (
+  PreBuild(
     commands: stringish,
     opts: {
-    andfinally?: stringish
-    runAs?: string
-    clearState?: boolean
+      andfinally?: stringish
+      runAs?: string
+      clearState?: boolean
     } = {
       clearState: false
     }
@@ -135,12 +135,12 @@ export class BuildSpec {
    * @example
    * const bspec = new BuildSpec().Build('npm test')
    */
-  Build (
+  Build(
     commands: stringish,
     opts: {
-    andfinally?: stringish
-    runAs?: string
-    clearState?: boolean
+      andfinally?: stringish
+      runAs?: string
+      clearState?: boolean
     } = {
       clearState: false
     }
@@ -176,12 +176,12 @@ export class BuildSpec {
    * @example
    * const bspec = new BuildSpec().PostBuild('npm test')
    */
-  PostBuild (
+  PostBuild(
     commands: stringish,
     opts: {
-    andfinally?: stringish
-    runAs?: string
-    clearState?: boolean
+      andfinally?: stringish
+      runAs?: string
+      clearState?: boolean
     } = {
       clearState: false
     }
@@ -214,7 +214,7 @@ export class BuildSpec {
    * @description Add Artifacts
    * @param input - Accepts a string file set of or annoted object included files.
    */
-  Artifacts (
+  Artifacts(
     input: string | IbuildSpecArtifactDatastringish | IbuildSpecArtifactDatastringish[]
   ): BuildSpec {
     //
@@ -244,9 +244,9 @@ export class BuildSpec {
     }
     return this
   }
-  Env (_env?: {
-  variables?: { [prefix: string]: string }
-  parameterStore?: { [prefix: string]: string }
+  Env(_env?: {
+    variables?: { [prefix: string]: string }
+    parameterStore?: { [prefix: string]: string }
   }): BuildSpec {
     if (
       // if we have state AND you pass in state - then lets fold it in. else reseth the internet state
@@ -277,7 +277,7 @@ export class BuildSpec {
 
     return this
   }
-  Cache (input: string | string[]): BuildSpec {
+  Cache(input: string | string[]): BuildSpec {
     if (this.cache && this.cache.paths) {
       this.cache = {
         paths: Array.isArray(input)
@@ -289,13 +289,13 @@ export class BuildSpec {
     }
     return this
   }
-  toJSON (): object {
+  toJSON(): object {
     return { ...this }
   }
-  toYAML (): string {
+  toYAML(): string {
     return yaml.dump(this.toJSON())
   }
-  fromYAML (input: string): BuildSpec {
+  fromYAML(input: string): BuildSpec {
     const _buildspec = yaml.safeLoad(input)
     if (!('version' in _buildspec) || !('phases' in _buildspec)) {
       throw new Error(

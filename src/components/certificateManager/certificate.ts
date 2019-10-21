@@ -1,7 +1,11 @@
+/**
+ * @module Certificate
+ */
+
 import Url from 'url'
 import randomWord from 'random-word'
 import Randoma from 'randoma'
-import { IRef, Tags, Itags, ITags } from '../../Template'
+import { IRef, Tags, Itags, ITags } from '../Template'
 // import Joi, { JoiObject } from 'joi'
 //
 export class AWSCertificate {
@@ -20,7 +24,7 @@ export class AWSCertificate {
     Tags?: ITags[]
   }
 
-  constructor (props: IcertObj | string | string[]) {
+  constructor(props: IcertObj | string | string[]) {
     console.warn(
       `WARNING: This certificate will pause completion of the rest of the application until its validated - via email or DNS depending on your setup.`
     )
@@ -81,10 +85,10 @@ export class AWSCertificate {
       throw new Error('Certificate Constructor does not know what to do with the input')
     }
   }
-  addDomains (input: IcertDomainInput): AWSCertificate {
+  addDomains(input: IcertDomainInput): AWSCertificate {
     return this
   }
-  proveViaEmail (useEmail: true): AWSCertificate {
+  proveViaEmail(useEmail: true): AWSCertificate {
     const _this = this
 
     _this.Properties = {
@@ -94,7 +98,7 @@ export class AWSCertificate {
 
     return _this
   }
-  tags (...inTags: Itags[]): AWSCertificate {
+  tags(...inTags: Itags[]): AWSCertificate {
     const _this = this
 
     _this.Properties = {
@@ -104,12 +108,12 @@ export class AWSCertificate {
 
     return _this
   }
-  Ref (): IRef {
+  Ref(): IRef {
     return {
       Ref: this.name
     }
   }
-  toJSON (): object {
+  toJSON(): object {
     return {
       [this.name]: {
         Type: this.Type,
@@ -117,13 +121,13 @@ export class AWSCertificate {
       }
     }
   }
-  everyDomain (): string[] {
+  everyDomain(): string[] {
     return [this.Properties.DomainName, ...(this.Properties.SubjectAlternativeNames as string[])]
   }
-  altDomains (): string[] {
+  altDomains(): string[] {
     return [...(this.Properties.SubjectAlternativeNames as string[])]
   }
-  mainDomain (): string {
+  mainDomain(): string {
     return this.Properties.DomainName
   }
   //
@@ -183,22 +187,22 @@ export const _transformInputDomainData = (
 export const _domainObjOpts = (_in: { domain: string; proofingDomain: string }[]) => {
   return _in.length > 0
     ? {
-      DomainValidationOptions: _in.map(obj => ({
-        DomainName: obj.domain,
-        ValidationDomain: obj.proofingDomain
-      }))
-    }
+        DomainValidationOptions: _in.map(obj => ({
+          DomainName: obj.domain,
+          ValidationDomain: obj.proofingDomain
+        }))
+      }
     : {}
 }
 
 export const _domainStringOpts = (_in: string[]) => {
   return _in.length > 0
     ? {
-      DomainValidationOptions: _in.map(domainString => ({
-        DomainName: domainString,
-        ValidationDomain: domainString
-      }))
-    }
+        DomainValidationOptions: _in.map(domainString => ({
+          DomainName: domainString,
+          ValidationDomain: domainString
+        }))
+      }
     : {}
 }
 export const _handleFirstDomain = (

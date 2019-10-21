@@ -1,4 +1,4 @@
-import { ITags } from '../../Template'
+import { ITags } from '../Template'
 
 export class Route53ResolverResolverEndpoint {
   readonly Type: 'AWS::Route53Resolver::ResolverEndpoint'
@@ -16,7 +16,7 @@ export class Route53ResolverResolverEndpoint {
     Tags: ITags[]
   }
 
-  constructor (props = {}) {
+  constructor(props = {}) {
     this.Type = 'AWS::Route53Resolver::ResolverEndpoint'
   }
 }

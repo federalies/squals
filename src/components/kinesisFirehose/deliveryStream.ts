@@ -30,7 +30,6 @@ import {
   ifCondition
 } from '../../utils/validations/objectCheck'
 export class KinesisFirehoseDeliveryStream implements squals {
-  // #region attributes
   name: string
   Type = 'AWS::KinesisFirehose::DeliveryStream'
   Properties: IKinesisFirehoseDeliveryStream_props
@@ -38,9 +37,15 @@ export class KinesisFirehoseDeliveryStream implements squals {
     retryDurionSec: number
   }
 
-  // #endregion attributes
-
-  constructor (i: IKinesisFirehoseDeliveryStream_min) {
+  /**
+   *
+   * @description Tell us about the fucntion
+   * @param i __and description* example
+   * ```js
+   * const ret = new KinesisFirehoseDeliveryStream({opt: 's3', roleARN:'', bucketARN:''})
+   * ```
+   */
+  constructor(i: IKinesisFirehoseDeliveryStream_min) {
     this.name = genComponentName(i.name)
     this._defaults = { retryDurionSec: 60 }
     this.Properties = {
@@ -50,19 +55,19 @@ export class KinesisFirehoseDeliveryStream implements squals {
     const { deliveryStreamName, deliveryStreamType, name, ...theRest } = i
     this.configureDestination(theRest)
   }
-  static _cw (i: Icw_config_min): ICloudWatchConfig_props {
+  static _cw(i: Icw_config_min): ICloudWatchConfig_props {
     return {
       Enabled: 'enabled' in i ? i.enabled : true,
       LogGroupName: i.group,
       LogStreamName: i.stream
     }
   }
-  static _encryption (i: IencConfig_min): IEncryptionConfiguration_props {
+  static _encryption(i: IencConfig_min): IEncryptionConfiguration_props {
     return i.keyArn === 'NoEncryption'
       ? { NoEncryptionConfig: 'NoEncryption' }
       : { KMSEncryptionConfig: { AWSKMSKeyARN: i.keyArn } }
   }
-  static _processors (...iList: Iprocessor_min[]): Iprocessor_prop[] {
+  static _processors(...iList: Iprocessor_min[]): Iprocessor_prop[] {
     return iList.map(topListEntry => {
       return {
         Type: 'Lambda',
@@ -73,26 +78,25 @@ export class KinesisFirehoseDeliveryStream implements squals {
       } as Iprocessor_prop
     })
   }
-  static _s3 (i: Is3_config_min): IS3DestinationConfiguration {
+  static _s3(i: Is3_config_min): IS3DestinationConfiguration {
     return {
       BucketARN: i.bucketARN,
       RoleARN: i.roleARN,
       CompressionFormat: i.compression,
-      BufferingHints: { IntervalInSeconds: i.hints.s, SizeInMBs: i.hints.MBs },
+      ...(i.hints ? {BufferingHints: { IntervalInSeconds: i.hints.s, SizeInMBs: i.hints.MBs }} : {BufferingHints: { IntervalInSeconds: 60, SizeInMBs: 100 }} ),
       ...(i.prefix ? { Prefix: i.prefix } : {}),
       ...(i.errPrefix ? { ErrorOutputPrefix: i.errPrefix } : {}),
       ...(i.encryption ? { EncryptionConfiguration: this._encryption(i.encryption) } : {}),
       ...(i.cw ? { CloudWatchLoggingOptions: this._cw(i.cw) } : {})
     }
   }
-  static _s3Dest (i: s3DestinationConfiguration_min): IS3DestinationConfiguration {
-    const { opt, ...s3_min } = i
-    return this._s3(s3_min)
+  static _s3Dest(i: s3DestinationConfiguration_min): IS3DestinationConfiguration {
+    return this._s3(i)
   }
-  static _kinesis (i: kinesisStreamSourceConfiguration_min): IKinesisStreamSourceConfiguration {
+  static _kinesis(i: kinesisStreamSourceConfiguration_min): IKinesisStreamSourceConfiguration {
     return { RoleARN: i.roleARN, KinesisStreamARN: i.kinesisStreamARN }
   }
-  static _elasticSearch (
+  static _elasticSearch(
     i: elasticsearchDestinationConfiguration_min,
     _defaults = { retryDurionSec: 60 }
   ): IElasticsearchDestinationConfiguration {
@@ -109,17 +113,17 @@ export class KinesisFirehoseDeliveryStream implements squals {
       ...(i.s3BackupMode ? { S3BackupMode: i.s3BackupMode } : { S3BackupMode: 'Enabled' }),
       ...(i.processWith
         ? {
-          ProcessingConfiguration: {
-            Enabled: i.processWith.enabled,
-            ...(i.processWith.processors
-              ? { Processors: this._processors(...i.processWith.processors) }
-              : {})
+            ProcessingConfiguration: {
+              Enabled: i.processWith.enabled,
+              ...(i.processWith.processors
+                ? { Processors: this._processors(...i.processWith.processors) }
+                : {})
+            }
           }
-        }
         : {})
     }
   }
-  static _redshift (i: redshiftDestinationConfiguration_min): IRedshiftDestinationConfiguration {
+  static _redshift(i: redshiftDestinationConfiguration_min): IRedshiftDestinationConfiguration {
     return {
       RoleARN: i.roleARN,
       Password: i.password,
@@ -134,17 +138,17 @@ export class KinesisFirehoseDeliveryStream implements squals {
       ...(i.cw ? { CloudWatchLoggingOptions: this._cw(i.cw) } : {}),
       ...(i.processWith
         ? {
-          ProcessingConfiguration: {
-            Enabled: i.processWith.enabled,
-            ...(i.processWith.processors
-              ? { Processors: this._processors(...i.processWith.processors) }
-              : {})
+            ProcessingConfiguration: {
+              Enabled: i.processWith.enabled,
+              ...(i.processWith.processors
+                ? { Processors: this._processors(...i.processWith.processors) }
+                : {})
+            }
           }
-        }
         : {})
     }
   }
-  static _splunk (i: splunkDestinationConfiguration_min): ISplunkDestinationConfiguration {
+  static _splunk(i: splunkDestinationConfiguration_min): ISplunkDestinationConfiguration {
     return {
       HECEndpoint: i.hec.endpoint,
       HECToken: i.hec.token,
@@ -156,17 +160,17 @@ export class KinesisFirehoseDeliveryStream implements squals {
       ...(i.s3BackupMode ? { S3BackupMode: i.s3BackupMode } : {}),
       ...(i.processWith
         ? {
-          ProcessingConfiguration: {
-            Enabled: i.processWith.enabled,
-            ...(i.processWith.processors
-              ? { Processors: this._processors(...i.processWith.processors) }
-              : {})
+            ProcessingConfiguration: {
+              Enabled: i.processWith.enabled,
+              ...(i.processWith.processors
+                ? { Processors: this._processors(...i.processWith.processors) }
+                : {})
+            }
           }
-        }
         : {})
     }
   }
-  static _s3Extended (
+  static _s3Extended(
     i: extendedS3DestinationConfiguration_min
   ): IExtendedS3DestinationConfiguration {
     const schema = (i: S3ExtendedDataConversionSchema_min): IExtendedS3_SchemaConfiguration => ({
@@ -244,41 +248,41 @@ export class KinesisFirehoseDeliveryStream implements squals {
       ...(i.errPrefix ? { ErrorOutputPrefix: i.errPrefix } : {}),
       ...(i.processWith
         ? {
-          ProcessingConfiguration: {
-            Enabled: i.processWith.enabled,
-            ...(i.processWith.processors
-              ? { Processors: this._processors(...i.processWith.processors) }
-              : {})
+            ProcessingConfiguration: {
+              Enabled: i.processWith.enabled,
+              ...(i.processWith.processors
+                ? { Processors: this._processors(...i.processWith.processors) }
+                : {})
+            }
           }
-        }
         : {}),
       ...(i.dataConversion
         ? {
-          DataFormatConversionConfiguration: {
-            Enabled: i.dataConversion.enabled,
-            SchemaConfiguration: schema(i.dataConversion.schema),
-            InputFormatConfiguration: inFmt(i.dataConversion.inputFmt),
-            OutputFormatConfiguration: outFmt(i.dataConversion.outputFmt)
+            DataFormatConversionConfiguration: {
+              Enabled: i.dataConversion.enabled,
+              SchemaConfiguration: schema(i.dataConversion.schema),
+              InputFormatConfiguration: inFmt(i.dataConversion.inputFmt),
+              OutputFormatConfiguration: outFmt(i.dataConversion.outputFmt)
+            }
           }
-        }
         : {})
     }
     return ret
   }
 
-  static fromString (s: string): KinesisFirehoseDeliveryStream {
+  static fromString(s: string): KinesisFirehoseDeliveryStream {
     return KinesisFirehoseDeliveryStream.validate(JSON.parse(s))
   }
 
-  static fromJSON (i: object): KinesisFirehoseDeliveryStream {
+  static fromJSON(i: object): KinesisFirehoseDeliveryStream {
     return KinesisFirehoseDeliveryStream.validateJSON(i as IKinesisFirehoseDeliveryStream_json)
   }
 
-  static fromJS (i: object): KinesisFirehoseDeliveryStream {
+  static fromJS(i: object): KinesisFirehoseDeliveryStream {
     return KinesisFirehoseDeliveryStream.validateJS(i as IKinesisFirehoseDeliveryStream_min)
   }
 
-  static from (i: string | object): KinesisFirehoseDeliveryStream {
+  static from(i: string | object): KinesisFirehoseDeliveryStream {
     return KinesisFirehoseDeliveryStream.validate(i)
   }
 
@@ -288,7 +292,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
    * @param i - Is the input interface for the KinesisFirehoseDeliveryStream.
    *
    */
-  static validate (i: string | object): KinesisFirehoseDeliveryStream {
+  static validate(i: string | object): KinesisFirehoseDeliveryStream {
     return validatorGeneric<KinesisFirehoseDeliveryStream>(
       i as squals,
       KinesisFirehoseDeliveryStream
@@ -300,7 +304,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
    * @throws
    *
    */
-  static validateJS (i: IKinesisFirehoseDeliveryStream_min): KinesisFirehoseDeliveryStream {
+  static validateJS(i: IKinesisFirehoseDeliveryStream_min): KinesisFirehoseDeliveryStream {
     // validation logic here
     throw new Error(`Yikes not real excited to make this part yet...`)
   }
@@ -310,7 +314,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
    * @throws
    *
    */
-  static validateJSON (i: IKinesisFirehoseDeliveryStream_json): KinesisFirehoseDeliveryStream {
+  static validateJSON(i: IKinesisFirehoseDeliveryStream_json): KinesisFirehoseDeliveryStream {
     // validation logic here then...
     // dummy constuctor object
     throw new Error(`yikes not implemented yet`)
@@ -324,14 +328,14 @@ export class KinesisFirehoseDeliveryStream implements squals {
     return ret
   }
 
-  toJSON (): IKinesisFirehoseDeliveryStream_json {
+  toJSON(): IKinesisFirehoseDeliveryStream_json {
     const newLocal: IKinesisFirehoseDeliveryStream_json = {
       [this.name]: { Type: 'AWS::KinesisFirehose::DeliveryStream', Properties: this.Properties }
     }
     return newLocal
   }
 
-  _name (s: string): KinesisFirehoseDeliveryStream {
+  _name(s: string): KinesisFirehoseDeliveryStream {
     this.name = s
     return this
   }
@@ -340,7 +344,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
    * @param i
    * @see: <http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kinesisfirehose-deliverystream.html#cfn-kinesisfirehose-deliverystream-deliverystreamname>
    */
-  deliveryStreamName (i: IStrRefGetAtt): KinesisFirehoseDeliveryStream {
+  deliveryStreamName(i: IStrRefGetAtt): KinesisFirehoseDeliveryStream {
     this.Properties.DeliveryStreamName = i
     return this
   }
@@ -349,7 +353,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
    * @param i
    * @see: <http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kinesisfirehose-deliverystream.html#cfn-kinesisfirehose-deliverystream-deliverystreamtype>
    */
-  deliveryStreamType (i: IStrRefGetAtt): KinesisFirehoseDeliveryStream {
+  deliveryStreamType(i: IStrRefGetAtt): KinesisFirehoseDeliveryStream {
     this.Properties.DeliveryStreamType = i
     return this
   }
@@ -358,7 +362,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
    * @see: <http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-kinesisfirehose-deliverystream.html#cfn-kinesisfirehose-deliverystream-deliverystreamtype>
    * @param i - Is a multi type param where you might first type the opt: 's3' | 's3ext' | 'redshift' | 'kinesis' | 'splunk' | 'elasticSearch'.
    */
-  configureDestination (i: IStreamDestinationOptions_min): KinesisFirehoseDeliveryStream {
+  configureDestination(i: IStreamDestinationOptions_min): KinesisFirehoseDeliveryStream {
     switch (i.opt) {
       case 'elasticSearch':
         this.Properties.ElasticsearchDestinationConfiguration = KinesisFirehoseDeliveryStream._elasticSearch(
@@ -390,7 +394,7 @@ export class KinesisFirehoseDeliveryStream implements squals {
     return this
   }
 
-  Arn (): IGetAtt {
+  Arn(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'Arn'] }
   }
 }
@@ -413,9 +417,9 @@ interface IencConfig_min {
 }
 
 interface Is3_config_min {
-  prefix?: IStrRefGetAtt
   roleARN: IStrRefGetAtt
   bucketARN: IStrRefGetAtt
+  prefix?: IStrRefGetAtt
   errPrefix?: IStrRefGetAtt
   compression: IcompressionTypes
   encryption?: IencConfig_min

@@ -1,11 +1,11 @@
 // import Url from 'url'
-import { CountryCodes_ISO3166 } from '../../cloudFront'
+import { CountryCodes_ISO3166 } from '../cloudFront'
 import {
   validRoute53HostId,
   validRecordSetTypes,
   validRecordSetStrings,
   validAbbrevUnitedStateStrings
-} from '../enums'
+} from './enums'
 
 import {
   squals,
@@ -18,7 +18,9 @@ import {
   ITags,
   Itags,
   IRef
-} from '../../Template'
+} from '../Template'
+
+import { Route53HostedZone } from './hostedZone'
 
 /**
  * @descrition asdasd
@@ -34,11 +36,34 @@ export class Route53Record {
     Type: validRecordSetTypes // DNS type
     Name: string
     ResourceRecords?: (string | IGetAtt | IRef)[]
-    Region?: string
+    // #region Region union_type
+    Region?:
+      | 'ap-east-1'
+      | 'ap-northeast-1'
+      | 'ap-northeast-2'
+      | 'ap-northeast-3'
+      | 'ap-south-1'
+      | 'ap-southeast-1'
+      | 'ap-southeast-2'
+      | 'ca-central-1'
+      | 'cn-north-1'
+      | 'cn-northwest-1'
+      | 'eu-central-1'
+      | 'eu-north-1'
+      | 'eu-west-1'
+      | 'eu-west-2'
+      | 'eu-west-3'
+      | 'me-south-1'
+      | 'sa-east-1'
+      | 'us-east-1'
+      | 'us-east-2'
+      | 'us-west-1'
+      | 'us-west-2'
+    // #endregion Region union_type
     AliasTarget?: IRecordSetAliasTargetData
     GeoLocation?: IRecordSetGeoLocationData
     Comment?: string
-    Failover?: string
+    Failover?: 'PRIMARY' | 'SECONDARY'
     HealthCheckId?: string
     HostedZoneId?: string
     HostedZoneName?: string
@@ -48,14 +73,14 @@ export class Route53Record {
     Weight?: number
   }
 
-  constructor (props: IdnsSimple) {
+  constructor(props: IdnsSimple) {
     this.Type = 'AWS::Route53::RecordSet'
     this.name = genComponentName(props.name)
     const { Type, Name, TTL, ResourceRecords } = normalizeInputs(props)
     this.Properties = { Type, Name, ResourceRecords, TTL }
   }
 
-  toJSON (): object {
+  toJSON(): object {
     return {
       [this.name]: {
         Type: this.Type,
@@ -64,7 +89,7 @@ export class Route53Record {
     }
   }
 
-  Ref () {
+  Ref() {
     return { Ref: this.name }
   }
 }

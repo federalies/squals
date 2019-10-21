@@ -1,4 +1,8 @@
 /**
+ * @module CloudFrontCDN
+ */
+
+/**
  * CDN()
  *  + source domain/path
  *  - comment?

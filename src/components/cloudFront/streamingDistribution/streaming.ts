@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 export class StreamingDistribution {
   name: string
   Type: string

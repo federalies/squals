@@ -286,7 +286,7 @@ export const importVal = (sharedValueToImport: IImoprtValue_val) => {
  * @example
  * const ret = select['A', "b", "C", 'd'])(2)
  */
-export const select = (list: string[] | ISelect_value)=>(idx: number | IFindInMap): ISelect => {
+export const select = (list: string[] | ISelect_value) => (idx: number | IFindInMap): ISelect => {
   return { 'Fn::Select': [idx, list] }
 }
 

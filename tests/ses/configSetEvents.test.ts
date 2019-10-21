@@ -29,6 +29,8 @@ describe('SES Plain ConfgSets ', () => {
     const i: ISESConfigurationSet_min = { name: 'compName', configName: 'myName' }
     const a1 = SESConfigurationSet.validate(i)
     const a2 = new SESConfigurationSet(i)
+
+    console.log({ a1: a1.toJSON() })
     const j1 = SESConfigurationSet.validateJSON(a1.toJSON())
     const j2 = SESConfigurationSet.validateJSON(a2.toJSON())
     expect(a1).toEqual(a2)

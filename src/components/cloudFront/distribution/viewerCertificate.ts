@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 import { IRef } from '../../Template'
 
 /**

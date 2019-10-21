@@ -1,12 +1,15 @@
 {
   "name": "squals",
   "version": "0.1.0",
-  "description": "",
+  "description": "A Web-friendly cloud generator making simple to share and integrate cloud components",
   "main": "lib/src/index.js",
   "typings": "lib/src/index.d.ts",
+  "author": "Eric D Moore",
+  "license": "MIT",
   "directories": {
     "example": "examples",
-    "test": "tests"
+    "test": "tests",
+    "lib": "src"
   },
   "repository": {
     "type": "git",
@@ -30,15 +33,14 @@
     "federalies",
     "generator",
     "aws",
+    "gcloud",
+    "azure",
     "cloudformation",
     "templates",
     "cloud-templates",
     "infrastructure"
   ],
-  "author": "Eric D Moore",
-  "license": "MIT",
   "dependencies": {
-    "@loopback/openapi-spec-builder": "^1.2.5",
     "@sandfox/arn": "^2.1.0",
     "aws-sdk": "^2.441.0",
     "deep-equal": "^1.0.1",
@@ -93,7 +95,9 @@
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.1.0",
-    "typedoc": "^0.14.2"
+    "typedoc": "^0.15.0",
+    "typedoc-plugin-external-module-name": "^2.1.0",
+    "typedoc-plugin-internal-external": "^2.0.2"
   },
   "futureIdeas": {
     "deps": {
@@ -106,6 +110,8 @@
       "acorn": "^6.1.1"
     },
     "dev": {
+      "@loopback/openapi-spec-builder": "^1.2.5",
+      "typedoc-plugin-single-line-tags": "^1.0.0",
       "ajv": "^6.9.1",
       "ajv-cli": "^3.0.0"
     }

@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 // source: https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2
 
 // Geo-political lines are often contested and "blurry ideas" that vary based on the source.

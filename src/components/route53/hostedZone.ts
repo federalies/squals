@@ -1,40 +1,41 @@
-import { ITags, IGetAtt, IRef, Itags, tags } from '../../Template'
-import randomWord from 'random-word'
-import Randoma from 'randoma'
+import { genComponentName, ITags, IGetAtt, IRef, Itags, tags } from '../Template'
 
 export class Route53HostedZone {
   name: string
   Type: 'AWS::Route53::HostedZone'
   Properties: {
     Name: string
-    HostedZoneConfig?: { Comment: string }
+    HostedZoneConfig?: {
+      Comment: string
+    }
     HostedZoneTags?: ITags[]
     QueryLoggingConfig?: {
       CloudWatchLogsLogGroupArn: string
     }
-    VPCs?: { VPCId: string; VPCRegion: string }[]
+    VPCs?: {
+      VPCId: string
+      VPCRegion: string
+    }[]
   }
+
   /**
-   *
+   * @description makes a new HostedZone
    * @param props
-   * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html
+   * @see [AWS Docs](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-route53-hostedzone.html)
+   * @example
+   * ```js
+   * const min = new Route53HostedZone('mydomain.com')
+   * const full = new Route53HostedZone({ name:'zoneComponent', domain:'mydomain.com', comment:'comment', tags:{key1:'value1'} })
+   * ```
    */
-  constructor (props: IdomainInput) {
+  constructor(props: IdomainInput) {
     this.Type = 'AWS::Route53::HostedZone'
-
-    let defaultName = `${randomWord()}${new Randoma({
-      seed: new Date().getTime()
-    }).integer()}`
-
     if (typeof props === 'string') {
-      this.name = defaultName
+      this.name = genComponentName(props)
       this.Properties = { Name: props } // input = domain name
       // optionals = NONE
     } else if ('domain' in props) {
-      let defaultName = `${randomWord()}-${randomWord()}-${new Randoma({
-        seed: new Date().getTime()
-      }).integer()}`
-      this.name = { name: defaultName, ...props }.name
+      this.name = genComponentName(props.name)
       this.Properties = { Name: props.domain } // input = domain name
       // optionals
       if (props.comment) this.Properties.HostedZoneConfig = { Comment: props.comment }
@@ -53,7 +54,7 @@ export class Route53HostedZone {
     }
   }
 
-  toJSON (): object {
+  toJSON(): object {
     return {
       [this.name]: {
         Type: this.Type,
@@ -61,13 +62,13 @@ export class Route53HostedZone {
       }
     }
   }
-  Ref (): IRef {
+  Ref(): IRef {
     return { Ref: this.name }
   }
   /**
    * @see https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/intrinsic-function-reference-getatt.html
    */
-  NameServers (): IGetAtt {
+  NameServers(): IGetAtt {
     return { 'Fn::GetAtt': [this.name, 'NameServers'] }
   }
 }

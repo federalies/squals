@@ -1,0 +1,96 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+    "mosaicismsHemstitches2124600842": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": "getfedera.com"
+      }
+    },
+    "sesRuleSet1": {
+      "Type": "AWS::SES::ReceiptRuleSet",
+      "Properties": {}
+    },
+    "maticos2124617649": {
+      "Type": "AWS::SES::ReceiptRule",
+      "Properties": {
+        "RuleSetName": {
+          "Ref": "sesRuleSet1"
+        },
+        "Rule": {
+          "Enabled": true,
+          "ScanEnabled": true,
+          "TlsPolicy": "Optional"
+        }
+      }
+    },
+    "perky2124600842": {
+      "Type": "AWS::Route53::RecordSetGroup",
+      "Properties": {
+        "HostedZoneId": {
+          "Ref": "mosaicismsHemstitches2124600842"
+        },
+        "RecordSets": []
+      }
+    },
+    "prosodist2124617649": {
+      "Type": "AWS::SES::ConfigurationSet",
+      "Properties": {
+        "Name": "basic"
+      }
+    },
+    "autonomous2124617649": {
+      "Type": "AWS::S3::Bucket"
+    },
+    "granophyre2124634456": {
+      "Type": "AWS::KinesisFirehose::DeliveryStream",
+      "Properties": {
+        "S3DestinationConfiguration": {
+          "BucketARN": {
+            "Fn::GetAtt": ["autonomous2124617649", "Arn"]
+          },
+          "RoleARN": "",
+          "CompressionFormat": "GZIP",
+          "BufferingHints": {
+            "IntervalInSeconds": 60,
+            "SizeInMBs": 500
+          }
+        }
+      }
+    },
+    "apraxias2124634456": {
+      "Type": "AWS::SES::ConfigurationSetEventDestination",
+      "Properties": {
+        "ConfigurationSetName": {
+          "Ref": "prosodist2124617649"
+        },
+        "EventDestination": {
+          "MatchingEventTypes": [
+            "bounce",
+            "click",
+            "complaint",
+            "delivery",
+            "open",
+            "reject",
+            "renderingFailure",
+            "send"
+          ],
+          "Enabled": true,
+          "KinesisFirehoseDestination": {
+            "IAMRoleARN": "",
+            "DeliveryStreamARN": {
+              "Fn::GetAtt": ["granophyre2124634456", "Arn"]
+            }
+          }
+        }
+      }
+    },
+    "radioautograph2124634456": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {}
+      }
+    }
+  },
+  "Description": "Squals AutoGen Description 1566944081330"
+}

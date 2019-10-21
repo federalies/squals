@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 import { IGetAtt, IRef } from '../../Template'
 
 export const cacheBehaviorsConfig = (

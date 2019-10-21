@@ -1,3 +1,7 @@
+/**
+ * @module CloudFrontCDN
+ */
+
 import randomWord from 'random-word'
 import Randoma from 'randoma'
 

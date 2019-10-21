@@ -100,10 +100,13 @@ import { S3Bucket } from '../../src/components/s3'
 import { IamRole, IamPolicy } from '../../src/components/iam'
 
 const zone = new Route53HostedZone({ domain: 'getfedera.com' })
+const recordSetGrp = new Route53RecordSetGroup({}, zone)
+  .MX({ loc: 'abc', sub: 'mail', priority: 10 })
+  .MX({ loc: 'abc', sub: 'mail', priority: 20 })
+
 const sesRuleSet = new SESReceiptRuleSet({ name: 'sesRuleSet1', ruleSetName: 'inbound_all' })
 const sesRule = new SESReceiptRule().linktoRuleSet(sesRuleSet)
-const record1 = new Route53Record({ mx: { sub: 'mail', loc: 'abc', priority: 10 } })
-const record2 = new Route53Record({ mx: { sub: 'mail', loc: 'abc', priority: 20 } })
+
 const sesConfigSet = new SESConfigurationSet({ configName: 'basic' })
 const fhDestination = new S3Bucket()
 const fireHose = new KinesisFirehoseDeliveryStream({
@@ -133,8 +136,7 @@ const t = new Template().addResources(
   zone,
   sesRuleSet,
   sesRule,
-  record1,
-  record2,
+  recordSetGrp,
   sesConfigSet,
   fhDestination,
   fireHose,

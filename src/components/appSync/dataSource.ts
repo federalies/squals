@@ -1,15 +1,19 @@
+/**
+ * @module AppSync
+ */
+
 import { IRef, squals, IGetAtt, genComponentName, validatorGeneric } from '../Template'
 import { verifyIfThen, ifPathEq, has } from '../../utils/validations/objectCheck'
 import { struct } from 'superstruct'
 import { AppSyncApi } from './api'
-import { flowRight } from 'lodash-es'
+// import { flowRight } from 'lodash-es'
 
 export class AppSyncDataSource implements squals {
   name: string
   Type = 'AWS::AppSync::DataSource'
   Properties: IDataSource_Props
 
-  constructor (i: IAppSyncDataSource_min, api?: AppSyncApi) {
+  constructor(i: IAppSyncDataSource_min, api?: AppSyncApi) {
     this.name = typeof i.name === 'string' ? i.name : genComponentName()
     this.Properties = {
       ApiId: api ? api.ApiId() : i.api ? i.api : '< StillNeedsToBeLinked >',
@@ -17,19 +21,19 @@ export class AppSyncDataSource implements squals {
       Type: 'NONE'
     }
   }
-  static fromString (i: string): AppSyncDataSource {
+  static fromString(i: string): AppSyncDataSource {
     return AppSyncDataSource.from(JSON.parse)
   }
-  static fromJS (i: object): AppSyncDataSource {
+  static fromJS(i: object): AppSyncDataSource {
     return AppSyncDataSource.validateJS(i as IAppSyncDataSource_min)
   }
-  static fromJSON (i: object): AppSyncDataSource {
+  static fromJSON(i: object): AppSyncDataSource {
     return AppSyncDataSource.validateJSON(i as IDataSource_json)
   }
-  static from (i: string | object): AppSyncDataSource {
+  static from(i: string | object): AppSyncDataSource {
     return AppSyncDataSource.validate(i)
   }
-  static validateJS (i: IAppSyncDataSource_min): AppSyncDataSource {
+  static validateJS(i: IAppSyncDataSource_min): AppSyncDataSource {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -104,7 +108,7 @@ export class AppSyncDataSource implements squals {
 
     return new AppSyncDataSource(v5(v4(v3(v2(v1(i))))))
   }
-  static validateJSON (i: IDataSource_json): AppSyncDataSource {
+  static validateJSON(i: IDataSource_json): AppSyncDataSource {
     const ref = struct({ Ref: 'string' })
     const getAtt = struct({ 'Fn:GetAtt': struct.tuple(['string', 'string']) })
     const strGetAttRef = struct(struct.union(['string', getAtt, ref]))
@@ -167,14 +171,14 @@ export class AppSyncDataSource implements squals {
     ret.Properties = o[_name].Properties
     return ret
   }
-  static validate (i: string | object): AppSyncDataSource {
+  static validate(i: string | object): AppSyncDataSource {
     return validatorGeneric<AppSyncDataSource>(i as squals, AppSyncDataSource)
   }
-  _name (n: string) {
+  _name(n: string) {
     this.name = n
     return this
   }
-  toJSON (): IDataSource_json {
+  toJSON(): IDataSource_json {
     return {
       [this.name]: {
         Type: 'AWS::AppSync::DataSource',
@@ -182,9 +186,9 @@ export class AppSyncDataSource implements squals {
       }
     }
   }
-  Ref () {}
-  DataSourceArn () {}
-  Name () {}
+  Ref() {}
+  DataSourceArn() {}
+  Name() {}
 }
 
 interface IDataSource_json {

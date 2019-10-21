@@ -1,10 +1,10 @@
 import { Route53RecordSetGroup } from '../../../src/components/route53/recordSetGroup'
-import { Route53HostedZone } from '../../../src/components/route53'
+import { Route53HostedZone, Route53Record } from '../../../src/components/route53'
 
 describe('RecordSet Group', () => {
   test('defaults', () => {
     const domain1 = 'example.com'
-    const dnsRecordGrp = new Route53RecordSetGroup(new Route53HostedZone(domain1))
+    const dnsRecordGrp = new Route53RecordSetGroup({}, new Route53HostedZone(domain1))
     dnsRecordGrp.CNAME(['www.', 'otherdomain.com'])
 
     expect(dnsRecordGrp).toHaveProperty('name')
@@ -15,14 +15,14 @@ describe('RecordSet Group', () => {
       dnsRecordGrp.Properties.RecordSets.map(v => {
         expect(v).toHaveProperty('name')
         expect(v.Type).toEqual('AWS::Route53::RecordSet')
-        return v.Properties
+        return v instanceof Route53Record ? { ...v.Properties } : v
       })
     ).toEqual([{ Type: 'CNAME', Name: 'www.', ResourceRecords: ['otherdomain.com'], TTL: '300' }])
   })
 
   test('more realistic example', () => {
     const domain1 = 'example.com'
-    const dnsRecordGrp = new Route53RecordSetGroup(new Route53HostedZone(domain1))
+    const dnsRecordGrp = new Route53RecordSetGroup({}, new Route53HostedZone(domain1))
     dnsRecordGrp
       .CNAME({ sub: 'test', loc: 'testingsite.com', ttl: 100 })
       .CNAME(['www.', 'otherdomain.com'])
@@ -44,7 +44,7 @@ describe('RecordSet Group', () => {
       dnsRecordGrp.Properties.RecordSets.map(v => {
         expect(v.Type).toEqual('AWS::Route53::RecordSet')
         expect(v).toHaveProperty('name')
-        return v.Properties
+        return v instanceof Route53Record ? { ...v.Properties } : v
       })
     ).toEqual(expected)
   })
