@@ -91,7 +91,7 @@
     "eslint-plugin-standard": "^4.0.0",
     "eslint-utils": ">=1.4.1",
     "jest": "^24.1.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "prettier": "^1.18.2",
     "ts-jest": "^24.0.0",
     "ts-node": "^8.1.0",
